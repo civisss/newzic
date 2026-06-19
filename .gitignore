@@ -1,0 +1,24 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Environment
+.env
+*.pem
+
+# Docker
+pgdata/
