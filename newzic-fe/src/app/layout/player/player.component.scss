@@ -10,6 +10,10 @@
   z-index: $z-player;
   @include glass(0.92);
   border-top: 1px solid $border-subtle;
+
+  @include mobile {
+    bottom: 60px;
+  }
 }
 
 .player-inner {

@@ -1,0 +1,4 @@
+-- Add 2 more active spotlights for carousel
+INSERT INTO spotlights (id, artist_id, quote, featured_song_id, editor_note, week_label, active) VALUES
+('f1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000003', 'Bass is not just sound — it is a physical experience that connects people to the music.', 'c1000000-0000-0000-0000-000000000005', 'DJ Bass Master brings a massive sonic presence to the electronic scene. His album "Bass Cathedral" pushes the boundaries of bass music with cinematic production.', 'Week of June 16, 2025', true),
+('f1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000005', 'I sing what I feel. Every note carries the weight of real emotion and lived experiences.', 'c1000000-0000-0000-0000-000000000009', 'Sofia Wave is redefining modern R&B with her soulful voice and introspective lyrics. "Velvet Dreams" is a standout single that showcases her raw talent.', 'Week of June 16, 2025', true);

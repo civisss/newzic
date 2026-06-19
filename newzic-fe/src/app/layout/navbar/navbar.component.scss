@@ -44,18 +44,6 @@
 
   @include mobile {
     display: none;
-    &.mobile-open {
-      display: flex;
-      flex-direction: column;
-      position: absolute;
-      top: $nav-height;
-      left: 0;
-      right: 0;
-      background: $bg-surface;
-      border-bottom: 1px solid $border-subtle;
-      padding: 16px;
-      gap: 8px;
-    }
   }
 }
 
@@ -119,6 +107,8 @@
     color: $text-primary;
     background: rgba(255, 255, 255, 0.06);
   }
+
+  @include mobile { display: none; }
 }
 
 .badge {
@@ -156,6 +146,10 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  @include mobile {
+    display: none;
   }
 }
 
@@ -358,34 +352,128 @@
   color: $text-secondary;
   transition: color $transition-fast;
   &:hover { color: $text-primary; }
+
+  @include mobile { display: none; }
 }
 
 .btn-signup {
   @include button-primary;
   padding: 8px 22px;
   font-size: 0.85rem;
+
+  @include mobile { display: none; }
 }
 
-// Hamburger
-.hamburger {
+// ── Mobile Bottom Tab Bar ──
+.mobile-tab-bar {
   display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-
-  span {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: $text-secondary;
-    border-radius: 2px;
-    transition: all $transition-fast;
-  }
 
   @include mobile {
     display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    z-index: $z-nav;
+    @include glass(0.92);
+    border-top: 1px solid $border-subtle;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 8px;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  color: $text-tertiary;
+  font-size: 0.6rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color $transition-fast;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+
+  svg {
+    transition: color $transition-fast;
+  }
+
+  &.active {
+    color: $accent-violet;
+
+    svg {
+      color: $accent-violet;
+    }
+  }
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+// Upload button — center, elevated
+.tab-upload {
+  .tab-upload-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $accent-violet, #8B5CF6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -18px;
+    box-shadow: 0 4px 16px rgba($accent-violet, 0.4);
+    transition: transform $transition-fast, box-shadow $transition-fast;
+
+    svg { color: white; }
+  }
+
+  &.active .tab-upload-btn,
+  &:hover .tab-upload-btn {
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba($accent-violet, 0.55);
+  }
+
+  span { display: none; }
+}
+
+// Notification badge
+.tab-notif {
+  position: relative;
+}
+
+.tab-badge {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: $accent-pink;
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+// Profile avatar
+.tab-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid transparent;
+  transition: border-color $transition-fast;
+
+  .tab-item.active & {
+    border-color: $accent-violet;
   }
 }

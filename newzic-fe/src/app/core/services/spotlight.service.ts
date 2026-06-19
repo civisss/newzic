@@ -9,27 +9,24 @@ export class SpotlightService {
 
   constructor(private http: HttpClient) {}
 
-  getCurrent(): Observable<Spotlight> {
-    return this.http.get<any>(`${environment.apiUrl}/spotlight/current`).pipe(
-      map(s => ({
-        id: s.id,
+  getWeeklyTop(): Observable<Spotlight[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/spotlight/weekly-top`).pipe(
+      map(list => list.map(s => ({
         artistId: s.artistId,
         artistName: s.artistName,
         artistAvatar: s.artistAvatar || '',
         artistCover: s.artistCover || '',
-        quote: s.quote || '',
-        featuredSongId: s.featuredSongId || '',
-        featuredSongTitle: s.featuredSongTitle || '',
-        featuredSongCover: s.featuredSongCover || '',
-        editorNote: s.editorNote || '',
-        weekLabel: s.weekLabel || '',
         artistFollowers: s.artistFollowers || 0,
         artistTotalPlays: s.artistTotalPlays || 0,
         artistGenres: s.artistGenres || [],
         artistTotalSongs: s.artistTotalSongs || 0,
         artistVerified: s.artistVerified || false,
-        artistLocation: s.artistLocation
-      }))
+        artistLocation: s.artistLocation,
+        category: s.category,
+        categoryLabel: s.categoryLabel,
+        description: s.description,
+        extraStat: s.extraStat
+      })))
     );
   }
 }

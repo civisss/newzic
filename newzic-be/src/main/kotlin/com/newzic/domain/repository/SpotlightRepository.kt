@@ -9,4 +9,7 @@ interface SpotlightRepository : JpaRepository<SpotlightEntity, UUID> {
 
     @EntityGraph(attributePaths = ["artist", "featuredSong"])
     fun findFirstByActiveTrueOrderByCreatedAtDesc(): SpotlightEntity?
+
+    @EntityGraph(attributePaths = ["artist", "featuredSong"])
+    fun findTop3ByActiveTrueOrderByCreatedAtDesc(): List<SpotlightEntity>
 }

@@ -1,4 +1,5 @@
 @use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
 
 main {
   min-height: 100vh;
@@ -9,5 +10,9 @@ main {
 
   &.with-player {
     padding-bottom: $player-height;
+
+    @include mobile {
+      padding-bottom: calc(#{$player-height} + 60px);
+    }
   }
 }

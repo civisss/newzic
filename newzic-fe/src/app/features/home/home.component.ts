@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { ArtistService } from '../../core/services/artist.service';
@@ -8,17 +8,16 @@ import { FeedService } from '../../core/services/feed.service';
 import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Artist, Song, Spotlight, FeedPost } from '../../core/models';
-import { DatePipe } from '@angular/common';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FormatNumberPipe, DatePipe, LogoComponent],
+  imports: [RouterLink, FormatNumberPipe, LogoComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   trendingArtists = signal<Artist[]>([]);
   trendingSongs = signal<Song[]>([]);
   newReleases = signal<Song[]>([]);
@@ -26,8 +25,10 @@ export class HomeComponent implements OnInit {
   communityPicks = signal<Artist[]>([]);
   recommendedArtists = signal<Artist[]>([]);
   recommendedSongs = signal<Song[]>([]);
-  spotlight = signal<Spotlight | null>(null);
+  spotlights = signal<Spotlight[]>([]);
+  activeSlide = signal(0);
   feed = signal<FeedPost[]>([]);
+  private carouselInterval: any;
 
   constructor(
     public auth: AuthService,
@@ -44,7 +45,10 @@ export class HomeComponent implements OnInit {
     this.songService.getNewReleases().subscribe(s => this.newReleases.set(s));
     this.artistService.getProducers().subscribe(a => this.producers.set(a));
     this.artistService.getCommunityPicks().subscribe(a => this.communityPicks.set(a));
-    this.spotlightService.getCurrent().subscribe(s => this.spotlight.set(s));
+    this.spotlightService.getWeeklyTop().subscribe(list => {
+      this.spotlights.set(list);
+      if (list.length > 1) this.startCarousel();
+    });
     this.feedService.getFeed().subscribe(f => this.feed.set(f.slice(0, 4)));
 
     if (this.auth.user()) {
@@ -91,5 +95,37 @@ export class HomeComponent implements OnInit {
 
   getPostTypeClass(type: string): string {
     return type.replace(/_/g, '-');
+  }
+
+  goToSlide(index: number): void {
+    this.activeSlide.set(index);
+    this.restartCarousel();
+  }
+
+  nextSlide(): void {
+    const total = this.spotlights().length;
+    if (total > 0) {
+      this.activeSlide.set((this.activeSlide() + 1) % total);
+    }
+  }
+
+  prevSlide(): void {
+    const total = this.spotlights().length;
+    if (total > 0) {
+      this.activeSlide.set((this.activeSlide() - 1 + total) % total);
+    }
+  }
+
+  private startCarousel(): void {
+    this.carouselInterval = setInterval(() => this.nextSlide(), 6000);
+  }
+
+  private restartCarousel(): void {
+    clearInterval(this.carouselInterval);
+    this.startCarousel();
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.carouselInterval);
   }
 }

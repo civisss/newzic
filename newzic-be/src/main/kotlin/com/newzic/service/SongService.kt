@@ -165,6 +165,10 @@ class SongService(
     fun recordPlay(songId: UUID, userId: UUID?) {
         val song = songRepository.findById(songId)
             .orElseThrow { NoSuchElementException("Song not found") }
+
+        // Don't count plays from the song's own artist
+        if (userId != null && userId == song.artist.id) return
+
         song.plays += 1
         song.updatedAt = LocalDateTime.now()
         songRepository.save(song)

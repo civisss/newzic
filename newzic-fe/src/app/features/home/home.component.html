@@ -39,67 +39,96 @@
     </section>
   }
 
-  <!-- ARTIST OF THE WEEK -->
-  @if (spotlight()) {
+  <!-- WEEKLY TOP CAROUSEL -->
+  @if (spotlights().length > 0) {
     <section class="section spotlight-section">
       <div class="container">
         <div class="section-header">
           <div>
-            <span class="section-badge aotw-badge">Artist of the Week</span>
-            <h2>{{ spotlight()!.weekLabel }}</h2>
+            <span class="section-badge aotw-badge">Weekly Top</span>
+            <h2>Artists of the Week</h2>
           </div>
         </div>
-        <div class="spotlight-card">
-          <div class="spotlight-cover">
-            <div class="spotlight-overlay"></div>
-            <div class="spotlight-inner">
-              <img [src]="spotlight()!.artistAvatar" [alt]="spotlight()!.artistName" class="spotlight-avatar" />
-              <div class="spotlight-info">
-                <div class="spotlight-name-row">
-                  <h3>{{ spotlight()!.artistName }}</h3>
-                  @if (spotlight()!.artistVerified) {
-                    <svg class="spotlight-verified" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  }
-                  @if (spotlight()!.artistLocation) {
-                    <span class="spotlight-location">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {{ spotlight()!.artistLocation }}
-                    </span>
-                  }
-                </div>
-                <div class="spotlight-stats">
-                  <div class="spotlight-stat">
-                    <strong>{{ spotlight()!.artistTotalPlays | formatNumber }}</strong>
-                    <span>Plays</span>
+        <div class="carousel">
+          <div class="carousel-track" [style.transform]="'translateX(-' + activeSlide() * 100 + '%)'">
+            @for (s of spotlights(); track s.category) {
+              <div class="carousel-slide">
+                <div class="spotlight-card">
+                  <div class="spotlight-cover">
+                    <div class="spotlight-overlay"></div>
+                    <div class="spotlight-inner">
+                      <img [src]="s.artistAvatar" [alt]="s.artistName" class="spotlight-avatar" />
+                      <div class="spotlight-info">
+                        <span class="spotlight-category">{{ s.categoryLabel }}</span>
+                        <div class="spotlight-name-row">
+                          <h3>{{ s.artistName }}</h3>
+                          @if (s.artistVerified) {
+                            <svg class="spotlight-verified" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                          }
+                          @if (s.artistLocation) {
+                            <span class="spotlight-location">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                              {{ s.artistLocation }}
+                            </span>
+                          }
+                        </div>
+                        <div class="spotlight-stats">
+                          <div class="spotlight-stat">
+                            <strong>{{ s.artistTotalPlays | formatNumber }}</strong>
+                            <span>Plays</span>
+                          </div>
+                          <div class="spotlight-stat">
+                            <strong>{{ s.artistFollowers | formatNumber }}</strong>
+                            <span>Followers</span>
+                          </div>
+                          <div class="spotlight-stat">
+                            <strong>{{ s.artistTotalSongs }}</strong>
+                            <span>Tracks</span>
+                          </div>
+                          @if (s.extraStat) {
+                            <div class="spotlight-stat highlight-stat">
+                              <strong>{{ s.extraStat | formatNumber }}</strong>
+                              <span>Reactions</span>
+                            </div>
+                          }
+                        </div>
+                        @if (s.artistGenres.length > 0) {
+                          <div class="spotlight-genres">
+                            @for (g of s.artistGenres; track g) {
+                              <span class="spotlight-genre-tag">{{ g }}</span>
+                            }
+                          </div>
+                        }
+                        <p class="spotlight-note">{{ s.description }}</p>
+                        <div class="spotlight-actions">
+                          <a [routerLink]="'/artist/' + s.artistId" class="btn-spotlight">View Profile</a>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="spotlight-stat">
-                    <strong>{{ spotlight()!.artistFollowers | formatNumber }}</strong>
-                    <span>Followers</span>
-                  </div>
-                  <div class="spotlight-stat">
-                    <strong>{{ spotlight()!.artistTotalSongs }}</strong>
-                    <span>Tracks</span>
-                  </div>
-                </div>
-                @if (spotlight()!.artistGenres.length > 0) {
-                  <div class="spotlight-genres">
-                    @for (g of spotlight()!.artistGenres; track g) {
-                      <span class="spotlight-genre-tag">{{ g }}</span>
-                    }
-                  </div>
-                }
-                <p class="spotlight-quote">"{{ spotlight()!.quote }}"</p>
-                <p class="spotlight-note">{{ spotlight()!.editorNote }}</p>
-                <div class="spotlight-actions">
-                  <a [routerLink]="'/artist/' + spotlight()!.artistId" class="btn-spotlight">View Profile</a>
-                  <button class="btn-play-spotlight" (click)="playSong(trendingSongs()[0])">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    Listen to {{ spotlight()!.featuredSongTitle }}
-                  </button>
                 </div>
               </div>
-            </div>
+            }
           </div>
+
+          <!-- Navigation arrows -->
+          @if (spotlights().length > 1) {
+            <button class="carousel-arrow carousel-prev" (click)="prevSlide()" aria-label="Previous">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="carousel-arrow carousel-next" (click)="nextSlide()" aria-label="Next">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+            </button>
+          }
+
+          <!-- Dots -->
+          @if (spotlights().length > 1) {
+            <div class="carousel-dots">
+              @for (s of spotlights(); track s.category; let i = $index) {
+                <button class="carousel-dot" [class.active]="i === activeSlide()" (click)="goToSlide(i)" [attr.aria-label]="'Go to slide ' + (i + 1)"></button>
+              }
+            </div>
+          }
         </div>
       </div>
     </section>
@@ -399,86 +428,6 @@
             </div>
           }
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRODUCERS SPOTLIGHT -->
-  <section class="section producers-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Producers & Beatmakers 🎛️</h2>
-        <a routerLink="/search" class="see-all">Discover more</a>
-      </div>
-      <div class="producer-grid">
-        @for (artist of producers(); track artist.id) {
-          <a [routerLink]="'/artist/' + artist.id" class="producer-card">
-            <div class="producer-cover">
-              <div class="producer-overlay"></div>
-              <img [src]="artist.avatar" [alt]="artist.name" class="producer-avatar" />
-            </div>
-            <div class="producer-info">
-              <h4>{{ artist.name }}</h4>
-              <span class="producer-role">{{ getRoleLabel(artist.role) }}</span>
-              <div class="producer-genres">
-                @for (g of artist.genres; track g) {
-                  <span>{{ g }}</span>
-                }
-              </div>
-              @if (artist.lookingForCollab) {
-                <span class="collab-badge">Open for collabs</span>
-              }
-            </div>
-          </a>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- OPEN MIC FEED -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Open Mic 🎤</h2>
-        <a routerLink="/feed" class="see-all">View full feed</a>
-      </div>
-      <p class="section-desc">What artists are sharing right now</p>
-      <div class="feed-grid">
-        @for (post of feed(); track post.id) {
-          <div class="feed-card">
-            <div class="feed-header">
-              <a [routerLink]="'/artist/' + post.authorId" class="feed-author">
-                <img [src]="post.authorAvatar" [alt]="post.authorName" />
-                <div>
-                  <strong>{{ post.authorName }}</strong>
-                  <span>{{ post.authorRole }} · {{ post.timestamp | date:'mediumDate' }}</span>
-                </div>
-              </a>
-              <span class="feed-type" [class]="getPostTypeClass(post.type)">{{ getPostTypeLabel(post.type) }}</span>
-            </div>
-            <p class="feed-content">{{ post.content }}</p>
-            @if (post.image) {
-              <img [src]="post.image" [alt]="'Post by ' + post.authorName" class="feed-image" />
-            }
-            @if (post.songCover) {
-              <div class="feed-song" (click)="playSong(trendingSongs()[0])">
-                <img [src]="post.songCover" [alt]="post.songTitle" />
-                <div>
-                  <strong>{{ post.songTitle }}</strong>
-                  <span>Play preview</span>
-                </div>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-            }
-            <div class="feed-reactions">
-              <button>🔥 {{ post.reactions.fire | formatNumber }}</button>
-              <button>💎 {{ post.reactions.gem | formatNumber }}</button>
-              <button>🎯 {{ post.reactions.onpoint | formatNumber }}</button>
-              <button>🌟 {{ post.reactions.star | formatNumber }}</button>
-              <span class="feed-comments">{{ post.comments }} comments</span>
-            </div>
-          </div>
-        }
       </div>
     </div>
   </section>
