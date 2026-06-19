@@ -1,0 +1,168 @@
+<div class="auth-page">
+  <div class="auth-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Cover marquee top — scrolls left -->
+  <div class="reg-marquee reg-marquee-top">
+    <div class="reg-marquee-inner scroll-left">
+      @for (cover of coversTop; track $index + 'a') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversTop; track $index + 'b') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversTop; track $index + 'c') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversTop; track $index + 'd') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+    </div>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-header">
+      <app-logo [size]="44" [textSize]="24" [clickable]="false" />
+      <p class="auth-subtitle">Join the next generation of artists.</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="step-dot" [class.active]="step() === 1" [class.done]="step() > 1"></div>
+      <div class="step-line" [class.active]="step() > 1"></div>
+      <div class="step-dot" [class.active]="step() === 2"></div>
+    </div>
+
+    <form (ngSubmit)="register()" class="auth-form">
+      <!-- STEP 1: Account Info -->
+      @if (step() === 1) {
+        <div class="form-group">
+          <label for="artistName">Artist Name</label>
+          <input id="artistName" type="text" [(ngModel)]="artistName" name="artistName" placeholder="Your stage name" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" type="text" [(ngModel)]="username" name="username" placeholder="unique_username" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="you@email.com" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="Min 8 characters" required />
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Repeat password" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>I am a... <span class="label-hint">(select all that apply)</span></label>
+          <div class="role-row">
+            @for (r of primaryRoles; track r.value) {
+              <button type="button" class="role-chip" [class.selected]="isSelected(r.value)" (click)="toggleRole(r.value)">
+                <span class="role-icon">{{ r.icon }}</span>
+                <span>{{ r.label }}</span>
+              </button>
+            }
+          </div>
+          <div class="role-row">
+            @for (r of secondaryRoles; track r.value) {
+              <button type="button" class="role-chip" [class.selected]="isSelected(r.value)" (click)="toggleRole(r.value)">
+                <span class="role-icon">{{ r.icon }}</span>
+                <span>{{ r.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="error-msg">{{ error() }}</div>
+        }
+
+        <button type="button" class="btn-primary" (click)="nextStep()">
+          Continue
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      }
+
+      <!-- STEP 2: Preferences -->
+      @if (step() === 2) {
+        <h3 class="step-title">Tell us about your taste</h3>
+        <p class="step-desc">This helps us personalize your experience and recommend the right artists.</p>
+
+        <div class="form-group">
+          <label for="country">Where are you from?</label>
+          <select id="country" [(ngModel)]="country" name="country">
+            <option value="" disabled>Select your country</option>
+            @for (c of countries; track c.code) {
+              <option [value]="c.code">{{ c.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>What genres do you love? <span class="label-hint">(select a few)</span></label>
+          <div class="genre-grid">
+            @for (g of availableGenres; track g) {
+              <button type="button" class="genre-chip" [class.selected]="isGenreSelected(g)" (click)="toggleGenre(g)">
+                {{ g }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="error-msg">{{ error() }}</div>
+        }
+
+        <div class="step-actions">
+          <button type="button" class="btn-back" (click)="prevStep()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner"></span>
+            } @else {
+              Create Account
+            }
+          </button>
+        </div>
+      }
+    </form>
+
+    <div class="auth-footer">
+      <span>Already have an account?</span>
+      <a routerLink="/login">Log in</a>
+    </div>
+  </div>
+
+  <!-- Cover marquee bottom — scrolls right -->
+  <div class="reg-marquee reg-marquee-bottom">
+    <div class="reg-marquee-inner scroll-right">
+      @for (cover of coversBottom; track $index + 'a') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversBottom; track $index + 'b') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversBottom; track $index + 'c') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversBottom; track $index + 'd') {
+        <div class="reg-cover"><img [src]="cover" alt="" /></div>
+      }
+    </div>
+  </div>
+</div>

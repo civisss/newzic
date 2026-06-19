@@ -1,0 +1,159 @@
+<div class="profile-page container">
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <label class="profile-avatar-wrap">
+      <img [src]="avatarPreview() || auth.user()?.avatar" [alt]="auth.user()?.displayName" class="profile-avatar" />
+      <div class="avatar-overlay">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+      @if (savingAvatar()) {
+        <div class="avatar-spinner-overlay"><span class="spinner-sm"></span></div>
+      }
+      <input type="file" accept="image/*" (change)="onAvatarSelect($event)" hidden />
+    </label>
+    <div class="profile-info">
+      <h1>{{ auth.user()?.displayName }}</h1>
+      <span class="profile-username">&#64;{{ auth.user()?.username }}</span>
+      <span class="profile-role">{{ auth.user()?.role }}</span>
+      <p class="profile-bio">{{ auth.user()?.bio }}</p>
+      <div class="profile-actions">
+        <a routerLink="/upload" class="btn-upload-profile">Upload Music</a>
+        <button class="btn-edit-profile" (click)="activeTab.set('settings')">Edit Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="profile-tabs">
+    <button class="ptab" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">Dashboard</button>
+    <button class="ptab" [class.active]="activeTab() === 'settings'" (click)="activeTab.set('settings')">Settings</button>
+  </div>
+
+  @if (activeTab() === 'overview' && stats()) {
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon plays-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <div class="stat-data">
+          <strong>{{ stats()!.totalPlays | formatNumber }}</strong>
+          <span>Total Plays</span>
+        </div>
+        <span class="stat-trend" [class]="getTrendClass(stats()!.playsTrend)">
+          {{ getTrendIcon(stats()!.playsTrend) }} {{ stats()!.growthPercent }}%
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon followers-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="stat-data">
+          <strong>{{ stats()!.totalFollowers | formatNumber }}</strong>
+          <span>Followers</span>
+        </div>
+        <span class="stat-trend" [class]="getTrendClass(stats()!.followersTrend)">
+          {{ getTrendIcon(stats()!.followersTrend) }}
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon reactions-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="stat-data">
+          <strong>{{ stats()!.totalReactions | formatNumber }}</strong>
+          <span>Reactions</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon songs-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <div class="stat-data">
+          <strong>{{ stats()!.totalSongs }}</strong>
+          <span>Tracks</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Tracks -->
+    @if (mySongs().length > 0) {
+      <div class="my-tracks-section">
+        <h3>My Tracks</h3>
+        <div class="my-tracks-list">
+          @for (song of mySongs(); track song.id; let i = $index) {
+            <div class="my-track-row" (click)="playSong(song)">
+              <span class="my-track-num">{{ i + 1 }}</span>
+              <img [src]="song.cover" [alt]="song.title" class="my-track-cover" />
+              <div class="my-track-info">
+                <span class="my-track-title">{{ song.title }}</span>
+                <span class="my-track-genre">{{ song.genre }}</span>
+              </div>
+              <span class="my-track-plays">{{ song.plays | formatNumber }} plays</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+
+  @if (activeTab() === 'settings') {
+    <div class="settings-section">
+      <div class="settings-card">
+        <h3>Account</h3>
+        <div class="setting-row">
+          <label>Display Name</label>
+          <input type="text" [value]="auth.user()?.displayName" readonly />
+        </div>
+        <div class="setting-row">
+          <label>Email</label>
+          <input type="email" [value]="auth.user()?.email" readonly />
+        </div>
+        <div class="setting-row">
+          <label>Username</label>
+          <input type="text" [value]="auth.user()?.username" readonly />
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3>Music Preferences</h3>
+        <div class="setting-row">
+          <label>Country</label>
+          <select [(ngModel)]="editCountry">
+            <option value="">Not set</option>
+            @for (c of countries; track c.code) {
+              <option [value]="c.code">{{ c.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Genres you love</label>
+          <div class="pref-genre-grid">
+            @for (g of availableGenres; track g) {
+              <button type="button" class="pref-genre-chip" [class.selected]="isPrefGenreSelected(g)" (click)="togglePrefGenre(g)">
+                {{ g }}
+              </button>
+            }
+          </div>
+        </div>
+        <button class="btn-save-prefs" (click)="savePreferences()" [disabled]="savingPrefs()">
+          @if (savingPrefs()) {
+            <span class="spinner-sm"></span>
+          } @else {
+            Save Preferences
+          }
+        </button>
+      </div>
+      <div class="settings-card">
+        <h3>Connected Platforms</h3>
+        <div class="platform-list">
+          <div class="platform-row"><span>Spotify</span><button class="btn-connect">Connect</button></div>
+          <div class="platform-row"><span>YouTube Music</span><button class="btn-connect">Connect</button></div>
+          <div class="platform-row"><span>Apple Music</span><button class="btn-connect">Connect</button></div>
+          <div class="platform-row"><span>SoundCloud</span><button class="btn-connect">Connect</button></div>
+          <div class="platform-row"><span>TikTok</span><button class="btn-connect">Connect</button></div>
+          <div class="platform-row"><span>Instagram</span><button class="btn-connect">Connect</button></div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

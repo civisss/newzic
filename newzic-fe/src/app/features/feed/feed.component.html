@@ -1,0 +1,48 @@
+<div class="feed-page container">
+  <div class="feed-header">
+    <h1>Open Mic</h1>
+    <p>What artists are sharing right now — releases, behind the scenes, milestones, and more.</p>
+  </div>
+
+  <div class="feed-list">
+    @for (post of posts(); track post.id) {
+      <div class="feed-card">
+        <div class="fc-header">
+          <a [routerLink]="'/artist/' + post.authorId" class="fc-author">
+            <img [src]="post.authorAvatar" [alt]="post.authorName" />
+            <div>
+              <strong>{{ post.authorName }}</strong>
+              <span>{{ post.authorRole }} · {{ post.timestamp | date:'medium' }}</span>
+            </div>
+          </a>
+          <span class="fc-type" [class]="getPostTypeClass(post.type)">{{ getPostTypeLabel(post.type) }}</span>
+        </div>
+
+        <p class="fc-content">{{ post.content }}</p>
+
+        @if (post.image) {
+          <img [src]="post.image" class="fc-image" [alt]="'Post by ' + post.authorName" />
+        }
+
+        @if (post.songCover) {
+          <div class="fc-song">
+            <img [src]="post.songCover" [alt]="post.songTitle" />
+            <div>
+              <strong>{{ post.songTitle }}</strong>
+              <span>Play preview</span>
+            </div>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        }
+
+        <div class="fc-reactions">
+          <button>🔥 {{ post.reactions.fire | formatNumber }}</button>
+          <button>💎 {{ post.reactions.gem | formatNumber }}</button>
+          <button>🎯 {{ post.reactions.onpoint | formatNumber }}</button>
+          <button>🌟 {{ post.reactions.star | formatNumber }}</button>
+          <span class="fc-comments">{{ post.comments }} comments</span>
+        </div>
+      </div>
+    }
+  </div>
+</div>

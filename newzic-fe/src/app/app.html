@@ -1,0 +1,11 @@
+@if (auth.isLoggedIn()) {
+  <app-navbar />
+}
+
+<main [class.with-nav]="auth.isLoggedIn()" [class.with-player]="auth.isLoggedIn()">
+  <router-outlet />
+</main>
+
+@if (auth.isLoggedIn()) {
+  <app-player />
+}

@@ -1,0 +1,391 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $nav-height;
+  z-index: $z-nav;
+  @include glass(0.85);
+  border-bottom: 1px solid $border-subtle;
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  @include mobile {
+    padding: 0 16px;
+  }
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+
+  app-logo {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  @include mobile {
+    display: none;
+    &.mobile-open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: $nav-height;
+      left: 0;
+      right: 0;
+      background: $bg-surface;
+      border-bottom: 1px solid $border-subtle;
+      padding: 16px;
+      gap: 8px;
+    }
+  }
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: $radius-full;
+  color: $text-secondary;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color $transition-fast, background $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    color: $text-primary;
+    background: rgba($accent-violet, 0.12);
+
+    svg {
+      color: $accent-violet;
+    }
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  @include mobile {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: $radius-md;
+  }
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.icon-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: $radius-full;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  transition: color $transition-fast, background $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: $accent-pink;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid $border-light;
+  overflow: hidden;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+
+  &:hover {
+    border-color: $accent-violet;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Dropdown
+.dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 280px;
+  background: $bg-card;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+  z-index: $z-dropdown;
+}
+
+.notif-dropdown {
+  min-width: 360px;
+  max-height: 420px;
+  overflow-y: auto;
+  @include scrollbar;
+
+  @include mobile {
+    min-width: 300px;
+    right: -40px;
+  }
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid $border-subtle;
+
+  span {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  color: $accent-violet;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  &:hover { opacity: 0.8; }
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  &.unread {
+    background: rgba($accent-violet, 0.05);
+    border-left: 3px solid $accent-violet;
+  }
+}
+
+.notif-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.notif-content {
+  p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: $text-primary;
+  }
+  .notif-time {
+    font-size: 0.75rem;
+    color: $text-tertiary;
+    margin-top: 2px;
+    display: block;
+  }
+}
+
+.dropdown-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+
+  img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  strong {
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: $text-tertiary;
+  }
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: $border-subtle;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  font-size: 0.9rem;
+  color: $text-secondary;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: $text-primary;
+  }
+
+  &.logout {
+    color: $accent-pink;
+  }
+}
+
+// Language switcher
+.lang-wrap {
+  position: relative;
+}
+
+.lang-btn {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.lang-flag {
+  font-size: 1.15rem;
+}
+
+.lang-dropdown {
+  min-width: 200px;
+  padding: 8px 0;
+  right: 0;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 18px;
+  background: none;
+  border: none;
+  color: $text-secondary;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: $text-primary;
+  }
+
+  &.active {
+    color: $accent-violet;
+    font-weight: 600;
+  }
+
+  svg {
+    margin-left: auto;
+    color: $accent-violet;
+  }
+}
+
+// Auth buttons
+.btn-login {
+  padding: 8px 20px;
+  border-radius: $radius-full;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $text-secondary;
+  transition: color $transition-fast;
+  &:hover { color: $text-primary; }
+}
+
+.btn-signup {
+  @include button-primary;
+  padding: 8px 22px;
+  font-size: 0.85rem;
+}
+
+// Hamburger
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+
+  span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: $text-secondary;
+    border-radius: 2px;
+    transition: all $transition-fast;
+  }
+
+  @include mobile {
+    display: flex;
+  }
+}

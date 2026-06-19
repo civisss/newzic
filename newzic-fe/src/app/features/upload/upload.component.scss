@@ -1,0 +1,525 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+// ── PAGE ──
+.upload-page {
+  position: relative;
+  min-height: calc(100vh - $nav-height);
+  overflow: hidden;
+}
+
+.upload-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(160px);
+  opacity: 0.15;
+}
+.orb-1 { width: 500px; height: 500px; background: $accent-violet; top: -80px; right: -100px; }
+.orb-2 { width: 400px; height: 400px; background: $accent-blue; bottom: -60px; left: -80px; }
+
+.upload-container {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 24px 100px;
+
+  @include mobile { padding: 32px 16px 80px; }
+}
+
+// ── HERO ──
+.upload-hero {
+  text-align: center;
+  margin-bottom: 40px;
+
+  h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+
+    @include mobile { font-size: 1.8rem; }
+  }
+
+  p {
+    color: $text-secondary;
+    font-size: 1.05rem;
+  }
+}
+
+.hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba($accent-violet, 0.1);
+  border: 1px solid rgba($accent-violet, 0.2);
+  color: $accent-violet;
+  margin-bottom: 20px;
+}
+
+// ── STEPS ──
+.steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid $border-light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $text-muted;
+    transition: all $transition-fast;
+  }
+
+  span {
+    font-size: 0.85rem;
+    color: $text-muted;
+    font-weight: 500;
+    transition: color $transition-fast;
+
+    @include mobile { display: none; }
+  }
+
+  &.active {
+    .step-num {
+      border-color: $accent-violet;
+      color: $accent-violet;
+      box-shadow: 0 0 12px rgba($accent-violet, 0.3);
+    }
+    span { color: $text-primary; }
+  }
+
+  &.done {
+    .step-num {
+      border-color: $accent-green;
+      background: $accent-green;
+      color: white;
+    }
+    span { color: $accent-green; }
+  }
+}
+
+.step-line {
+  width: 48px;
+  height: 2px;
+  background: $border-light;
+  transition: background $transition-fast;
+
+  &.done { background: $accent-green; }
+
+  @include mobile { width: 24px; }
+}
+
+// ── DROP ZONE ──
+.drop-zone {
+  border: 2px dashed $border-light;
+  border-radius: $radius-xl;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all $transition-fast;
+  margin-bottom: 24px;
+  overflow: hidden;
+
+  &.drag-over {
+    border-color: $accent-violet;
+    background: rgba($accent-violet, 0.06);
+    transform: scale(1.01);
+  }
+
+  &.has-file {
+    border-style: solid;
+    border-color: $accent-green;
+    background: rgba($accent-green, 0.04);
+  }
+}
+
+.drop-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.drop-icon-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px dashed $border-medium;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-tertiary;
+  margin-bottom: 8px;
+}
+
+.drop-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.drop-sub {
+  font-size: 0.85rem;
+  color: $text-muted;
+}
+
+.browse-btn {
+  @include button-ghost;
+  padding: 10px 28px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+// File ready state
+.file-ready {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.file-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: $radius-md;
+  background: rgba($accent-green, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $accent-green;
+  flex-shrink: 0;
+}
+
+.file-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-status {
+  font-size: 0.8rem;
+  color: $accent-green;
+}
+
+.change-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid $border-light;
+  background: transparent;
+  color: $text-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $accent-pink;
+    color: $accent-pink;
+  }
+}
+
+// ── FORM CARD ──
+.form-card {
+  @include glass(0.4);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-xl;
+  padding: 32px;
+
+  @include mobile { padding: 24px 20px; }
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+
+  @include mobile { flex-direction: column; }
+}
+
+.flex-1 { flex: 1; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label { font-size: 0.85rem; font-weight: 500; color: $text-secondary; }
+  input, textarea, select { @include input-field; }
+  textarea { resize: vertical; min-height: 80px; }
+  select {
+    cursor: pointer;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+}
+
+// ── COVER ART (dedicated area) ──
+.cover-art-section {
+  margin-top: 4px;
+  display: flex;
+  justify-content: center;
+}
+
+.cover-art-drop {
+  display: block;
+  position: relative;
+  width: 240px;
+  aspect-ratio: 1 / 1;
+  border: 2px dashed $border-light;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $accent-violet;
+    .cover-art-empty svg { color: $accent-violet; }
+    .cover-art-hover { opacity: 1; }
+  }
+
+  &.has-cover {
+    border: none;
+  }
+}
+
+.cover-art-preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: $radius-lg;
+}
+
+.cover-art-hover {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: white;
+  opacity: 0;
+  transition: opacity $transition-fast;
+  border-radius: $radius-lg;
+
+  span { font-size: 0.82rem; font-weight: 500; }
+}
+
+.cover-art-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+  padding: 24px;
+
+  svg { color: $text-muted; transition: color $transition-fast; }
+}
+
+.cover-art-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.cover-art-hint {
+  font-size: 0.8rem;
+  color: $text-muted;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.error-msg {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.btn-upload {
+  @include button-primary;
+  width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+}
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── TIPS ──
+.upload-tips {
+  display: flex;
+  gap: 16px;
+  margin-top: 28px;
+
+  @include mobile { flex-direction: column; }
+}
+
+.tip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: $radius-md;
+  background: rgba($accent-blue, 0.06);
+  border: 1px solid rgba($accent-blue, 0.12);
+
+  svg { color: $accent-blue; flex-shrink: 0; }
+  span { font-size: 0.82rem; color: $text-secondary; line-height: 1.4; }
+  strong { color: $text-primary; }
+}
+
+// ── SUCCESS ──
+.upload-success {
+  position: relative;
+  text-align: center;
+  padding: 120px 20px 80px;
+}
+
+.success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: rgba($accent-green, 0.1);
+  color: $accent-green;
+  margin-bottom: 28px;
+  animation: scaleIn 0.4s ease;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.upload-success h2 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.success-track {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: $accent-violet;
+  margin-bottom: 4px;
+}
+
+.success-sub {
+  color: $text-tertiary;
+  font-size: 0.95rem;
+  margin-bottom: 36px;
+}
+
+.success-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.btn-another {
+  @include button-ghost;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-profile {
+  @include button-primary;
+  padding: 12px 28px;
+  text-decoration: none;
+}
+
+// Confetti
+.success-confetti {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confettiFall 1.5s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.1s);
+  opacity: 0;
+
+  &:nth-child(1) { background: $accent-violet; }
+  &:nth-child(2) { background: $accent-blue; }
+  &:nth-child(3) { background: $accent-pink; }
+  &:nth-child(4) { background: $accent-green; }
+  &:nth-child(5) { background: $accent-orange; }
+}
+
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg) translateX(0); }
+  100% { opacity: 0; transform: translateY(120px) rotate(720deg) translateX(calc((var(--i) - 2) * 60px)); }
+}

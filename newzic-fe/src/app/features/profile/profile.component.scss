@@ -1,0 +1,432 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.profile-page { padding: 40px 0 80px; }
+
+.profile-header {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 36px;
+
+  @include mobile { flex-direction: column; align-items: center; text-align: center; gap: 20px; }
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 50%;
+
+  &:hover .avatar-overlay { opacity: 1; }
+}
+
+.profile-avatar {
+  width: 120px; height: 120px;
+  border-radius: 50%; object-fit: cover;
+  border: 3px solid $border-subtle;
+}
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity $transition-fast;
+  color: white;
+}
+
+.avatar-spinner-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-sm {
+  width: 24px; height: 24px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.profile-info {
+  h1 { font-size: 1.8rem; margin-bottom: 4px; }
+}
+
+.profile-username {
+  color: $text-tertiary; font-size: 0.9rem;
+  margin-right: 12px;
+}
+
+.profile-role {
+  font-size: 0.72rem; padding: 3px 10px;
+  border-radius: $radius-full;
+  background: rgba($accent-violet, 0.12);
+  color: $accent-violet; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+.profile-bio {
+  color: $text-secondary; margin: 12px 0 16px;
+  font-size: 0.9rem; max-width: 500px;
+}
+
+.profile-actions {
+  display: flex; gap: 12px;
+  @include mobile { justify-content: center; }
+}
+
+.btn-upload-profile { @include button-primary; padding: 10px 24px; font-size: 0.85rem; }
+.btn-edit-profile { @include button-ghost; padding: 10px 24px; font-size: 0.85rem; }
+
+// Tabs
+.profile-tabs {
+  display: flex; gap: 4px;
+  border-bottom: 1px solid $border-subtle;
+  margin-bottom: 32px;
+}
+
+.ptab {
+  padding: 12px 24px;
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  color: $text-tertiary; font-size: 0.9rem;
+  font-weight: 500; cursor: pointer;
+  margin-bottom: -1px;
+  transition: all $transition-fast;
+  &:hover { color: $text-primary; }
+  &.active { color: $text-primary; border-bottom-color: $accent-violet; }
+}
+
+// Stats grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+
+  @include tablet { grid-template-columns: repeat(2, 1fr); }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.stat-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 20px;
+  background: $bg-card;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+}
+
+.stat-icon {
+  width: 44px; height: 44px;
+  border-radius: $radius-md;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.plays-icon { background: rgba($accent-violet, 0.12); color: $accent-violet; }
+.followers-icon { background: rgba($accent-blue, 0.12); color: $accent-blue; }
+.reactions-icon { background: rgba($accent-pink, 0.12); color: $accent-pink; }
+.songs-icon { background: rgba($accent-orange, 0.12); color: $accent-orange; }
+
+.stat-data {
+  flex: 1;
+  strong { display: block; font-size: 1.4rem; font-weight: 700; }
+  span { font-size: 0.78rem; color: $text-tertiary; }
+}
+
+.stat-trend {
+  font-size: 0.82rem; font-weight: 600;
+}
+
+.trend-up { color: $accent-green; }
+.trend-down { color: $accent-pink; }
+.trend-stable { color: $text-tertiary; }
+
+// Dashboard
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.chart-card, .cities-card {
+  background: $bg-card;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: 24px;
+
+  h3 { font-size: 1rem; margin-bottom: 20px; }
+}
+
+// Bar chart
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 180px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 100%;
+  max-width: 40px;
+  background: linear-gradient(to top, $accent-violet, $accent-blue);
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  min-height: 4px;
+  transition: height 0.6s ease;
+
+  &:hover .bar-tooltip { opacity: 1; transform: translateY(-4px); }
+}
+
+.bar-tooltip {
+  position: absolute;
+  top: -28px; left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: $bg-surface;
+  color: $text-primary;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: all $transition-fast;
+  pointer-events: none;
+}
+
+.bar-label {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  color: $text-tertiary;
+}
+
+// Cities
+.cities-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.city-row {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.city-rank {
+  width: 20px; font-size: 0.8rem;
+  color: $text-tertiary; font-weight: 600;
+}
+
+.city-name {
+  font-size: 0.85rem; min-width: 80px;
+}
+
+.city-bar-wrap {
+  flex: 1; height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.city-bar {
+  height: 100%;
+  background: linear-gradient(to right, $accent-violet, $accent-blue);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.city-plays {
+  font-size: 0.78rem; color: $text-tertiary;
+  min-width: 50px; text-align: right;
+}
+
+// Settings
+.settings-section {
+  display: flex; flex-direction: column; gap: 24px;
+  max-width: 600px;
+}
+
+.settings-card {
+  background: $bg-card;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: 24px;
+
+  h3 { font-size: 1rem; margin-bottom: 20px; }
+}
+
+.setting-row {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 16px;
+
+  label { font-size: 0.82rem; color: $text-tertiary; }
+  input { @include input-field; }
+}
+
+.platform-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.platform-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid $border-subtle;
+
+  &:last-child { border-bottom: none; }
+  span { font-size: 0.9rem; }
+}
+
+.btn-connect {
+  @include button-ghost;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+}
+
+select {
+  @include input-field;
+  cursor: pointer;
+}
+
+.pref-genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pref-genre-chip {
+  padding: 7px 14px;
+  border-radius: $radius-full;
+  border: 1px solid $border-light;
+  background: rgba(255, 255, 255, 0.03);
+  color: $text-secondary;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $accent-blue;
+    color: $text-primary;
+  }
+
+  &.selected {
+    background: rgba($accent-blue, 0.15);
+    border-color: $accent-blue;
+    color: $text-primary;
+  }
+}
+
+.btn-save-prefs {
+  @include button-primary;
+  width: 100%;
+  padding: 12px;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.spinner-sm {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── MY TRACKS ──
+.my-tracks-section {
+  margin-top: 32px;
+
+  h3 {
+    font-size: 1.15rem;
+    margin-bottom: 16px;
+  }
+}
+
+.my-tracks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.my-track-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $bg-card;
+  }
+}
+
+.my-track-num {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text-muted;
+  min-width: 28px;
+  text-align: center;
+}
+
+.my-track-cover {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-sm;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.my-track-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.my-track-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-track-genre {
+  font-size: 0.82rem;
+  color: $text-secondary;
+}
+
+.my-track-plays {
+  font-size: 0.82rem;
+  color: $text-tertiary;
+  white-space: nowrap;
+}

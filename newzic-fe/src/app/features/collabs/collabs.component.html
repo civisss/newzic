@@ -1,0 +1,66 @@
+<div class="collabs-page container">
+  <div class="collabs-header">
+    <h1>Collaboration Board</h1>
+    <p>Find your next musical partner. Post a request or browse what others are looking for.</p>
+  </div>
+
+  <!-- Search -->
+  <div class="collabs-search">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" placeholder="Search collabs by title, genre, tag..." />
+  </div>
+
+  <!-- Categories -->
+  <div class="category-bar">
+    @for (cat of categories; track cat.value) {
+      <button class="cat-btn" [class.active]="activeCategory() === cat.value" (click)="filterByCategory(cat.value)">
+        <span class="cat-icon">{{ cat.icon }}</span>
+        {{ cat.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Results -->
+  <div class="collabs-grid">
+    @for (collab of collabs(); track collab.id) {
+      <div class="collab-card">
+        <div class="collab-top">
+          <a [routerLink]="'/artist/' + collab.authorId" class="collab-author">
+            <img [src]="collab.authorAvatar" [alt]="collab.authorName" />
+            <div>
+              <strong>{{ collab.authorName }}</strong>
+              <span>{{ collab.authorRole }}</span>
+            </div>
+          </a>
+          <span class="collab-status" [class]="getStatusClass(collab.status)">{{ collab.status }}</span>
+        </div>
+        <h3 class="collab-title">{{ collab.title }}</h3>
+        <p class="collab-desc">{{ collab.description }}</p>
+        <div class="collab-meta">
+          <span class="collab-category">{{ getCategoryLabel(collab.category) }}</span>
+          @for (g of collab.genres; track g) {
+            <span class="collab-genre">{{ g }}</span>
+          }
+        </div>
+        <div class="collab-footer">
+          <span class="collab-date">{{ collab.createdAt | date:'mediumDate' }}</span>
+          <span class="collab-responses">{{ collab.responses }} responses</span>
+        </div>
+        <div class="collab-tags">
+          @for (t of collab.tags; track t) {
+            <span>{{ t }}</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (collabs().length === 0) {
+    <div class="no-collabs">
+      <h3>No collaborations found</h3>
+      <p>Try a different category or search term.</p>
+    </div>
+  }
+</div>

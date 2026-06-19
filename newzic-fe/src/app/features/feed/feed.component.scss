@@ -1,0 +1,103 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.feed-page { padding: 40px 0 80px; max-width: 680px; }
+
+.feed-header {
+  margin-bottom: 32px;
+  h1 { font-size: 2rem; margin-bottom: 8px; }
+  p { color: $text-secondary; font-size: 1rem; }
+}
+
+.feed-list {
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.feed-card {
+  background: $bg-card;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: 24px;
+  transition: background $transition-fast;
+  &:hover { background: $bg-card-hover; }
+}
+
+.fc-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.fc-author {
+  display: flex; align-items: center; gap: 12px;
+  img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+  strong { display: block; font-size: 0.95rem; }
+  span { font-size: 0.78rem; color: $text-tertiary; }
+}
+
+.fc-type {
+  font-size: 0.68rem; padding: 4px 12px;
+  border-radius: $radius-full;
+  font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba($accent-violet, 0.1); color: $accent-violet;
+
+  &.new-release { background: rgba($accent-pink, 0.1); color: $accent-pink; }
+  &.milestone { background: rgba($accent-orange, 0.1); color: $accent-orange; }
+  &.collab-request { background: rgba($accent-green, 0.1); color: $accent-green; }
+  &.behind-the-scenes { background: rgba($accent-blue, 0.1); color: $accent-blue; }
+}
+
+.fc-content {
+  font-size: 0.95rem; color: $text-secondary;
+  line-height: 1.7; margin-bottom: 16px;
+}
+
+.fc-image {
+  width: 100%; border-radius: $radius-md;
+  margin-bottom: 16px; max-height: 400px;
+  object-fit: cover;
+}
+
+.fc-song {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+  border-radius: $radius-md;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: background $transition-fast;
+  &:hover { background: rgba(255,255,255,0.06); }
+
+  img { width: 56px; height: 56px; border-radius: $radius-sm; object-fit: cover; }
+  div { flex: 1;
+    strong { display: block; font-size: 0.9rem; }
+    span { font-size: 0.78rem; color: $accent-violet; }
+  }
+  svg { color: $text-secondary; }
+}
+
+.fc-reactions {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+
+  button {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid $border-subtle;
+    border-radius: $radius-full;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: rgba($accent-violet, 0.1);
+      border-color: rgba($accent-violet, 0.3);
+    }
+  }
+}
+
+.fc-comments {
+  font-size: 0.78rem; color: $text-tertiary;
+  margin-left: auto;
+}

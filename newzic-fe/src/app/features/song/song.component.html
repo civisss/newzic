@@ -1,0 +1,71 @@
+@if (song()) {
+  <div class="song-page container">
+    <div class="back-bar">
+      <app-back-button />
+    </div>
+    <div class="song-hero">
+      <img [src]="song()!.cover" [alt]="song()!.title" class="song-cover" />
+      <div class="song-details">
+        <span class="song-type">{{ song()!.albumName ? 'Album Track' : 'Single' }}</span>
+        <h1>{{ song()!.title }}</h1>
+        <a [routerLink]="'/artist/' + song()!.artistId" class="song-artist-link">
+          @if (song()!.artistAvatar) {
+            <img [src]="song()!.artistAvatar" class="artist-mini-avatar" />
+          }
+          {{ song()!.artistName }}
+        </a>
+        <div class="song-meta">
+          <span>{{ song()!.genre }}</span>
+          <span>{{ song()!.duration | duration }}</span>
+          <span>{{ song()!.releaseDate | slice:0:4 }}</span>
+        </div>
+        <div class="song-stats">
+          <div class="song-stat">
+            <strong>{{ song()!.plays | formatNumber }}</strong>
+            <span>Plays</span>
+          </div>
+          <div class="song-stat">
+            <strong>{{ song()!.likes | formatNumber }}</strong>
+            <span>Likes</span>
+          </div>
+        </div>
+        <div class="song-reactions-bar">
+          <button class="reaction-btn">🔥 {{ song()!.reactions.fire | formatNumber }}</button>
+          <button class="reaction-btn">💎 {{ song()!.reactions.gem | formatNumber }}</button>
+          <button class="reaction-btn">🎯 {{ song()!.reactions.onpoint | formatNumber }}</button>
+          <button class="reaction-btn">🌟 {{ song()!.reactions.star | formatNumber }}</button>
+        </div>
+        <div class="song-actions">
+          <button class="btn-play-song" (click)="play()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Play
+          </button>
+          <button class="btn-share-song">Share</button>
+        </div>
+        <div class="song-tags">
+          @for (t of song()!.tags; track t) {
+            <span class="stag">{{ t }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (relatedSongs().length > 0) {
+      <div class="related-section">
+        <h3>More from {{ song()!.artistName }}</h3>
+        <div class="related-list">
+          @for (s of relatedSongs(); track s.id) {
+            <div class="related-row" (click)="playRelated(s)">
+              <img [src]="s.cover" [alt]="s.title" class="related-cover" />
+              <div class="related-info">
+                <span class="related-title">{{ s.title }}</span>
+                <span class="related-genre">{{ s.genre }} · {{ s.duration | duration }}</span>
+              </div>
+              <span class="related-plays">{{ s.plays | formatNumber }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

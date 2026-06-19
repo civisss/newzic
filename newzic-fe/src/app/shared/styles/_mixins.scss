@@ -1,0 +1,136 @@
+@use 'variables' as *;
+
+@mixin glass($opacity: 0.6) {
+  background: rgba(26, 26, 36, $opacity);
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+}
+
+@mixin card-hover {
+  transition: transform $transition-base, box-shadow $transition-base, background $transition-base;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    background: $bg-card-hover;
+  }
+}
+
+@mixin gradient-text($gradient: $gradient-violet-blue) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@mixin gradient-border($gradient: $gradient-violet-blue) {
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: $gradient;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+@mixin button-primary {
+  background: $gradient-violet-blue;
+  color: $text-primary;
+  border: none;
+  border-radius: $radius-full;
+  padding: 12px 32px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform $transition-fast, box-shadow $transition-fast, opacity $transition-fast;
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-glow-violet;
+    opacity: 0.95;
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-ghost {
+  background: transparent;
+  color: $text-primary;
+  border: 1px solid $border-light;
+  border-radius: $radius-full;
+  padding: 12px 32px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background $transition-fast, border-color $transition-fast;
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: $border-medium;
+  }
+}
+
+@mixin input-field {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  padding: 14px 18px;
+  color: $text-primary;
+  font-size: 0.95rem;
+  width: 100%;
+  outline: none;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  &::placeholder {
+    color: $text-tertiary;
+  }
+  &:focus {
+    border-color: $accent-violet;
+    box-shadow: 0 0 0 3px rgba($accent-violet, 0.15);
+  }
+}
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+// Responsive
+@mixin mobile {
+  @media (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: $breakpoint-md) {
+    @content;
+  }
+}

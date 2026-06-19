@@ -1,0 +1,10 @@
+build/
+.gradle/
+out/
+*.iml
+.idea/
+*.class
+*.jar
+*.war
+*.log
+application-local.yml

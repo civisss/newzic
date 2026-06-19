@@ -1,0 +1,534 @@
+<div class="home">
+  <!-- HERO — only shown for visitors (not logged in) -->
+  @if (!auth.isLoggedIn()) {
+    <section class="hero">
+      <div class="hero-bg">
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-grid"></div>
+      </div>
+      <div class="hero-content container">
+        <h1 class="hero-title animate-slide-up">
+          Discover the next<br>
+          <span class="gradient-text">generation of music.</span>
+        </h1>
+        <p class="hero-desc animate-slide-up stagger-1">
+          The launchpad for emerging artists, producers, and bands. Upload your music, grow your fanbase, and get discovered by the world.
+        </p>
+        <div class="hero-actions animate-slide-up stagger-2">
+          <a routerLink="/login" class="btn-hero-primary">Get Started</a>
+          <a routerLink="/search" class="btn-hero-ghost">Explore Artists</a>
+        </div>
+        <div class="hero-stats animate-slide-up stagger-3">
+          <div class="hero-stat">
+            <strong>10K+</strong>
+            <span>Artists</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <strong>50K+</strong>
+            <span>Tracks</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <strong>2M+</strong>
+            <span>Plays</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ARTIST OF THE WEEK -->
+  @if (spotlight()) {
+    <section class="section spotlight-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-badge aotw-badge">Artist of the Week</span>
+            <h2>{{ spotlight()!.weekLabel }}</h2>
+          </div>
+        </div>
+        <div class="spotlight-card">
+          <div class="spotlight-cover">
+            <div class="spotlight-overlay"></div>
+            <div class="spotlight-inner">
+              <img [src]="spotlight()!.artistAvatar" [alt]="spotlight()!.artistName" class="spotlight-avatar" />
+              <div class="spotlight-info">
+                <div class="spotlight-name-row">
+                  <h3>{{ spotlight()!.artistName }}</h3>
+                  @if (spotlight()!.artistVerified) {
+                    <svg class="spotlight-verified" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  }
+                  @if (spotlight()!.artistLocation) {
+                    <span class="spotlight-location">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {{ spotlight()!.artistLocation }}
+                    </span>
+                  }
+                </div>
+                <div class="spotlight-stats">
+                  <div class="spotlight-stat">
+                    <strong>{{ spotlight()!.artistTotalPlays | formatNumber }}</strong>
+                    <span>Plays</span>
+                  </div>
+                  <div class="spotlight-stat">
+                    <strong>{{ spotlight()!.artistFollowers | formatNumber }}</strong>
+                    <span>Followers</span>
+                  </div>
+                  <div class="spotlight-stat">
+                    <strong>{{ spotlight()!.artistTotalSongs }}</strong>
+                    <span>Tracks</span>
+                  </div>
+                </div>
+                @if (spotlight()!.artistGenres.length > 0) {
+                  <div class="spotlight-genres">
+                    @for (g of spotlight()!.artistGenres; track g) {
+                      <span class="spotlight-genre-tag">{{ g }}</span>
+                    }
+                  </div>
+                }
+                <p class="spotlight-quote">"{{ spotlight()!.quote }}"</p>
+                <p class="spotlight-note">{{ spotlight()!.editorNote }}</p>
+                <div class="spotlight-actions">
+                  <a [routerLink]="'/artist/' + spotlight()!.artistId" class="btn-spotlight">View Profile</a>
+                  <button class="btn-play-spotlight" (click)="playSong(trendingSongs()[0])">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    Listen to {{ spotlight()!.featuredSongTitle }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- RECOMMENDED FOR YOU — personalized based on country & genres -->
+  @if (auth.isLoggedIn() && (recommendedArtists().length > 0 || recommendedSongs().length > 0)) {
+    <section class="section recommended-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-badge rec-badge">For You</span>
+            <h2>Recommended For You</h2>
+          </div>
+        </div>
+        @if (recommendedSongs().length > 0) {
+          <h3 class="rec-sub">Tracks you'll love</h3>
+        }
+      </div>
+
+      @if (recommendedSongs().length > 0) {
+        <div class="marquee-section rec-marquee-wrap">
+          <div class="marquee-track">
+            <div class="marquee-inner rec-songs-marquee">
+              @for (song of recommendedSongs(); track song.id + 'a') {
+                <div class="rec-song-card" (click)="playRecommendedSong(song)">
+                  <div class="rec-song-cover-wrap">
+                    <img [src]="song.cover" [alt]="song.title" class="rec-song-cover" />
+                    <div class="rec-song-play-overlay">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <span class="rec-song-title">{{ song.title }}</span>
+                  <span class="rec-song-artist">{{ song.artistName }}</span>
+                </div>
+              }
+              @for (song of recommendedSongs(); track song.id + 'b') {
+                <div class="rec-song-card" (click)="playRecommendedSong(song)">
+                  <div class="rec-song-cover-wrap">
+                    <img [src]="song.cover" [alt]="song.title" class="rec-song-cover" />
+                    <div class="rec-song-play-overlay">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <span class="rec-song-title">{{ song.title }}</span>
+                  <span class="rec-song-artist">{{ song.artistName }}</span>
+                </div>
+              }
+              @for (song of recommendedSongs(); track song.id + 'c') {
+                <div class="rec-song-card" (click)="playRecommendedSong(song)">
+                  <div class="rec-song-cover-wrap">
+                    <img [src]="song.cover" [alt]="song.title" class="rec-song-cover" />
+                    <div class="rec-song-play-overlay">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <span class="rec-song-title">{{ song.title }}</span>
+                  <span class="rec-song-artist">{{ song.artistName }}</span>
+                </div>
+              }
+              @for (song of recommendedSongs(); track song.id + 'd') {
+                <div class="rec-song-card" (click)="playRecommendedSong(song)">
+                  <div class="rec-song-cover-wrap">
+                    <img [src]="song.cover" [alt]="song.title" class="rec-song-cover" />
+                    <div class="rec-song-play-overlay">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <span class="rec-song-title">{{ song.title }}</span>
+                  <span class="rec-song-artist">{{ song.artistName }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (recommendedArtists().length > 0) {
+        <div class="container">
+          <h3 class="rec-sub">Artists near you & for your taste</h3>
+          <div class="rec-artists-grid">
+            @for (artist of recommendedArtists(); track artist.id) {
+              <a [routerLink]="'/artist/' + artist.id" class="rec-artist-card">
+                <img [src]="artist.avatar" [alt]="artist.name" class="rec-artist-avatar" />
+                <span class="rec-artist-name">{{ artist.name }}</span>
+                <span class="rec-artist-meta">{{ artist.genres[0] || '' }} · {{ artist.followers | formatNumber }} fans</span>
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- TRENDING ARTISTS — infinite scrolling marquee -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Trending Artists 🔥</h2>
+        <a routerLink="/search" class="see-all">See all</a>
+      </div>
+    </div>
+    <div class="marquee-section">
+      <div class="marquee-track">
+        <div class="marquee-inner artists-marquee">
+          @for (artist of trendingArtists(); track artist.id + 'a') {
+            <a [routerLink]="'/artist/' + artist.id" class="artist-card">
+              <div class="artist-card-img">
+                <img [src]="artist.avatar" [alt]="artist.name" />
+                @if (artist.verified) {
+                  <span class="verified-badge" title="Verified">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </span>
+                }
+              </div>
+              <h4>{{ artist.name }}</h4>
+              <span class="artist-role">{{ getRoleLabel(artist.role) }}</span>
+              <div class="artist-meta">
+                <span>{{ artist.followers | formatNumber }}</span>
+                @if (artist.weeklyGrowth) {
+                  <span class="growth">+{{ artist.weeklyGrowth }}%</span>
+                }
+              </div>
+            </a>
+          }
+          @for (artist of trendingArtists(); track artist.id + 'b') {
+            <a [routerLink]="'/artist/' + artist.id" class="artist-card">
+              <div class="artist-card-img">
+                <img [src]="artist.avatar" [alt]="artist.name" />
+                @if (artist.verified) {
+                  <span class="verified-badge" title="Verified">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </span>
+                }
+              </div>
+              <h4>{{ artist.name }}</h4>
+              <span class="artist-role">{{ getRoleLabel(artist.role) }}</span>
+              <div class="artist-meta">
+                <span>{{ artist.followers | formatNumber }}</span>
+                @if (artist.weeklyGrowth) {
+                  <span class="growth">+{{ artist.weeklyGrowth }}%</span>
+                }
+              </div>
+            </a>
+          }
+          @for (artist of trendingArtists(); track artist.id + 'c') {
+            <a [routerLink]="'/artist/' + artist.id" class="artist-card">
+              <div class="artist-card-img">
+                <img [src]="artist.avatar" [alt]="artist.name" />
+                @if (artist.verified) {
+                  <span class="verified-badge" title="Verified">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </span>
+                }
+              </div>
+              <h4>{{ artist.name }}</h4>
+              <span class="artist-role">{{ getRoleLabel(artist.role) }}</span>
+              <div class="artist-meta">
+                <span>{{ artist.followers | formatNumber }}</span>
+                @if (artist.weeklyGrowth) {
+                  <span class="growth">+{{ artist.weeklyGrowth }}%</span>
+                }
+              </div>
+            </a>
+          }
+          @for (artist of trendingArtists(); track artist.id + 'd') {
+            <a [routerLink]="'/artist/' + artist.id" class="artist-card">
+              <div class="artist-card-img">
+                <img [src]="artist.avatar" [alt]="artist.name" />
+                @if (artist.verified) {
+                  <span class="verified-badge" title="Verified">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </span>
+                }
+              </div>
+              <h4>{{ artist.name }}</h4>
+              <span class="artist-role">{{ getRoleLabel(artist.role) }}</span>
+              <div class="artist-meta">
+                <span>{{ artist.followers | formatNumber }}</span>
+                @if (artist.weeklyGrowth) {
+                  <span class="growth">+{{ artist.weeklyGrowth }}%</span>
+                }
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHART: TRENDING TRACKS -->
+  <section class="section chart-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="section-badge">Top Chart</span>
+          <h2>Trending Tracks</h2>
+        </div>
+        <a routerLink="/search" class="see-all">See all</a>
+      </div>
+      <div class="chart-grid">
+        @for (song of trendingSongs(); track song.id; let i = $index) {
+          <div class="chart-card" (click)="playSong(song)">
+            <span class="chart-rank" [class.top3]="i < 3">{{ i + 1 }}</span>
+            <div class="chart-cover-wrap">
+              <img [src]="song.cover" [alt]="song.title" class="chart-cover" />
+              <div class="chart-play">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+            <div class="chart-info">
+              <span class="chart-title">{{ song.title }}</span>
+              <a [routerLink]="'/artist/' + song.artistId" class="chart-artist" (click)="$event.stopPropagation()">{{ song.artistName }}</a>
+            </div>
+            <div class="chart-stats">
+              <span class="chart-fire">🔥 {{ song.reactions.fire | formatNumber }}</span>
+              <span class="chart-plays">{{ song.plays | formatNumber }} plays</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- FRESH DROPS — infinite scrolling marquee -->
+  <section class="section fresh-drops-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Fresh Drops 💿</h2>
+      </div>
+    </div>
+    <div class="marquee-section">
+      <div class="marquee-track">
+        <div class="marquee-inner">
+          @for (song of newReleases(); track song.id + 'a') {
+            <div class="release-marquee-item" (click)="toggleSong(song)">
+              <div class="release-cover-wrap" [class.playing]="isPlayingSong(song)">
+                <img [src]="song.cover" [alt]="song.title" class="release-cover" />
+                <div class="release-play-overlay" [class.visible]="isPlayingSong(song)">
+                  @if (isPlayingSong(song)) {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  } @else {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                  }
+                </div>
+              </div>
+              <h4>{{ song.title }}</h4>
+              <span class="release-artist-name">{{ song.artistName }}</span>
+            </div>
+          }
+          @for (song of newReleases(); track song.id + 'b') {
+            <div class="release-marquee-item" (click)="toggleSong(song)">
+              <div class="release-cover-wrap" [class.playing]="isPlayingSong(song)">
+                <img [src]="song.cover" [alt]="song.title" class="release-cover" />
+                <div class="release-play-overlay" [class.visible]="isPlayingSong(song)">
+                  @if (isPlayingSong(song)) {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  } @else {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                  }
+                </div>
+              </div>
+              <h4>{{ song.title }}</h4>
+              <span class="release-artist-name">{{ song.artistName }}</span>
+            </div>
+          }
+          @for (song of newReleases(); track song.id + 'c') {
+            <div class="release-marquee-item" (click)="toggleSong(song)">
+              <div class="release-cover-wrap" [class.playing]="isPlayingSong(song)">
+                <img [src]="song.cover" [alt]="song.title" class="release-cover" />
+                <div class="release-play-overlay" [class.visible]="isPlayingSong(song)">
+                  @if (isPlayingSong(song)) {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  } @else {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                  }
+                </div>
+              </div>
+              <h4>{{ song.title }}</h4>
+              <span class="release-artist-name">{{ song.artistName }}</span>
+            </div>
+          }
+          @for (song of newReleases(); track song.id + 'd') {
+            <div class="release-marquee-item" (click)="toggleSong(song)">
+              <div class="release-cover-wrap" [class.playing]="isPlayingSong(song)">
+                <img [src]="song.cover" [alt]="song.title" class="release-cover" />
+                <div class="release-play-overlay" [class.visible]="isPlayingSong(song)">
+                  @if (isPlayingSong(song)) {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  } @else {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                  }
+                </div>
+              </div>
+              <h4>{{ song.title }}</h4>
+              <span class="release-artist-name">{{ song.artistName }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCERS SPOTLIGHT -->
+  <section class="section producers-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Producers & Beatmakers 🎛️</h2>
+        <a routerLink="/search" class="see-all">Discover more</a>
+      </div>
+      <div class="producer-grid">
+        @for (artist of producers(); track artist.id) {
+          <a [routerLink]="'/artist/' + artist.id" class="producer-card">
+            <div class="producer-cover">
+              <div class="producer-overlay"></div>
+              <img [src]="artist.avatar" [alt]="artist.name" class="producer-avatar" />
+            </div>
+            <div class="producer-info">
+              <h4>{{ artist.name }}</h4>
+              <span class="producer-role">{{ getRoleLabel(artist.role) }}</span>
+              <div class="producer-genres">
+                @for (g of artist.genres; track g) {
+                  <span>{{ g }}</span>
+                }
+              </div>
+              @if (artist.lookingForCollab) {
+                <span class="collab-badge">Open for collabs</span>
+              }
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN MIC FEED -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Open Mic 🎤</h2>
+        <a routerLink="/feed" class="see-all">View full feed</a>
+      </div>
+      <p class="section-desc">What artists are sharing right now</p>
+      <div class="feed-grid">
+        @for (post of feed(); track post.id) {
+          <div class="feed-card">
+            <div class="feed-header">
+              <a [routerLink]="'/artist/' + post.authorId" class="feed-author">
+                <img [src]="post.authorAvatar" [alt]="post.authorName" />
+                <div>
+                  <strong>{{ post.authorName }}</strong>
+                  <span>{{ post.authorRole }} · {{ post.timestamp | date:'mediumDate' }}</span>
+                </div>
+              </a>
+              <span class="feed-type" [class]="getPostTypeClass(post.type)">{{ getPostTypeLabel(post.type) }}</span>
+            </div>
+            <p class="feed-content">{{ post.content }}</p>
+            @if (post.image) {
+              <img [src]="post.image" [alt]="'Post by ' + post.authorName" class="feed-image" />
+            }
+            @if (post.songCover) {
+              <div class="feed-song" (click)="playSong(trendingSongs()[0])">
+                <img [src]="post.songCover" [alt]="post.songTitle" />
+                <div>
+                  <strong>{{ post.songTitle }}</strong>
+                  <span>Play preview</span>
+                </div>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            }
+            <div class="feed-reactions">
+              <button>🔥 {{ post.reactions.fire | formatNumber }}</button>
+              <button>💎 {{ post.reactions.gem | formatNumber }}</button>
+              <button>🎯 {{ post.reactions.onpoint | formatNumber }}</button>
+              <button>🌟 {{ post.reactions.star | formatNumber }}</button>
+              <span class="feed-comments">{{ post.comments }} comments</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA — only shown for visitors -->
+  @if (!auth.isLoggedIn()) {
+    <section class="section cta-section">
+      <div class="container">
+        <div class="cta-card">
+          <div class="cta-orb cta-orb-1"></div>
+          <div class="cta-orb cta-orb-2"></div>
+          <h2>Ready to share your sound?</h2>
+          <p>Join thousands of artists who are building their careers on Newzic.</p>
+          <div class="cta-actions">
+            <a routerLink="/register" class="btn-cta-primary">Sign Up Free</a>
+            <a routerLink="/search" class="btn-cta-ghost">Browse Artists</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- FOOTER -->
+  <footer class="home-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <app-logo [size]="28" [textSize]="16" [clickable]="false" />
+        <span class="footer-tagline">Let the world hear you.</span>
+      </div>
+      <div class="footer-socials">
+        <a href="https://instagram.com/newzic" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="https://tiktok.com/@newzic" target="_blank" rel="noopener" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+        </a>
+        <a href="https://twitter.com/newzic" target="_blank" rel="noopener" aria-label="X / Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://youtube.com/@newzic" target="_blank" rel="noopener" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="https://discord.gg/newzic" target="_blank" rel="noopener" aria-label="Discord">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg>
+        </a>
+        <a href="https://open.spotify.com/newzic" target="_blank" rel="noopener" aria-label="Spotify">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+        </a>
+      </div>
+      <p class="footer-copy">&copy; 2025 Newzic. All rights reserved.</p>
+    </div>
+  </footer>
+</div>

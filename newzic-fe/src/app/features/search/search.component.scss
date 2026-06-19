@@ -1,0 +1,310 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.search-page { padding: 40px 0 80px; }
+
+.search-header {
+  margin-bottom: 32px;
+  h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 8px; }
+  p { color: $text-secondary; font-size: 1.05rem; }
+}
+
+// Search bar
+.search-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  background: $bg-card;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-xl;
+  margin-bottom: 24px;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus-within {
+    border-color: $accent-violet;
+    box-shadow: 0 0 0 3px rgba($accent-violet, 0.12);
+  }
+
+  svg { color: $text-tertiary; flex-shrink: 0; }
+}
+
+.search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: $text-primary;
+  font-size: 1.05rem;
+
+  &::placeholder { color: $text-muted; }
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  color: $text-tertiary;
+  padding: 4px;
+  cursor: pointer;
+  &:hover { color: $text-primary; }
+}
+
+// Genre tags
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.genre-tag {
+  padding: 8px 18px;
+  border-radius: $radius-full;
+  border: 1px solid $border-light;
+  background: transparent;
+  color: $text-secondary;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $accent-violet;
+    color: $text-primary;
+    background: rgba($accent-violet, 0.06);
+  }
+
+  &.active {
+    background: rgba($accent-violet, 0.15);
+    border-color: $accent-violet;
+    color: $text-primary;
+  }
+}
+
+// Filter bar
+.filter-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid $border-subtle;
+  padding-bottom: 0;
+}
+
+.filter-btn {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: $text-tertiary;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  margin-bottom: -1px;
+
+  &:hover { color: $text-primary; }
+
+  &.active {
+    color: $text-primary;
+    border-bottom-color: $accent-violet;
+  }
+}
+
+// Results
+.results-section {
+  margin-bottom: 48px;
+
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: $text-secondary;
+    font-weight: 600;
+  }
+}
+
+// Artist masonry
+.artist-masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.search-artist-card {
+  background: $bg-card;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  @include card-hover;
+  display: block;
+}
+
+.sac-cover {
+  height: 100px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.sac-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, $bg-card);
+}
+
+.sac-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  margin-top: -20px;
+  position: relative;
+}
+
+.sac-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid $bg-card;
+  flex-shrink: 0;
+}
+
+.sac-info {
+  flex: 1;
+  min-width: 0;
+  h4 {
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.v-badge {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  color: #00E5FF;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.7)) drop-shadow(0 0 12px rgba(0, 229, 255, 0.3));
+}
+
+.sac-role {
+  font-size: 0.78rem;
+  color: $text-tertiary;
+}
+
+.sac-followers {
+  font-size: 0.8rem;
+  color: $text-secondary;
+  font-weight: 600;
+}
+
+.sac-genres {
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+
+  span {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: $radius-full;
+    background: rgba($accent-violet, 0.1);
+    color: $accent-violet;
+  }
+}
+
+.collab-tag {
+  display: inline-block;
+  margin: 0 16px 14px;
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: $radius-full;
+  background: rgba($accent-green, 0.12);
+  color: $accent-green;
+  font-weight: 600;
+}
+
+// Song results
+.song-results {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.song-result {
+  display: grid;
+  grid-template-columns: 44px 1fr auto auto auto auto 32px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $bg-card;
+    .sr-play { opacity: 1; }
+  }
+
+  @include mobile {
+    grid-template-columns: 40px 1fr auto 28px;
+    .sr-genre, .sr-reactions, .sr-plays { display: none; }
+  }
+}
+
+.sr-cover {
+  width: 44px; height: 44px; border-radius: $radius-sm; object-fit: cover;
+}
+
+.sr-info {
+  display: flex; flex-direction: column; min-width: 0;
+}
+
+.sr-title {
+  font-weight: 600; font-size: 0.88rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.sr-artist {
+  font-size: 0.78rem; color: $text-secondary;
+  &:hover { color: $text-primary; }
+}
+
+.sr-genre {
+  font-size: 0.75rem; color: $text-tertiary;
+  padding: 3px 10px; border-radius: $radius-full;
+  background: rgba(255,255,255,0.04);
+}
+
+.sr-reactions {
+  display: flex; gap: 10px;
+  span { font-size: 0.75rem; color: $text-tertiary; }
+}
+
+.sr-plays {
+  font-size: 0.78rem; color: $text-tertiary; min-width: 60px; text-align: right;
+}
+
+.sr-dur {
+  font-size: 0.78rem; color: $text-tertiary; font-variant-numeric: tabular-nums;
+}
+
+.sr-play {
+  background: none; border: none; color: $text-primary;
+  opacity: 0; padding: 4px; transition: opacity $transition-fast;
+}
+
+// No results
+.no-results {
+  text-align: center;
+  padding: 80px 20px;
+  h3 { font-size: 1.4rem; margin-bottom: 8px; }
+  p { color: $text-tertiary; }
+}

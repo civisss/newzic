@@ -1,0 +1,142 @@
+<div class="login-page">
+  <div class="login-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Cover marquee top — scrolls left -->
+  <div class="login-marquee login-marquee-top">
+    <div class="login-marquee-inner scroll-left">
+      @for (cover of coversTop; track $index + 'a') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversTop; track $index + 'b') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversTop; track $index + 'c') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversTop; track $index + 'd') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+    </div>
+  </div>
+
+  <div class="login-layout">
+    <!-- LEFT: Brand -->
+    <div class="login-brand">
+      <app-logo [size]="56" [textSize]="32" [clickable]="false" />
+      <h1 class="brand-motto">Let the world<br><span class="gradient-text">hear you.</span></h1>
+      <p class="brand-desc">The launchpad for emerging artists, producers, and bands. Upload your music, grow your fanbase, and get discovered.</p>
+
+      <div class="brand-features">
+        <div class="feature">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div>
+            <strong>Upload & Share</strong>
+            <span>Drop your tracks and let the world discover your sound.</span>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <strong>Collaborate</strong>
+            <span>Find producers, vocalists, and bands to create with.</span>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div>
+            <strong>Grow</strong>
+            <span>Track your stats, build your audience, and go viral.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-stats">
+        <div class="bstat"><strong>10K+</strong><span>Artists</span></div>
+        <div class="bstat-divider"></div>
+        <div class="bstat"><strong>50K+</strong><span>Tracks</span></div>
+        <div class="bstat-divider"></div>
+        <div class="bstat"><strong>2M+</strong><span>Plays</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Form -->
+    <div class="login-form-wrap">
+      <div class="form-card">
+        <h2>Welcome back</h2>
+        <p class="form-subtitle">Sign in to continue to Newzic</p>
+
+        <form (ngSubmit)="login()" class="auth-form">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              [(ngModel)]="username"
+              name="username"
+              placeholder="Enter your username"
+              autocomplete="username"
+              required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required />
+          </div>
+
+          @if (error()) {
+            <div class="error-msg">{{ error() }}</div>
+          }
+
+          <button type="submit" class="btn-primary" [disabled]="loading() || !username || !password">
+            @if (loading()) {
+              <span class="spinner"></span>
+            } @else {
+              Sign In
+            }
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>or</span>
+        </div>
+
+        <a routerLink="/register" class="btn-register">Create an account</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cover marquee bottom — scrolls right -->
+  <div class="login-marquee login-marquee-bottom">
+    <div class="login-marquee-inner scroll-right">
+      @for (cover of coversBottom; track $index + 'a') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversBottom; track $index + 'b') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversBottom; track $index + 'c') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+      @for (cover of coversBottom; track $index + 'd') {
+        <div class="login-cover"><img [src]="cover" alt="" /></div>
+      }
+    </div>
+  </div>
+</div>

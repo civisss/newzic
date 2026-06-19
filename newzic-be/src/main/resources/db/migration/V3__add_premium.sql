@@ -1,0 +1,9 @@
+-- Add premium flag to users
+ALTER TABLE users ADD COLUMN premium BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Make a few seed users premium
+UPDATE users SET premium = TRUE WHERE id IN (
+    'a1000000-0000-0000-0000-000000000001',
+    'a1000000-0000-0000-0000-000000000003',
+    'a1000000-0000-0000-0000-000000000004'
+);

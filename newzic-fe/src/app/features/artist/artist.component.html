@@ -1,0 +1,217 @@
+@if (artist()) {
+  <div class="artist-page">
+    <!-- HEADER -->
+    <div class="artist-header">
+      <div class="header-overlay"></div>
+      <div class="header-content container">
+        <div class="header-main">
+          <img [src]="artist()!.avatar" [alt]="artist()!.name" class="artist-avatar" />
+          <div class="header-info">
+          <div class="artist-name-row">
+            <h1>{{ artist()!.name }}
+              @if (artist()!.verified) {
+                <span class="verified-check" title="Verified artist">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </span>
+              }
+            </h1>
+            <div class="header-badges">
+              <span class="role-badge">{{ getRoleLabel(artist()!.role) }}</span>
+              @if (artist()!.premium) {
+                <span class="premium-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                  Premium
+                </span>
+              }
+            </div>
+          </div>
+          @if (artist()!.location) {
+            <p class="artist-location">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ artist()!.location }}
+            </p>
+          }
+          <p class="artist-bio">{{ artist()!.bio }}</p>
+          <div class="artist-stats">
+            <div class="stat">
+              <strong>{{ artist()!.followers | formatNumber }}</strong>
+              <span>Followers</span>
+            </div>
+            <div class="stat">
+              <strong>{{ artist()!.totalPlays | formatNumber }}</strong>
+              <span>Total Plays</span>
+            </div>
+            <div class="stat">
+              <strong>{{ songs().length }}</strong>
+              <span>Tracks</span>
+            </div>
+            @if (artist()!.weeklyGrowth) {
+              <div class="stat growth-stat">
+                <strong>+{{ artist()!.weeklyGrowth }}%</strong>
+                <span>Weekly Growth</span>
+              </div>
+            }
+          </div>
+          <div class="header-actions">
+            <button class="btn-follow" [class.following]="following()" (click)="toggleFollow()">
+              {{ following() ? 'Following' : 'Follow' }}
+            </button>
+            <button class="btn-play-all" [class.playing]="isPlayingArtist()" (click)="playAll()">
+              @if (isPlayingArtist()) {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+                Pause
+              } @else {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Play All
+              }
+            </button>
+            <button class="btn-share" aria-label="Share">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOCIAL LINKS -->
+    @if (getSocialEntries().length > 0) {
+      <div class="social-bar container">
+        @for (s of getSocialEntries(); track s.key) {
+          <a [href]="s.url" target="_blank" rel="noopener" class="social-link" [attr.aria-label]="getSocialLabel(s.key)">
+            @switch (s.key) {
+              @case ('spotify') {
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+              }
+              @case ('appleMusic') {
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043A5.022 5.022 0 0019.7.175a10.716 10.716 0 00-1.564-.12C17.49.01 16.843 0 14.963 0H9.037c-1.88 0-2.527.01-3.174.055-.543.04-1.08.1-1.564.12A5.022 5.022 0 002.426.89C1.307 1.624.563 2.624.246 3.934a9.23 9.23 0 00-.24 2.19C-.01 6.77 0 7.417 0 9.297v5.406c0 1.88-.01 2.527.006 3.174.04.543.1 1.08.24 2.19.317 1.31 1.062 2.31 2.18 3.043a5.022 5.022 0 001.874.715c.484.02 1.021.08 1.564.12.647.045 1.294.055 3.174.055h5.926c1.88 0 2.527-.01 3.174-.055.543-.04 1.08-.1 1.564-.12a5.022 5.022 0 001.874-.715c1.118-.734 1.863-1.734 2.18-3.043.14-.543.2-1.08.24-2.19.016-.647.006-1.294.006-3.174V9.297c0-1.88.01-2.527-.006-3.173zM16.95 17.08c0 .56-.04.97-.14 1.34-.13.46-.41.78-.84.97-.27.12-.56.16-.87.16-.12 0-.24-.01-.36-.03a1.795 1.795 0 01-.85-.38c-.29-.23-.47-.53-.54-.88-.05-.24-.07-.48-.07-.73V11.8c0-.35.02-.7.09-1.04.1-.47.34-.86.72-1.14.3-.22.64-.35 1.01-.4.18-.02.36-.02.54 0 .36.05.67.2.93.44.29.27.47.6.54.98.05.25.07.51.07.77v5.67zm-5.87-5.15V17.1c0 .55-.04.95-.13 1.31-.13.46-.41.79-.84.97-.27.12-.56.16-.87.16-.12 0-.24-.01-.36-.03a1.795 1.795 0 01-.85-.38c-.29-.23-.47-.53-.54-.88-.05-.24-.07-.48-.07-.73V11.8c0-.35.02-.7.09-1.04.1-.47.34-.86.72-1.14.3-.22.64-.35 1.01-.4.18-.02.36-.02.54 0 .36.05.67.2.93.44.29.27.47.6.54.98.05.25.07.51.07.77v-.59z"/></svg>
+              }
+              @case ('youtubeMusic') {
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.104c-3.924 0-7.104-3.18-7.104-7.104S8.076 4.896 12 4.896s7.104 3.18 7.104 7.104-3.18 7.104-7.104 7.104zm0-13.332c-3.432 0-6.228 2.796-6.228 6.228S8.568 18.228 12 18.228 18.228 15.432 18.228 12 15.432 5.772 12 5.772zM9.684 15.54V8.46L15.816 12l-6.132 3.54z"/></svg>
+              }
+              @case ('soundcloud') {
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.175 12.225c-.051 0-.094.046-.101.1l-.233 2.154.233 2.105c.007.058.05.098.101.098.05 0 .09-.04.099-.098l.255-2.105-.27-2.154c-.009-.06-.05-.1-.1-.1m-.899.828c-.06 0-.091.037-.104.094L0 14.479l.172 1.308c.013.06.044.094.104.094.057 0 .093-.035.104-.094l.199-1.308-.199-1.332c-.01-.057-.047-.094-.104-.094m1.8-1.143c-.066 0-.114.05-.122.116l-.218 2.454.218 2.374c.008.067.056.114.122.114.065 0 .112-.047.122-.114l.248-2.374-.248-2.454c-.01-.066-.057-.116-.122-.116m.899-.065c-.074 0-.128.059-.135.13l-.2 2.584.2 2.476c.007.071.061.127.135.127.072 0 .124-.056.135-.127l.226-2.476-.226-2.583c-.011-.072-.063-.131-.135-.131m.9-.131c-.081 0-.14.064-.147.145l-.184 2.78.184 2.543c.007.081.066.14.147.14.079 0 .136-.059.147-.14l.209-2.543-.209-2.78c-.011-.08-.068-.144-.147-.144m.9-.049c-.09 0-.152.072-.16.158l-.167 2.96.167 2.593c.008.086.07.153.16.153.088 0 .149-.067.16-.153l.19-2.593-.19-2.96c-.011-.086-.072-.158-.16-.158m.9-.06c-.099 0-.168.078-.175.172l-.15 3.09.15 2.62c.007.094.076.167.175.167.097 0 .163-.073.175-.167l.171-2.62-.171-3.09c-.012-.094-.078-.172-.175-.172m.902-.083c-.107 0-.181.085-.187.187l-.134 3.233.134 2.645c.006.103.08.183.187.183.106 0 .178-.08.187-.183l.153-2.645-.153-3.233c-.009-.102-.081-.187-.187-.187m2.1-1.453c-.035-.013-.073-.013-.107 0-.124.008-.208.1-.215.208l-.098 4.834.098 2.607c.007.121.1.212.222.212.12 0 .213-.091.222-.212l.112-2.607-.112-4.834c-.009-.108-.09-.2-.215-.208h.093m.899-.11c-.131 0-.234.103-.24.232l-.086 5.006.086 2.597c.006.131.109.228.24.228.13 0 .229-.097.24-.228l.098-2.597-.098-5.006c-.011-.13-.11-.232-.24-.232m.9-.082c-.141 0-.25.112-.255.249l-.068 5.138.068 2.582c.005.14.114.247.255.247.139 0 .247-.107.255-.247l.08-2.582-.08-5.138c-.008-.137-.116-.249-.255-.249m.901-.048c-.148 0-.262.119-.268.262l-.052 5.236.052 2.568c.006.15.12.261.268.261.147 0 .259-.111.268-.261l.06-2.568-.06-5.236c-.009-.143-.121-.262-.268-.262m1.304-1.395c-.171 0-.303.132-.307.302l-.04 6.68.04 2.54c.004.171.136.3.307.3.17 0 .3-.129.307-.3l.047-2.54-.047-6.68c-.007-.17-.137-.302-.307-.302m2.073.135c-.02-.176-.155-.314-.335-.314-.178 0-.316.138-.335.314L20.37 14.48l.082 2.503c.019.176.157.31.335.31.176 0 .313-.134.335-.31l.094-2.503-.094-5.11zm.904-.094c-.02-.187-.168-.332-.35-.332-.185 0-.332.145-.352.332l-.076 5.265.076 2.476c.02.186.167.328.352.328.182 0 .33-.142.35-.328l.088-2.476-.088-5.265zm.9-.098c-.022-.197-.176-.35-.367-.35-.19 0-.346.153-.367.35l-.063 5.413.063 2.453c.021.196.177.344.367.344.19 0 .345-.148.367-.344l.073-2.453-.073-5.413zM21.645 6.2c-.377 0-.682.305-.682.682v15.124c0 .378.305.683.682.683h.062c.377 0 .682-.305.682-.683V6.882c0-.377-.305-.682-.682-.682h-.062z"/></svg>
+              }
+              @case ('tiktok') {
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+              }
+              @case ('instagram') {
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              }
+            }
+          </a>
+        }
+      </div>
+    }
+
+    <!-- TABS -->
+    <div class="tabs-bar container">
+      <button class="tab" [class.active]="activeTab() === 'music'" (click)="setTab('music')">Music</button>
+      <button class="tab" [class.active]="activeTab() === 'about'" (click)="setTab('about')">About</button>
+      @if (artist()!.photos && artist()!.photos!.length > 0) {
+        <button class="tab" [class.active]="activeTab() === 'photos'" (click)="setTab('photos')">Gallery</button>
+      }
+    </div>
+
+    <div class="container tab-content">
+      <!-- MUSIC TAB -->
+      @if (activeTab() === 'music') {
+        <!-- Albums -->
+        @if (albums().length > 0) {
+          <div class="music-section">
+            <h3>Releases</h3>
+            <div class="album-grid">
+              @for (album of albums(); track album.id) {
+                <div class="album-card">
+                  <img [src]="album.cover" [alt]="album.title" class="album-cover" />
+                  <div class="album-info">
+                    <span class="album-type">{{ album.type | uppercase }}</span>
+                    <h4>{{ album.title }}</h4>
+                    <span class="album-meta">{{ album.releaseDate | slice:0:4 }} · {{ album.genre }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Tracks -->
+        <div class="music-section">
+          <h3>Tracks</h3>
+          <div class="tracks-list">
+            @for (song of songs(); track song.id; let i = $index) {
+              <div class="track-row" (click)="playSong(song)">
+                <span class="track-num">{{ i + 1 }}</span>
+                <img [src]="song.cover" [alt]="song.title" class="track-cover" />
+                <div class="track-info">
+                  <span class="track-title">{{ song.title }}</span>
+                  <span class="track-genre">{{ song.genre }}</span>
+                </div>
+                <div class="track-reactions">
+                  <button class="reaction-btn" (click)="reactToSong($event, song, 'fire')">🔥 {{ song.reactions.fire | formatNumber }}</button>
+                  <button class="reaction-btn" (click)="reactToSong($event, song, 'gem')">💎 {{ song.reactions.gem | formatNumber }}</button>
+                  <button class="reaction-btn" (click)="reactToSong($event, song, 'onpoint')">🎯 {{ song.reactions.onpoint | formatNumber }}</button>
+                  <button class="reaction-btn" (click)="reactToSong($event, song, 'star')">🌟 {{ song.reactions.star | formatNumber }}</button>
+                </div>
+                <span class="track-plays">{{ song.plays | formatNumber }}</span>
+                <span class="track-dur">{{ song.duration | duration }}</span>
+                <button class="track-play" aria-label="Play">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ABOUT TAB -->
+      @if (activeTab() === 'about') {
+        <div class="about-section">
+          <div class="about-main">
+            <h3>About</h3>
+            <p class="about-long-bio">{{ artist()!.longBio || artist()!.bio }}</p>
+
+            @if (artist()!.location) {
+              <div class="about-detail">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ artist()!.location }}
+              </div>
+            }
+            <div class="about-detail">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Joined {{ artist()!.joinedDate }}
+            </div>
+
+            <div class="about-tags">
+              <h4>Tags</h4>
+              <div class="tag-list">
+                @for (t of artist()!.tags; track t) {
+                  <span class="tag">{{ t }}</span>
+                }
+              </div>
+            </div>
+
+            @if (artist()!.collabDescription) {
+              <div class="collab-section">
+                <h4>Collaboration</h4>
+                <p>{{ artist()!.collabDescription }}</p>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+
+      <!-- PHOTOS TAB -->
+      @if (activeTab() === 'photos' && artist()!.photos) {
+        <div class="gallery">
+          @for (photo of artist()!.photos!; track photo) {
+            <div class="gallery-item">
+              <img [src]="photo" [alt]="artist()!.name + ' photo'" />
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

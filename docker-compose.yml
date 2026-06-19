@@ -1,0 +1,53 @@
+services:
+  # ── PostgreSQL ──
+  db:
+    image: postgres:16-alpine
+    container_name: newzic-db
+    environment:
+      POSTGRES_DB: newzic
+      POSTGRES_USER: newzic
+      POSTGRES_PASSWORD: newzic
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U newzic"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot Backend ──
+  backend:
+    build:
+      context: ./newzic-be
+      dockerfile: Dockerfile
+    container_name: newzic-be
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/newzic
+      DB_USERNAME: newzic
+      DB_PASSWORD: newzic
+      JWT_SECRET: newzic-dev-secret-key-change-in-production-minimum-256-bits-long
+      CORS_ORIGINS: http://localhost:4200
+    ports:
+      - "8080:8080"
+
+  # ── Angular Frontend (via Nginx) ──
+  frontend:
+    build:
+      context: ./newzic-fe
+      dockerfile: Dockerfile
+    container_name: newzic-fe
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:8080
+      PORT: "80"
+    ports:
+      - "4200:80"
+
+volumes:
+  pgdata:

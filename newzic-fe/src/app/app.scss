@@ -1,0 +1,13 @@
+@use 'app/shared/styles/variables' as *;
+
+main {
+  min-height: 100vh;
+
+  &.with-nav {
+    padding-top: $nav-height;
+  }
+
+  &.with-player {
+    padding-bottom: $player-height;
+  }
+}

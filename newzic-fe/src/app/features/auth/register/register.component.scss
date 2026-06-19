@@ -1,0 +1,348 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: $bg-primary;
+  position: relative;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+// ── COVER MARQUEES ──
+.reg-marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.reg-marquee-top {
+  padding-top: 20px;
+  padding-bottom: 0;
+}
+
+.reg-marquee-bottom {
+  padding-top: 0;
+  padding-bottom: 20px;
+}
+
+.reg-marquee-inner {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+
+  &.scroll-left {
+    animation: regMarqueeLeft 35s linear infinite;
+  }
+
+  &.scroll-right {
+    animation: regMarqueeRight 35s linear infinite;
+  }
+}
+
+.reg-cover {
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  opacity: 0.3;
+  background: $bg-card;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+@keyframes regMarqueeLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes regMarqueeRight {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.35;
+}
+
+.orb-1 { width: 400px; height: 400px; background: $accent-pink; top: -100px; right: -100px; }
+.orb-2 { width: 350px; height: 350px; background: $accent-violet; bottom: -80px; left: -80px; }
+.orb-3 { width: 250px; height: 250px; background: $accent-blue; top: 40%; left: 30%; }
+
+.auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  @include glass(0.7);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-xl;
+  padding: 44px 40px;
+  margin: auto 0;
+  animation: fadeIn 0.6s ease;
+
+  @include mobile { padding: 32px 20px; }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+  app-logo { display: flex; justify-content: center; }
+}
+
+.auth-subtitle {
+  color: $text-tertiary;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+// ── STEP INDICATOR ──
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $border-light;
+  transition: all $transition-fast;
+
+  &.active {
+    background: $accent-violet;
+    box-shadow: 0 0 8px rgba($accent-violet, 0.5);
+    transform: scale(1.2);
+  }
+
+  &.done {
+    background: $accent-blue;
+  }
+}
+
+.step-line {
+  width: 60px;
+  height: 2px;
+  background: $border-light;
+  transition: background $transition-fast;
+
+  &.active {
+    background: linear-gradient(90deg, $accent-blue, $accent-violet);
+  }
+}
+
+.step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+}
+
+.step-desc {
+  font-size: 0.85rem;
+  color: $text-tertiary;
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.step-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  .btn-primary {
+    flex: 1;
+  }
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border-radius: $radius-full;
+  border: 1px solid $border-light;
+  background: transparent;
+  color: $text-secondary;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $text-tertiary;
+    color: $text-primary;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-secondary;
+  }
+
+  input { @include input-field; }
+}
+
+.label-hint {
+  font-weight: 400;
+  color: $text-muted;
+  font-size: 0.78rem;
+}
+
+.role-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.role-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: $radius-full;
+  border: 1px solid $border-light;
+  background: rgba(255, 255, 255, 0.03);
+  color: $text-secondary;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $accent-violet;
+    color: $text-primary;
+  }
+
+  &.selected {
+    background: rgba($accent-violet, 0.15);
+    border-color: $accent-violet;
+    color: $text-primary;
+  }
+
+  .role-icon { font-size: 1.1rem; }
+}
+
+.genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genre-chip {
+  padding: 8px 14px;
+  border-radius: $radius-full;
+  border: 1px solid $border-light;
+  background: rgba(255, 255, 255, 0.03);
+  color: $text-secondary;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $accent-blue;
+    color: $text-primary;
+  }
+
+  &.selected {
+    background: rgba($accent-blue, 0.15);
+    border-color: $accent-blue;
+    color: $text-primary;
+  }
+}
+
+select {
+  @include input-field;
+  cursor: pointer;
+}
+
+.error-msg {
+  background: rgba($accent-pink, 0.1);
+  border: 1px solid rgba($accent-pink, 0.2);
+  color: $accent-pink;
+  padding: 10px 14px;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+}
+
+.btn-primary {
+  @include button-primary;
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+}
+
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.9rem;
+  color: $text-tertiary;
+
+  a {
+    color: $accent-violet;
+    font-weight: 600;
+    margin-left: 4px;
+    &:hover { opacity: 0.8; }
+  }
+}
