@@ -11,6 +11,7 @@ spring:
       data-source-properties:
         ssl: ${DB_SSL:false}
         sslmode: ${DB_SSLMODE:prefer}
+        sslfactory: ${DB_SSLFACTORY:}
 
   jpa:
     hibernate:
