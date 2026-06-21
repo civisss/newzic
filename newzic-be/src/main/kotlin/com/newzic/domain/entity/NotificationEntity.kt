@@ -28,11 +28,13 @@ class NotificationEntity(
 
     var link: String? = null,
 
+    var songId: UUID? = null,
+
     var isRead: Boolean = false,
 
     val createdAt: LocalDateTime = LocalDateTime.now()
 )
 
 enum class NotificationType {
-    FOLLOW, LIKE, COMMENT, RELEASE, MILESTONE
+    FOLLOW, REACTION, LIKE, COMMENT, RELEASE, MILESTONE
 }

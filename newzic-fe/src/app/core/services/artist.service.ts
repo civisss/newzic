@@ -47,6 +47,18 @@ export class ArtistService {
     return this.http.get<{ following: boolean }>(`${environment.apiUrl}/artists/${artistId}/following`);
   }
 
+  getFollowers(artistId: string): Observable<Artist[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/artists/${artistId}/followers`).pipe(
+      map(list => list.map(u => this.mapArtist(u)))
+    );
+  }
+
+  getFollowing(artistId: string): Observable<Artist[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/artists/${artistId}/following-list`).pipe(
+      map(list => list.map(u => this.mapArtist(u)))
+    );
+  }
+
   search(query: string): Observable<Artist[]> {
     return this.http.get<any>(`${environment.apiUrl}/artists/search?q=${encodeURIComponent(query)}`).pipe(
       map(page => (page.content || []).map((u: any) => this.mapArtist(u)))

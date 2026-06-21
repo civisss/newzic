@@ -14,12 +14,9 @@
 }
 
 .feed-card {
-  background: $bg-card;
-  border: 1px solid $border-subtle;
+  @include glass-card;
   border-radius: $radius-lg;
   padding: 24px;
-  transition: background $transition-fast;
-  &:hover { background: $bg-card-hover; }
 }
 
 .fc-header {
@@ -66,8 +63,8 @@
   border-radius: $radius-md;
   margin-bottom: 16px;
   cursor: pointer;
-  transition: background $transition-fast;
-  &:hover { background: rgba(255,255,255,0.06); }
+  transition: all $transition-base;
+  &:hover { background: rgba(255,255,255,0.06); transform: translateY(-1px); }
 
   img { width: 56px; height: 56px; border-radius: $radius-sm; object-fit: cover; }
   div { flex: 1;
@@ -88,11 +85,12 @@
     font-size: 0.82rem;
     color: $text-secondary;
     cursor: pointer;
-    transition: all $transition-fast;
+    transition: all $transition-base;
 
     &:hover {
       background: rgba($accent-violet, 0.1);
       border-color: rgba($accent-violet, 0.3);
+      transform: translateY(-1px);
     }
   }
 }

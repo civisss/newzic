@@ -34,12 +34,18 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/songs/recommended").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/songs/liked").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/songs/*/liked").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/songs/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/artists/recommended").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/artists/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/spotlight/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/feed/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/collaborations/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/albums/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/messages/**").authenticated()
+                    .requestMatchers(HttpMethod.POST, "/api/messages/**").authenticated()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)

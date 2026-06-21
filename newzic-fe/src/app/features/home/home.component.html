@@ -9,30 +9,30 @@
       </div>
       <div class="hero-content container">
         <h1 class="hero-title animate-slide-up">
-          Discover the next<br>
-          <span class="gradient-text">generation of music.</span>
+          {{ 'home.hero_title_1' | translate }}<br>
+          <span class="gradient-text">{{ 'home.hero_title_2' | translate }}</span>
         </h1>
         <p class="hero-desc animate-slide-up stagger-1">
-          The launchpad for emerging artists, producers, and bands. Upload your music, grow your fanbase, and get discovered by the world.
+          {{ 'home.hero_desc' | translate }}
         </p>
         <div class="hero-actions animate-slide-up stagger-2">
-          <a routerLink="/login" class="btn-hero-primary">Get Started</a>
-          <a routerLink="/search" class="btn-hero-ghost">Explore Artists</a>
+          <a routerLink="/login" class="btn-hero-primary">{{ 'home.get_started' | translate }}</a>
+          <a routerLink="/search" class="btn-hero-ghost">{{ 'home.explore_artists' | translate }}</a>
         </div>
         <div class="hero-stats animate-slide-up stagger-3">
           <div class="hero-stat">
             <strong>10K+</strong>
-            <span>Artists</span>
+            <span>{{ 'home.hero_artists' | translate }}</span>
           </div>
           <div class="hero-stat-divider"></div>
           <div class="hero-stat">
             <strong>50K+</strong>
-            <span>Tracks</span>
+            <span>{{ 'home.hero_tracks' | translate }}</span>
           </div>
           <div class="hero-stat-divider"></div>
           <div class="hero-stat">
             <strong>2M+</strong>
-            <span>Plays</span>
+            <span>{{ 'home.hero_plays' | translate }}</span>
           </div>
         </div>
       </div>
@@ -45,8 +45,8 @@
       <div class="container">
         <div class="section-header">
           <div>
-            <span class="section-badge aotw-badge">Weekly Top</span>
-            <h2>Artists of the Week</h2>
+            <span class="section-badge aotw-badge">{{ 'home.weekly_top' | translate }}</span>
+            <h2>{{ 'home.artists_of_week' | translate }}</h2>
           </div>
         </div>
         <div class="carousel">
@@ -75,20 +75,20 @@
                         <div class="spotlight-stats">
                           <div class="spotlight-stat">
                             <strong>{{ s.artistTotalPlays | formatNumber }}</strong>
-                            <span>Plays</span>
+                            <span>{{ 'home.spotlight_plays' | translate }}</span>
                           </div>
                           <div class="spotlight-stat">
                             <strong>{{ s.artistFollowers | formatNumber }}</strong>
-                            <span>Followers</span>
+                            <span>{{ 'home.spotlight_followers' | translate }}</span>
                           </div>
                           <div class="spotlight-stat">
                             <strong>{{ s.artistTotalSongs }}</strong>
-                            <span>Tracks</span>
+                            <span>{{ 'home.spotlight_tracks' | translate }}</span>
                           </div>
                           @if (s.extraStat) {
                             <div class="spotlight-stat highlight-stat">
                               <strong>{{ s.extraStat | formatNumber }}</strong>
-                              <span>Reactions</span>
+                              <span>{{ 'home.spotlight_reactions' | translate }}</span>
                             </div>
                           }
                         </div>
@@ -101,7 +101,7 @@
                         }
                         <p class="spotlight-note">{{ s.description }}</p>
                         <div class="spotlight-actions">
-                          <a [routerLink]="'/artist/' + s.artistId" class="btn-spotlight">View Profile</a>
+                          <a [routerLink]="'/artist/' + s.artistId" class="btn-spotlight">{{ 'home.view_profile' | translate }}</a>
                         </div>
                       </div>
                     </div>
@@ -140,12 +140,12 @@
       <div class="container">
         <div class="section-header">
           <div>
-            <span class="section-badge rec-badge">For You</span>
-            <h2>Recommended For You</h2>
+            <span class="section-badge rec-badge">{{ 'home.for_you' | translate }}</span>
+            <h2>{{ 'home.recommended' | translate }}</h2>
           </div>
         </div>
         @if (recommendedSongs().length > 0) {
-          <h3 class="rec-sub">Tracks you'll love</h3>
+          <h3 class="rec-sub">{{ 'home.tracks_love' | translate }}</h3>
         }
       </div>
 
@@ -160,6 +160,9 @@
                     <div class="rec-song-play-overlay">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     </div>
+                    <button class="rec-like-btn" [class.liked]="likedSongIds().has(song.id)" [class.like-pop]="likeAnimatingId() === song.id" (click)="toggleLike($event, song)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="likedSongIds().has(song.id) ? '#EC4899' : 'none'" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </button>
                   </div>
                   <span class="rec-song-title">{{ song.title }}</span>
                   <span class="rec-song-artist">{{ song.artistName }}</span>
@@ -172,6 +175,9 @@
                     <div class="rec-song-play-overlay">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     </div>
+                    <button class="rec-like-btn" [class.liked]="likedSongIds().has(song.id)" [class.like-pop]="likeAnimatingId() === song.id" (click)="toggleLike($event, song)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="likedSongIds().has(song.id) ? '#EC4899' : 'none'" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </button>
                   </div>
                   <span class="rec-song-title">{{ song.title }}</span>
                   <span class="rec-song-artist">{{ song.artistName }}</span>
@@ -184,6 +190,9 @@
                     <div class="rec-song-play-overlay">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     </div>
+                    <button class="rec-like-btn" [class.liked]="likedSongIds().has(song.id)" [class.like-pop]="likeAnimatingId() === song.id" (click)="toggleLike($event, song)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="likedSongIds().has(song.id) ? '#EC4899' : 'none'" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </button>
                   </div>
                   <span class="rec-song-title">{{ song.title }}</span>
                   <span class="rec-song-artist">{{ song.artistName }}</span>
@@ -196,6 +205,9 @@
                     <div class="rec-song-play-overlay">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     </div>
+                    <button class="rec-like-btn" [class.liked]="likedSongIds().has(song.id)" [class.like-pop]="likeAnimatingId() === song.id" (click)="toggleLike($event, song)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="likedSongIds().has(song.id) ? '#EC4899' : 'none'" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </button>
                   </div>
                   <span class="rec-song-title">{{ song.title }}</span>
                   <span class="rec-song-artist">{{ song.artistName }}</span>
@@ -208,7 +220,7 @@
 
       @if (recommendedArtists().length > 0) {
         <div class="container">
-          <h3 class="rec-sub">Artists near you & for your taste</h3>
+          <h3 class="rec-sub">{{ 'home.artists_near' | translate }}</h3>
           <div class="rec-artists-grid">
             @for (artist of recommendedArtists(); track artist.id) {
               <a [routerLink]="'/artist/' + artist.id" class="rec-artist-card">
@@ -227,8 +239,8 @@
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <h2>Trending Artists 🔥</h2>
-        <a routerLink="/search" class="see-all">See all</a>
+        <h2>{{ 'home.trending_artists' | translate }} 🔥</h2>
+        <a routerLink="/search" class="see-all">{{ 'home.see_all' | translate }}</a>
       </div>
     </div>
     <div class="marquee-section">
@@ -324,10 +336,10 @@
     <div class="container">
       <div class="section-header">
         <div>
-          <span class="section-badge">Top Chart</span>
-          <h2>Trending Tracks</h2>
+          <span class="section-badge">{{ 'home.top_chart' | translate }}</span>
+          <h2>{{ 'home.trending_songs' | translate }}</h2>
         </div>
-        <a routerLink="/search" class="see-all">See all</a>
+        <a routerLink="/search" class="see-all">{{ 'home.see_all' | translate }}</a>
       </div>
       <div class="chart-grid">
         @for (song of trendingSongs(); track song.id; let i = $index) {
@@ -357,7 +369,7 @@
   <section class="section fresh-drops-section">
     <div class="container">
       <div class="section-header">
-        <h2>Fresh Drops 💿</h2>
+        <h2>{{ 'home.fresh_drops' | translate }} 💿</h2>
       </div>
     </div>
     <div class="marquee-section">
@@ -439,11 +451,11 @@
         <div class="cta-card">
           <div class="cta-orb cta-orb-1"></div>
           <div class="cta-orb cta-orb-2"></div>
-          <h2>Ready to share your sound?</h2>
-          <p>Join thousands of artists who are building their careers on Newzic.</p>
+          <h2>{{ 'home.cta_title' | translate }}</h2>
+          <p>{{ 'home.cta_desc' | translate }}</p>
           <div class="cta-actions">
-            <a routerLink="/register" class="btn-cta-primary">Sign Up Free</a>
-            <a routerLink="/search" class="btn-cta-ghost">Browse Artists</a>
+            <a routerLink="/register" class="btn-cta-primary">{{ 'home.sign_up_free' | translate }}</a>
+            <a routerLink="/search" class="btn-cta-ghost">{{ 'home.browse_artists' | translate }}</a>
           </div>
         </div>
       </div>
@@ -455,7 +467,7 @@
     <div class="container footer-inner">
       <div class="footer-brand">
         <app-logo [size]="28" [textSize]="16" [clickable]="false" />
-        <span class="footer-tagline">Let the world hear you.</span>
+        <span class="footer-tagline">{{ 'home.footer_tagline' | translate }}</span>
       </div>
       <div class="footer-socials">
         <a href="https://instagram.com/newzic" target="_blank" rel="noopener" aria-label="Instagram">
@@ -477,7 +489,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
         </a>
       </div>
-      <p class="footer-copy">&copy; 2025 Newzic. All rights reserved.</p>
+      <p class="footer-copy">{{ 'home.footer_copy' | translate }}</p>
     </div>
   </footer>
 </div>

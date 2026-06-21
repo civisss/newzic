@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { ArtistService } from '../../core/services/artist.service';
 import { SongService } from '../../core/services/song.service';
 import { SpotlightService } from '../../core/services/spotlight.service';
@@ -13,7 +14,7 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FormatNumberPipe, LogoComponent],
+  imports: [RouterLink, FormatNumberPipe, LogoComponent, TranslatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -28,6 +29,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   spotlights = signal<Spotlight[]>([]);
   activeSlide = signal(0);
   feed = signal<FeedPost[]>([]);
+  likedSongIds = signal<Set<string>>(new Set());
+  likeAnimatingId = signal<string | null>(null);
   private carouselInterval: any;
 
   constructor(
@@ -54,6 +57,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.auth.user()) {
       this.artistService.getRecommended().subscribe(a => this.recommendedArtists.set(a));
       this.songService.getRecommended().subscribe(s => this.recommendedSongs.set(s));
+      this.songService.getLikedSongs().subscribe(liked => {
+        this.likedSongIds.set(new Set(liked.map(l => l.id)));
+      });
     }
   }
 
@@ -75,6 +81,22 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   playRecommendedSong(song: Song): void {
     this.playerService.play(song, this.recommendedSongs());
+  }
+
+  toggleLike(event: Event, song: Song): void {
+    event.stopPropagation();
+    if (!this.auth.isLoggedIn()) return;
+    this.songService.toggleLike(song.id).subscribe(r => {
+      const ids = new Set(this.likedSongIds());
+      if (r.liked) {
+        ids.add(song.id);
+        this.likeAnimatingId.set(song.id);
+        setTimeout(() => this.likeAnimatingId.set(null), 600);
+      } else {
+        ids.delete(song.id);
+      }
+      this.likedSongIds.set(ids);
+    });
   }
 
   getRoleLabel(role: string): string {

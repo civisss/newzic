@@ -3,29 +3,39 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { AuthService } from '../../core/services/auth.service';
+import { I18nService } from '../../core/services/i18n.service';
 import { StatsService } from '../../core/services/stats.service';
 import { SongService } from '../../core/services/song.service';
 import { PlayerService } from '../../core/services/player.service';
 import { ArtistStats, Song } from '../../core/models';
 import { environment } from '../../../environments/environment';
+import { FollowersModalComponent } from '../../shared/components/followers-modal/followers-modal.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterLink, FormatNumberPipe, FormsModule],
+  imports: [RouterLink, FormatNumberPipe, FormsModule, TranslatePipe, FollowersModalComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
   stats = signal<ArtistStats | null>(null);
   mySongs = signal<Song[]>([]);
-  activeTab = signal<'overview' | 'settings'>('overview');
+  likedSongs = signal<Song[]>([]);
+  activeTab = signal<'overview' | 'liked' | 'settings'>('overview');
   savingPrefs = signal(false);
   savingAvatar = signal(false);
   avatarPreview = signal('');
+  showFollowModal = signal(false);
+  followModalMode = signal<'followers' | 'following'>('followers');
   editCountry = '';
   editPreferredGenres: string[] = [];
+  editSocialLinks: { spotify: string; youtubeMusic: string; appleMusic: string; soundcloud: string; tiktok: string; instagram: string } = {
+    spotify: '', youtubeMusic: '', appleMusic: '', soundcloud: '', tiktok: '', instagram: ''
+  };
+  savingSocials = signal(false);
 
   countries = [
     { code: 'IT', label: 'Italy' },
@@ -56,6 +66,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     public auth: AuthService,
+    public i18n: I18nService,
     private statsService: StatsService,
     private songService: SongService,
     private playerService: PlayerService,
@@ -63,12 +74,25 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.auth.refreshUser();
     this.statsService.getMyStats().subscribe(s => this.stats.set(s));
     const user = this.auth.user();
     if (user) {
       this.songService.getByArtist(user.id).subscribe(songs => this.mySongs.set(songs));
+      this.songService.getLikedSongs().subscribe(songs => this.likedSongs.set(songs));
       this.editCountry = user.country || '';
       this.editPreferredGenres = [...(user.preferredGenres || [])];
+      const sl = user.socialLinks;
+      if (sl) {
+        this.editSocialLinks = {
+          spotify: sl.spotify || '',
+          youtubeMusic: sl.youtubeMusic || '',
+          appleMusic: sl.appleMusic || '',
+          soundcloud: sl.soundcloud || '',
+          tiktok: sl.tiktok || '',
+          instagram: sl.instagram || ''
+        };
+      }
     }
   }
 
@@ -133,6 +157,35 @@ export class ProfileComponent implements OnInit {
 
   isPrefGenreSelected(genre: string): boolean {
     return this.editPreferredGenres.includes(genre);
+  }
+
+  openFollowersModal(mode: 'followers' | 'following'): void {
+    this.followModalMode.set(mode);
+    this.showFollowModal.set(true);
+  }
+
+  closeFollowModal(): void {
+    this.showFollowModal.set(false);
+  }
+
+  saveSocialLinks(): void {
+    this.savingSocials.set(true);
+    const links: any = {};
+    if (this.editSocialLinks.spotify) links.spotify = this.editSocialLinks.spotify;
+    if (this.editSocialLinks.youtubeMusic) links.youtubeMusic = this.editSocialLinks.youtubeMusic;
+    if (this.editSocialLinks.appleMusic) links.appleMusic = this.editSocialLinks.appleMusic;
+    if (this.editSocialLinks.soundcloud) links.soundcloud = this.editSocialLinks.soundcloud;
+    if (this.editSocialLinks.tiktok) links.tiktok = this.editSocialLinks.tiktok;
+    if (this.editSocialLinks.instagram) links.instagram = this.editSocialLinks.instagram;
+    this.http.patch<any>(`${environment.apiUrl}/users/me`, {
+      socialLinks: links
+    }).subscribe({
+      next: () => {
+        this.auth.refreshUser();
+        this.savingSocials.set(false);
+      },
+      error: () => this.savingSocials.set(false)
+    });
   }
 
   savePreferences(): void {

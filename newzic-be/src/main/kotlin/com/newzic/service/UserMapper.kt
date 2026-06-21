@@ -41,7 +41,8 @@ class UserMapper {
                 instagram = user.instagramUrl
             ),
             photos = user.photos.toList(),
-            joinedDate = user.joinedDate.toString()
+            joinedDate = user.joinedDate.toString(),
+            preferredLanguage = user.preferredLanguage
         )
     }
 }

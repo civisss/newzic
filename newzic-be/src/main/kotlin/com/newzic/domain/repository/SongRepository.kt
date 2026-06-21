@@ -13,6 +13,8 @@ interface SongRepository : JpaRepository<SongEntity, UUID> {
     @EntityGraph(attributePaths = ["artist", "album", "tags"])
     fun findByArtistId(artistId: UUID, pageable: Pageable): Page<SongEntity>
 
+    fun findByArtistId(artistId: UUID): List<SongEntity>
+
     @EntityGraph(attributePaths = ["artist", "album", "tags"])
     fun findByAlbumId(albumId: UUID): List<SongEntity>
 

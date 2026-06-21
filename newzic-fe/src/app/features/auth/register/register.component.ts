@@ -23,6 +23,7 @@ export class RegisterComponent {
   step = signal(1);
   error = signal('');
   loading = signal(false);
+  fieldErrors = signal<Record<string, string>>({});
 
   countries = [
     { code: 'IT', label: 'Italy' },
@@ -124,14 +125,74 @@ export class RegisterComponent {
     return this.selectedGenres.includes(genre);
   }
 
+  validateField(field: string): void {
+    const errors = { ...this.fieldErrors() };
+    switch (field) {
+      case 'email':
+        if (this.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+          errors['email'] = 'Invalid email format';
+        } else {
+          delete errors['email'];
+        }
+        break;
+      case 'password':
+        if (this.password && (this.password.length < 8 || this.password.length > 128)) {
+          errors['password'] = 'Password must be 8–128 characters';
+        } else {
+          delete errors['password'];
+        }
+        if (this.confirmPassword && this.password !== this.confirmPassword) {
+          errors['confirmPassword'] = 'Passwords do not match';
+        } else {
+          delete errors['confirmPassword'];
+        }
+        break;
+      case 'confirmPassword':
+        if (this.confirmPassword && this.password !== this.confirmPassword) {
+          errors['confirmPassword'] = 'Passwords do not match';
+        } else {
+          delete errors['confirmPassword'];
+        }
+        break;
+      case 'username':
+        if (this.username && this.username.length < 3) {
+          errors['username'] = 'Username must be at least 3 characters';
+        } else {
+          delete errors['username'];
+        }
+        break;
+      case 'artistName':
+        if (!this.artistName) {
+          errors['artistName'] = 'Artist name is required';
+        } else {
+          delete errors['artistName'];
+        }
+        break;
+    }
+    this.fieldErrors.set(errors);
+  }
+
+  hasError(field: string): boolean {
+    return !!this.fieldErrors()[field];
+  }
+
   nextStep(): void {
     this.error.set('');
+    this.fieldErrors.set({});
     if (!this.artistName || !this.username || !this.email || !this.password || !this.confirmPassword) {
       this.error.set('Please fill in all fields');
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+      this.fieldErrors.set({ email: 'Invalid email format' });
+      return;
+    }
+    if (this.password.length < 8) {
+      this.fieldErrors.set({ password: 'Password must be at least 8 characters' });
+      return;
+    }
     if (this.password !== this.confirmPassword) {
-      this.error.set('Passwords do not match');
+      this.fieldErrors.set({ confirmPassword: 'Passwords do not match' });
       return;
     }
     if (this.selectedRoles.length === 0) {
@@ -173,7 +234,18 @@ export class RegisterComponent {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err?.error?.message || 'Registration failed. Please try again.');
+        const body = err?.error;
+        if (body?.details) {
+          const errors: Record<string, string> = {};
+          for (const [key, msgs] of Object.entries(body.details)) {
+            errors[key] = Array.isArray(msgs) ? msgs[0] : String(msgs);
+          }
+          this.fieldErrors.set(errors);
+          if (Object.keys(errors).some(k => ['email', 'password', 'username', 'artistName'].includes(k))) {
+            this.step.set(1);
+          }
+        }
+        this.error.set(body?.error || body?.message || 'Registration failed. Please try again.');
         this.loading.set(false);
       }
     });

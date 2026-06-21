@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PlayerService } from '../../core/services/player.service';
+import { SongService } from '../../core/services/song.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-player',
@@ -10,7 +12,35 @@ import { PlayerService } from '../../core/services/player.service';
   styleUrl: './player.component.scss'
 })
 export class PlayerComponent {
-  constructor(public player: PlayerService) {}
+  liked = signal(false);
+  likeAnimating = signal(false);
+  private lastCheckedId = '';
+
+  constructor(
+    public player: PlayerService,
+    private songService: SongService,
+    private auth: AuthService
+  ) {
+    effect(() => {
+      const song = this.player.currentSong();
+      if (song && this.auth.isLoggedIn() && song.id !== this.lastCheckedId) {
+        this.lastCheckedId = song.id;
+        this.songService.isLiked(song.id).subscribe(r => this.liked.set(r.liked));
+      }
+    });
+  }
+
+  toggleLike(): void {
+    const song = this.player.currentSong();
+    if (!song || !this.auth.isLoggedIn()) return;
+    this.songService.toggleLike(song.id).subscribe(r => {
+      this.liked.set(r.liked);
+      if (r.liked) {
+        this.likeAnimating.set(true);
+        setTimeout(() => this.likeAnimating.set(false), 600);
+      }
+    });
+  }
 
   onProgressClick(event: MouseEvent): void {
     const bar = event.currentTarget as HTMLElement;

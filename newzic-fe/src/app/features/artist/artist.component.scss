@@ -5,7 +5,9 @@
 .artist-header {
   position: relative;
   min-height: 320px;
-  background: linear-gradient(135deg, #B06CFF 0%, #3B82F6 60%, #EC4899 100%);
+  background: linear-gradient(135deg, $accent-violet 0%, $accent-blue 50%, $accent-pink 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -111,14 +113,14 @@
   align-items: center;
   vertical-align: middle;
   margin-left: 2px;
-  color: #00E5FF;
-  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.7)) drop-shadow(0 0 14px rgba(0, 229, 255, 0.35));
+  color: $accent-cyan;
+  filter: drop-shadow(0 0 6px rgba($accent-cyan, 0.7)) drop-shadow(0 0 14px rgba($accent-cyan, 0.35));
   animation: verifiedPulse 2.5s ease-in-out infinite;
 }
 
 @keyframes verifiedPulse {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.7)) drop-shadow(0 0 14px rgba(0, 229, 255, 0.35)); }
-  50%      { filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.9)) drop-shadow(0 0 22px rgba(0, 229, 255, 0.5)); }
+  0%, 100% { filter: drop-shadow(0 0 6px rgba($accent-cyan, 0.7)) drop-shadow(0 0 14px rgba($accent-cyan, 0.35)); }
+  50%      { filter: drop-shadow(0 0 10px rgba($accent-cyan, 0.9)) drop-shadow(0 0 22px rgba($accent-cyan, 0.5)); }
 }
 
 .premium-badge {
@@ -128,16 +130,16 @@
   font-size: 0.75rem;
   padding: 5px 16px;
   border-radius: $radius-full;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.15));
+  background: linear-gradient(135deg, rgba($accent-gold, 0.2), rgba($accent-orange, 0.15));
   backdrop-filter: blur(8px);
-  color: #ffd700;
+  color: $accent-gold;
   font-weight: 700;
   letter-spacing: 0.5px;
-  border: 1px solid rgba(255, 215, 0, 0.5);
+  border: 1px solid rgba($accent-gold, 0.5);
   text-transform: uppercase;
 
   svg {
-    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5));
+    filter: drop-shadow(0 0 3px rgba($accent-gold, 0.5));
   }
 }
 
@@ -168,15 +170,26 @@
   margin-bottom: 20px;
 }
 
-.artist-stats {
+.artist-stats-row {
   display: flex;
-  gap: 32px;
+  align-items: center;
+  gap: 24px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 
   @include mobile {
-    gap: 20px;
+    gap: 16px;
     justify-content: center;
   }
+}
+
+.stat-divider {
+  width: 1px;
+  height: 32px;
+  background: $border-medium;
+  flex-shrink: 0;
+
+  @include mobile { display: none; }
 }
 
 .stat {
@@ -184,6 +197,26 @@
   flex-direction: column;
   strong { font-size: 1.3rem; font-weight: 700; }
   span { font-size: 0.78rem; color: $text-tertiary; }
+}
+
+.stat-clickable {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all $transition-base;
+  color: $text-primary;
+  text-align: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba($accent-violet, 0.15);
+    transform: translateY(-1px);
+
+    strong { color: $accent-violet; }
+    span { color: $text-secondary; }
+  }
 }
 
 .growth-stat strong { color: $accent-green; }
@@ -214,6 +247,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.btn-message {
+  @include button-ghost;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+
+  &:hover { color: $accent-violet; border-color: $accent-violet; }
 }
 
 .btn-share {
@@ -251,7 +296,7 @@
   border-radius: 50%;
   border: 1px solid $border-subtle;
   color: $text-secondary;
-  transition: all $transition-fast;
+  transition: all $transition-base;
 
   svg {
     width: 20px;
@@ -259,10 +304,11 @@
   }
 
   &:hover {
-    background: rgba($accent-violet, 0.15);
-    border-color: $accent-violet;
+    background: rgba($accent-violet, 0.12);
+    border-color: rgba($accent-violet, 0.5);
     color: $text-primary;
     transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba($accent-violet, 0.1);
   }
 }
 
@@ -284,10 +330,14 @@
   font-weight: 500;
   cursor: pointer;
   margin-bottom: -1px;
-  transition: all $transition-fast;
+  transition: all $transition-base;
 
   &:hover { color: $text-primary; }
-  &.active { color: $text-primary; border-bottom-color: $accent-violet; }
+  &.active {
+    color: $text-primary;
+    border-bottom-color: $accent-violet;
+    text-shadow: 0 0 20px rgba($accent-violet, 0.3);
+  }
 }
 
 .tab-content { padding: 32px 0 80px; }
@@ -306,11 +356,9 @@
 }
 
 .album-card {
-  background: $bg-card;
-  border: 1px solid $border-subtle;
+  @include glass-card;
   border-radius: $radius-lg;
   overflow: hidden;
-  @include card-hover;
 }
 
 .album-cover {
@@ -397,16 +445,47 @@
 
 .track-genre { font-size: 0.75rem; color: $text-tertiary; }
 
+// Like button
+.like-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: $text-tertiary;
+  transition: color $transition-fast, transform $transition-spring;
+  flex-shrink: 0;
+
+  &:hover { color: $accent-pink; transform: scale(1.2); }
+
+  &.liked {
+    color: $accent-pink;
+    filter: drop-shadow(0 0 6px rgba($accent-pink, 0.4));
+    animation: like-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .like-heart { transition: transform $transition-fast; }
+}
+
+@keyframes like-pop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.4); }
+  60%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
 .track-plays {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.8rem;
-  color: #4ade80;
+  color: $accent-green;
   font-variant-numeric: tabular-nums;
 
   svg {
-    color: #4ade80;
+    color: $accent-green;
     flex-shrink: 0;
   }
 }

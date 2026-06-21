@@ -3,6 +3,7 @@ import { ArtistStats } from '../core/models';
 export const MOCK_STATS: ArtistStats = {
   totalPlays: 45200,
   totalFollowers: 1280,
+  totalFollowing: 67,
   totalReactions: 8900,
   totalSongs: 6,
   weeklyData: [

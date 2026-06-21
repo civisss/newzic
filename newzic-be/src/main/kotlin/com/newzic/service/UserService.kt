@@ -3,6 +3,7 @@ package com.newzic.service
 import com.newzic.api.dto.UpdateProfileRequest
 import com.newzic.api.dto.UserResponse
 import com.newzic.domain.entity.ArtistRole
+import com.newzic.domain.entity.NotificationType
 import com.newzic.domain.repository.FollowRepository
 import com.newzic.domain.repository.UserRepository
 import org.springframework.data.domain.Page
@@ -16,7 +17,8 @@ import java.util.UUID
 class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
-    private val userMapper: UserMapper
+    private val userMapper: UserMapper,
+    private val notificationService: NotificationService
 ) {
 
     fun getById(id: UUID): UserResponse {
@@ -141,6 +143,7 @@ class UserService(
         request.preferredGenres?.let { user.preferredGenres = it.toMutableSet() }
         request.lookingForCollab?.let { user.lookingForCollab = it }
         request.collabDescription?.let { user.collabDescription = it }
+        request.preferredLanguage?.let { user.preferredLanguage = it }
         request.socialLinks?.let { links ->
             links.spotify?.let { user.spotifyUrl = it }
             links.youtubeMusic?.let { user.youtubeMusicUrl = it }
@@ -183,11 +186,31 @@ class UserService(
             userRepository.save(following)
             userRepository.save(follower)
 
+            notificationService.create(
+                recipientId = followingId,
+                fromUserId = followerId,
+                type = NotificationType.FOLLOW,
+                message = "${follower.displayName} started following you",
+                link = "/artist/$followerId"
+            )
+
             return true // followed
         }
     }
 
     fun isFollowing(followerId: UUID, followingId: UUID): Boolean {
         return followRepository.existsByFollowerIdAndFollowingId(followerId, followingId)
+    }
+
+    @Transactional(readOnly = true)
+    fun getFollowers(userId: UUID): List<UserResponse> {
+        return followRepository.findByFollowingId(userId)
+            .map { userMapper.toResponse(it.follower) }
+    }
+
+    @Transactional(readOnly = true)
+    fun getFollowing(userId: UUID): List<UserResponse> {
+        return followRepository.findByFollowerId(userId)
+            .map { userMapper.toResponse(it.following) }
     }
 }

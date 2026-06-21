@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, effect } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { I18nService } from '../../core/services/i18n.service';
@@ -9,11 +10,11 @@ import { I18nService } from '../../core/services/i18n.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, DatePipe, LogoComponent],
+  imports: [RouterLink, RouterLinkActive, DatePipe, LogoComponent, TranslatePipe],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   showUserMenu = signal(false);
   showNotifications = signal(false);
   showMobileMenu = signal(false);
@@ -25,14 +26,24 @@ export class NavbarComponent {
     public i18n: I18nService
   ) {}
 
+  ngOnInit(): void {
+    if (this.auth.isLoggedIn()) {
+      this.notifService.load();
+    }
+  }
+
   toggleUserMenu(): void {
     this.showUserMenu.update(v => !v);
     this.showNotifications.set(false);
   }
 
   toggleNotifications(): void {
-    this.showNotifications.update(v => !v);
+    const opening = !this.showNotifications();
+    this.showNotifications.set(opening);
     this.showUserMenu.set(false);
+    if (opening) {
+      this.notifService.load();
+    }
   }
 
   toggleMobileMenu(): void {

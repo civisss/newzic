@@ -10,6 +10,9 @@ export interface User {
   bio?: string;
   socialLinks?: SocialLinks;
   joinedDate: string;
+  followers?: number;
+  following?: number;
   country?: string;
   preferredGenres?: string[];
+  preferredLanguage?: string;
 }

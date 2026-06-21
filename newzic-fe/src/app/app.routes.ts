@@ -51,5 +51,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/feed/feed.component').then(m => m.FeedComponent)
   },
+  {
+    path: 'messages',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/messages/messages.component').then(m => m.MessagesComponent)
+  },
+  {
+    path: 'messages/:userId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/messages/messages.component').then(m => m.MessagesComponent)
+  },
   { path: '**', redirectTo: 'login' }
 ];

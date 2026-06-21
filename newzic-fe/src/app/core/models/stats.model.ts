@@ -8,6 +8,7 @@ export interface WeeklyStats {
 export interface ArtistStats {
   totalPlays: number;
   totalFollowers: number;
+  totalFollowing: number;
   totalReactions: number;
   totalSongs: number;
   weeklyData: WeeklyStats[];

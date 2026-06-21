@@ -15,7 +15,9 @@ data class NotificationResponse(
     val type: String,
     val message: String,
     val avatar: String?,
+    val fromUserId: String?,
     val fromUser: String?,
+    val songId: String?,
     val timestamp: String,
     val read: Boolean,
     val link: String?
@@ -42,7 +44,8 @@ class NotificationService(
     }
 
     @Transactional
-    fun create(recipientId: UUID, fromUserId: UUID?, type: NotificationType, message: String, link: String? = null) {
+    fun create(recipientId: UUID, fromUserId: UUID?, type: NotificationType, message: String, link: String? = null, songId: UUID? = null) {
+        if (recipientId == fromUserId) return // don't notify yourself
         val recipient = userRepository.findById(recipientId).orElse(null) ?: return
         val fromUser = fromUserId?.let { userRepository.findById(it).orElse(null) }
 
@@ -52,7 +55,8 @@ class NotificationService(
                 message = message,
                 recipient = recipient,
                 fromUser = fromUser,
-                link = link
+                link = link,
+                songId = songId
             )
         )
     }
@@ -63,7 +67,9 @@ class NotificationService(
             type = n.type.name.lowercase(),
             message = n.message,
             avatar = n.fromUser?.avatar,
+            fromUserId = n.fromUser?.id?.toString(),
             fromUser = n.fromUser?.displayName,
+            songId = n.songId?.toString(),
             timestamp = n.createdAt.toString(),
             read = n.isRead,
             link = n.link

@@ -56,24 +56,28 @@
   color: $text-secondary;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: color $transition-fast, background $transition-fast;
+  transition: all $transition-base;
+  position: relative;
 
   &:hover {
     color: $text-primary;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   &.active {
     color: $text-primary;
-    background: rgba($accent-violet, 0.12);
+    background: rgba($accent-violet, 0.14);
+    box-shadow: 0 0 16px rgba($accent-violet, 0.12);
 
     svg {
       color: $accent-violet;
+      filter: drop-shadow(0 0 4px rgba($accent-violet, 0.4));
     }
   }
 
   svg {
     flex-shrink: 0;
+    transition: all $transition-base;
   }
 
   @include mobile {
@@ -101,11 +105,16 @@
   border: none;
   background: transparent;
   color: $text-secondary;
-  transition: color $transition-fast, background $transition-fast;
+  transition: all $transition-base;
 
   &:hover {
     color: $text-primary;
     background: rgba(255, 255, 255, 0.06);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 
   @include mobile { display: none; }
@@ -113,18 +122,20 @@
 
 .badge {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 5px;
+  right: 5px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: $accent-pink;
+  background: linear-gradient(135deg, $accent-pink, $accent-orange);
   color: white;
   font-size: 0.65rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba($accent-pink, 0.4);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .avatar-btn {
@@ -136,10 +147,12 @@
   padding: 0;
   background: none;
   cursor: pointer;
-  transition: border-color $transition-fast;
+  transition: all $transition-base;
 
   &:hover {
     border-color: $accent-violet;
+    box-shadow: 0 0 12px rgba($accent-violet, 0.25);
+    transform: scale(1.05);
   }
 
   img {
@@ -159,10 +172,11 @@
   top: calc(100% + 12px);
   right: 0;
   min-width: 280px;
-  background: $bg-card;
-  border: 1px solid $border-subtle;
+  background: rgba(20, 20, 35, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: $radius-lg;
-  box-shadow: $shadow-lg;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
   overflow: hidden;
   animation: fadeIn 0.2s ease;
   z-index: $z-dropdown;
@@ -228,17 +242,50 @@
   flex-shrink: 0;
 }
 
+.notif-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-elevated;
+  color: $text-tertiary;
+}
+
 .notif-content {
+  flex: 1;
+  min-width: 0;
   p {
     font-size: 0.85rem;
     line-height: 1.4;
     color: $text-primary;
+    margin: 0;
   }
   .notif-time {
     font-size: 0.75rem;
     color: $text-tertiary;
     margin-top: 2px;
     display: block;
+  }
+}
+
+.notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $accent-violet;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 18px;
+  color: $text-tertiary;
+  p {
+    font-size: 0.85rem;
+    margin: 0;
   }
 }
 
@@ -276,12 +323,16 @@
   align-items: center;
   gap: 12px;
   padding: 12px 18px;
+  font: inherit;
   font-size: 0.9rem;
+  line-height: 1.4;
   color: $text-secondary;
   border: none;
   background: none;
   width: 100%;
   text-align: left;
+  cursor: pointer;
+  text-decoration: none;
   transition: background $transition-fast, color $transition-fast;
 
   &:hover {
@@ -360,6 +411,7 @@
   @include button-primary;
   padding: 8px 22px;
   font-size: 0.85rem;
+  letter-spacing: 0.3px;
 
   @include mobile { display: none; }
 }
@@ -422,13 +474,13 @@
     width: 46px;
     height: 46px;
     border-radius: 50%;
-    background: linear-gradient(135deg, $accent-violet, #8B5CF6);
+    background: linear-gradient(135deg, $accent-violet, $accent-blue);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: -18px;
     box-shadow: 0 4px 16px rgba($accent-violet, 0.4);
-    transition: transform $transition-fast, box-shadow $transition-fast;
+    transition: transform $transition-spring, box-shadow $transition-base;
 
     svg { color: white; }
   }

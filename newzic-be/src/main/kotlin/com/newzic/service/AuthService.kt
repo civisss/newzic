@@ -19,6 +19,10 @@ class AuthService(
     private val userMapper: UserMapper
 ) {
 
+    companion object {
+        const val DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23B06CFF'/%3E%3Cstop offset='100%25' stop-color='%233B82F6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='200' height='200' rx='100' fill='url(%23g)'/%3E%3Cpath d='M65 145V60L105 110V60' stroke='white' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M120 78c10 8 16 20 16 32s-6 24-16 32' stroke='white' stroke-width='9' stroke-linecap='round' fill='none' opacity='0.9'/%3E%3Cpath d='M138 62c14 12 22 29 22 46s-8 34-22 46' stroke='white' stroke-width='8' stroke-linecap='round' fill='none' opacity='0.5'/%3E%3C/svg%3E"
+    }
+
     @Transactional
     fun register(request: RegisterRequest): AuthResponse {
         if (userRepository.existsByUsername(request.username)) {
@@ -41,6 +45,7 @@ class AuthService(
             email = request.email,
             passwordHash = passwordEncoder.encode(request.password),
             displayName = request.artistName,
+            avatar = DEFAULT_AVATAR,
             roles = roles,
             country = request.country,
             preferredGenres = request.preferredGenres.toMutableSet()

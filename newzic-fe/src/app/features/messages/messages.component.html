@@ -1,0 +1,74 @@
+<div class="messages-page" [class.has-active]="activeConversation()">
+  <!-- Conversation list (sidebar on desktop, full view on mobile when no active chat) -->
+  <div class="conversations-panel">
+    <div class="conversations-header">
+      <h2>{{ 'messages.title' | translate }}</h2>
+    </div>
+    <div class="conversations-list">
+      @if (conversations().length === 0) {
+        <div class="empty-conversations">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p>{{ 'messages.no_conversations' | translate }}</p>
+          <span>{{ 'messages.start_chat' | translate }}</span>
+        </div>
+      }
+      @for (conv of conversations(); track conv.userId) {
+        <div class="conversation-item" [class.active]="activeConversation() === conv.userId" [class.unread]="conv.unread" (click)="openConversation(conv.userId)">
+          <img [src]="conv.avatar || '/assets/default-avatar.png'" [alt]="conv.displayName" class="conv-avatar" />
+          <div class="conv-info">
+            <span class="conv-name">{{ conv.displayName }}</span>
+            <span class="conv-last">{{ conv.lastMessage }}</span>
+          </div>
+          @if (conv.unread) {
+            <span class="conv-unread-dot"></span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Chat panel (overlay on mobile, right side on desktop) -->
+  @if (activeConversation()) {
+    <div class="chat-panel">
+      <div class="chat-header">
+        <button class="chat-back" (click)="closeConversation()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        @if (getActiveUser(); as user) {
+          <img [src]="user.avatar || '/assets/default-avatar.png'" [alt]="user.displayName" class="chat-avatar" />
+          <a [routerLink]="'/artist/' + user.userId" class="chat-user-name">{{ user.displayName }}</a>
+        }
+      </div>
+
+      <div class="chat-messages">
+        @for (msg of messages(); track msg.id) {
+          <div class="chat-msg" [class.mine]="msg.senderId === currentUserId()">
+            <div class="msg-bubble">
+              {{ msg.content }}
+            </div>
+            <span class="msg-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+          </div>
+        }
+        <div #messagesEnd></div>
+      </div>
+
+      <div class="chat-input">
+        <textarea
+          [(ngModel)]="newMessage"
+          [placeholder]="'messages.type_message' | translate"
+          (keydown)="onKeyDown($event)"
+          rows="1"
+        ></textarea>
+        <button class="send-btn" (click)="sendMessage()" [disabled]="sending() || !newMessage.trim()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
+</div>

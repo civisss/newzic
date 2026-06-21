@@ -1,0 +1,182 @@
+@use 'app/shared/styles/variables' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-panel {
+  background: rgba(15, 15, 26, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: $radius-lg;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.4);
+  width: 420px;
+  max-width: 90vw;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.25s ease;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $border-subtle;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $text-primary;
+  }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: $text-tertiary;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: $radius-sm;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: $accent-violet;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.modal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: $text-tertiary;
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+.modal-list {
+  padding: 8px 0;
+}
+
+.modal-user-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background $transition-fast;
+  text-align: left;
+  color: $text-primary;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+
+    .modal-chevron {
+      opacity: 1;
+      transform: translateX(2px);
+    }
+  }
+}
+
+.modal-user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-verified {
+  color: $accent-cyan;
+  flex-shrink: 0;
+}
+
+.modal-user-meta {
+  font-size: 0.8rem;
+  color: $text-tertiary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-chevron {
+  color: $text-tertiary;
+  opacity: 0;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

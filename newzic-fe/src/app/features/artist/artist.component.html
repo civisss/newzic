@@ -32,39 +32,50 @@
             </p>
           }
           <p class="artist-bio">{{ artist()!.bio }}</p>
-          <div class="artist-stats">
-            <div class="stat">
+          <div class="artist-stats-row">
+            <button class="stat stat-clickable" (click)="openFollowersModal('followers')">
               <strong>{{ artist()!.followers | formatNumber }}</strong>
-              <span>Followers</span>
-            </div>
+              <span>{{ 'artist.followers' | translate }}</span>
+            </button>
+            <button class="stat stat-clickable" (click)="openFollowersModal('following')">
+              <strong>{{ artist()!.following | formatNumber }}</strong>
+              <span>{{ 'artist.following_label' | translate }}</span>
+            </button>
+            <span class="stat-divider"></span>
             <div class="stat">
               <strong>{{ artist()!.totalPlays | formatNumber }}</strong>
-              <span>Total Plays</span>
+              <span>{{ 'artist.total_plays' | translate }}</span>
             </div>
             <div class="stat">
               <strong>{{ songs().length }}</strong>
-              <span>Tracks</span>
+              <span>{{ 'artist.tracks' | translate }}</span>
             </div>
             @if (artist()!.weeklyGrowth) {
               <div class="stat growth-stat">
                 <strong>+{{ artist()!.weeklyGrowth }}%</strong>
-                <span>Weekly Growth</span>
+                <span>{{ 'artist.weekly_growth' | translate }}</span>
               </div>
             }
           </div>
           <div class="header-actions">
             <button class="btn-follow" [class.following]="following()" (click)="toggleFollow()">
-              {{ following() ? 'Following' : 'Follow' }}
+              {{ following() ? ('artist.following' | translate) : ('artist.follow' | translate) }}
             </button>
             <button class="btn-play-all" [class.playing]="isPlayingArtist()" (click)="playAll()">
               @if (isPlayingArtist()) {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
-                Pause
+                {{ 'artist.pause' | translate }}
               } @else {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Play All
+                {{ 'artist.play_all' | translate }}
               }
             </button>
+            @if (auth.isLoggedIn() && artist()!.id !== auth.user()?.id) {
+              <button class="btn-message" (click)="openChat(artist()!.id)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                {{ 'artist.send_message' | translate }}
+              </button>
+            }
             <button class="btn-share" aria-label="Share">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>
@@ -106,10 +117,10 @@
 
     <!-- TABS -->
     <div class="tabs-bar container">
-      <button class="tab" [class.active]="activeTab() === 'music'" (click)="setTab('music')">Music</button>
-      <button class="tab" [class.active]="activeTab() === 'about'" (click)="setTab('about')">About</button>
+      <button class="tab" [class.active]="activeTab() === 'music'" (click)="setTab('music')">{{ 'artist.tracks' | translate }}</button>
+      <button class="tab" [class.active]="activeTab() === 'about'" (click)="setTab('about')">{{ 'artist.about' | translate }}</button>
       @if (artist()!.photos && artist()!.photos!.length > 0) {
-        <button class="tab" [class.active]="activeTab() === 'photos'" (click)="setTab('photos')">Gallery</button>
+        <button class="tab" [class.active]="activeTab() === 'photos'" (click)="setTab('photos')">{{ 'artist.photos' | translate }}</button>
       }
     </div>
 
@@ -119,7 +130,7 @@
         <!-- Albums -->
         @if (albums().length > 0) {
           <div class="music-section">
-            <h3>Releases</h3>
+            <h3>{{ 'artist.releases' | translate }}</h3>
             <div class="album-grid">
               @for (album of albums(); track album.id) {
                 <div class="album-card">
@@ -137,7 +148,7 @@
 
         <!-- Tracks -->
         <div class="music-section">
-          <h3>Tracks</h3>
+          <h3>{{ 'artist.tracks' | translate }}</h3>
           <div class="tracks-list">
             @for (song of songs(); track song.id; let i = $index) {
               <div class="track-row" (click)="playSong(song)">
@@ -150,6 +161,11 @@
                   </div>
                   <span class="track-genre">{{ song.genre }}</span>
                 </div>
+                <button class="like-btn" [class.liked]="likedSongIds().has(song.id)" (click)="toggleLike($event, song)" aria-label="Like">
+                  <svg class="like-heart" width="18" height="18" viewBox="0 0 24 24" [attr.fill]="likedSongIds().has(song.id) ? '#EC4899' : 'none'" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </button>
                 <div class="track-plays">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                   {{ song.plays | formatNumber }}
@@ -182,7 +198,7 @@
       @if (activeTab() === 'about') {
         <div class="about-section">
           <div class="about-main">
-            <h3>About</h3>
+            <h3>{{ 'artist.about' | translate }}</h3>
             <p class="about-long-bio">{{ artist()!.longBio || artist()!.bio }}</p>
 
             @if (artist()!.location) {
@@ -193,11 +209,11 @@
             }
             <div class="about-detail">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              Joined {{ artist()!.joinedDate }}
+              {{ 'artist.joined' | translate }} {{ artist()!.joinedDate }}
             </div>
 
             <div class="about-tags">
-              <h4>Tags</h4>
+              <h4>{{ 'artist.tags' | translate }}</h4>
               <div class="tag-list">
                 @for (t of artist()!.tags; track t) {
                   <span class="tag">{{ t }}</span>
@@ -207,7 +223,7 @@
 
             @if (artist()!.collabDescription) {
               <div class="collab-section">
-                <h4>Collaboration</h4>
+                <h4>{{ 'artist.collaboration' | translate }}</h4>
                 <p>{{ artist()!.collabDescription }}</p>
               </div>
             }
@@ -228,4 +244,12 @@
       }
     </div>
   </div>
+
+  @if (showFollowModal()) {
+    <app-followers-modal
+      [userId]="artist()!.id"
+      [mode]="followModalMode()"
+      (closed)="closeFollowModal()"
+    />
+  }
 }

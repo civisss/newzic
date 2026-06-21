@@ -41,7 +41,9 @@ export class NotificationService {
       type: n.type,
       message: n.message,
       avatar: n.avatar || '',
+      fromUserId: n.fromUserId,
       fromUser: n.fromUser || '',
+      songId: n.songId,
       timestamp: n.timestamp,
       read: n.read,
       link: n.link

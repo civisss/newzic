@@ -3,17 +3,20 @@ import { ActivatedRoute } from '@angular/router';
 import { UpperCasePipe, SlicePipe } from '@angular/common';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { ArtistService } from '../../core/services/artist.service';
 import { SongService } from '../../core/services/song.service';
 import { AlbumService } from '../../core/services/album.service';
 import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
+import { MessageService } from '../../core/services/message.service';
 import { Artist, Song, Album } from '../../core/models';
+import { FollowersModalComponent } from '../../shared/components/followers-modal/followers-modal.component';
 
 @Component({
   selector: 'app-artist',
   standalone: true,
-  imports: [UpperCasePipe, SlicePipe, FormatNumberPipe, DurationPipe],
+  imports: [UpperCasePipe, SlicePipe, FormatNumberPipe, DurationPipe, TranslatePipe, FollowersModalComponent],
   templateUrl: './artist.component.html',
   styleUrl: './artist.component.scss'
 })
@@ -23,6 +26,9 @@ export class ArtistComponent implements OnInit {
   albums = signal<Album[]>([]);
   activeTab = signal<'music' | 'about' | 'photos'>('music');
   following = signal(false);
+  likedSongIds = signal<Set<string>>(new Set());
+  showFollowModal = signal(false);
+  followModalMode = signal<'followers' | 'following'>('followers');
 
   constructor(
     private route: ActivatedRoute,
@@ -30,14 +36,22 @@ export class ArtistComponent implements OnInit {
     private songService: SongService,
     private albumService: AlbumService,
     public playerService: PlayerService,
-    public auth: AuthService
+    public auth: AuthService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const id = params['id'];
       this.artistService.getById(id).subscribe(a => this.artist.set(a ?? null));
-      this.songService.getByArtist(id).subscribe(s => this.songs.set(s));
+      this.songService.getByArtist(id).subscribe(s => {
+        this.songs.set(s);
+        if (this.auth.isLoggedIn()) {
+          this.songService.getLikedSongs().subscribe(liked => {
+            this.likedSongIds.set(new Set(liked.map(l => l.id)));
+          });
+        }
+      });
       this.albumService.getByArtist(id).subscribe(a => this.albums.set(a));
       if (this.auth.isLoggedIn()) {
         this.artistService.isFollowing(id).subscribe(r => this.following.set(r.following));
@@ -79,6 +93,22 @@ export class ArtistComponent implements OnInit {
     });
   }
 
+  toggleLike(event: Event, song: Song): void {
+    event.stopPropagation();
+    if (!this.auth.isLoggedIn()) return;
+    this.songService.toggleLike(song.id).subscribe(r => {
+      const ids = new Set(this.likedSongIds());
+      if (r.liked) {
+        ids.add(song.id);
+      } else {
+        ids.delete(song.id);
+      }
+      this.likedSongIds.set(ids);
+      const updated = this.songs().map(s => s.id === song.id ? { ...s, likes: s.likes + (r.liked ? 1 : -1) } : s);
+      this.songs.set(updated);
+    });
+  }
+
   reactToSong(event: Event, song: Song, type: string): void {
     event.stopPropagation();
     if (!this.auth.isLoggedIn()) return;
@@ -113,6 +143,19 @@ export class ArtistComponent implements OnInit {
       soundcloud: 'SoundCloud', tiktok: 'TikTok', instagram: 'Instagram'
     };
     return labels[key] || key;
+  }
+
+  openChat(artistId: string): void {
+    this.messageService.requestOpenChat(artistId);
+  }
+
+  openFollowersModal(mode: 'followers' | 'following'): void {
+    this.followModalMode.set(mode);
+    this.showFollowModal.set(true);
+  }
+
+  closeFollowModal(): void {
+    this.showFollowModal.set(false);
   }
 
   getSocialEntries(): { key: string; url: string }[] {

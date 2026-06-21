@@ -12,14 +12,20 @@
 .collabs-search {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 20px;
-  background: $bg-card;
-  border: 1px solid $border-subtle;
+  background: $glass-card-bg;
+  backdrop-filter: blur(16px);
+  border: 1px solid $glass-card-border;
   border-radius: $radius-xl;
   margin-bottom: 20px;
-  transition: border-color $transition-fast;
+  transition: all $transition-base;
 
-  &:focus-within { border-color: $accent-violet; }
-  svg { color: $text-tertiary; flex-shrink: 0; }
+  &:focus-within {
+    border-color: $accent-violet;
+    box-shadow: 0 0 0 3px rgba($accent-violet, 0.1), 0 0 30px rgba($accent-violet, 0.06);
+    background: rgba($accent-violet, 0.04);
+  }
+  svg { color: $text-tertiary; flex-shrink: 0; transition: color $transition-base; }
+  &:focus-within svg { color: $accent-violet; }
 
   input {
     flex: 1; background: none; border: none; outline: none;
@@ -42,10 +48,20 @@
   color: $text-secondary;
   font-size: 0.82rem; font-weight: 500;
   cursor: pointer;
-  transition: all $transition-fast;
+  transition: all $transition-base;
 
-  &:hover { border-color: $accent-violet; color: $text-primary; }
-  &.active { background: rgba($accent-violet, 0.15); border-color: $accent-violet; color: $text-primary; }
+  &:hover {
+    border-color: rgba($accent-violet, 0.5);
+    color: $text-primary;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($accent-violet, 0.08);
+  }
+  &.active {
+    background: rgba($accent-violet, 0.15);
+    border-color: $accent-violet;
+    color: $text-primary;
+    box-shadow: 0 0 16px rgba($accent-violet, 0.12);
+  }
   .cat-icon { font-size: 1rem; }
 }
 
@@ -58,13 +74,9 @@
 }
 
 .collab-card {
-  background: $bg-card;
-  border: 1px solid $border-subtle;
+  @include glass-card;
   border-radius: $radius-lg;
   padding: 24px;
-  transition: all $transition-fast;
-
-  &:hover { background: $bg-card-hover; border-color: $border-light; }
 }
 
 .collab-top {

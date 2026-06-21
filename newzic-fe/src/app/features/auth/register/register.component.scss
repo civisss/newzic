@@ -53,7 +53,7 @@
   overflow: hidden;
   flex-shrink: 0;
   opacity: 0.3;
-  background: $bg-card;
+  background: rgba(255, 255, 255, 0.03);
 
   img {
     width: 100%;
@@ -304,6 +304,18 @@ select {
   background-position: right 14px center;
   appearance: none;
   -webkit-appearance: none;
+}
+
+.input-error {
+  border-color: $accent-pink !important;
+  box-shadow: 0 0 0 3px rgba($accent-pink, 0.15) !important;
+}
+
+.field-error {
+  color: $accent-pink;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
 }
 
 .error-msg {

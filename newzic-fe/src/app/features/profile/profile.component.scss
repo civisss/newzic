@@ -103,6 +103,7 @@
 }
 
 .ptab {
+  display: flex; align-items: center; gap: 6px;
   padding: 12px 24px;
   background: none; border: none;
   border-bottom: 2px solid transparent;
@@ -111,53 +112,64 @@
   margin-bottom: -1px;
   transition: all $transition-fast;
   &:hover { color: $text-primary; }
-  &.active { color: $text-primary; border-bottom-color: $accent-violet; }
+  &.active {
+    color: $text-primary;
+    border-bottom-color: $accent-violet;
+    text-shadow: 0 0 20px rgba($accent-violet, 0.3);
+  }
 }
 
-// Stats grid
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+// Stats row (inline, matching artist page)
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
   margin-bottom: 32px;
+  flex-wrap: wrap;
 
-  @include tablet { grid-template-columns: repeat(2, 1fr); }
-  @include mobile { grid-template-columns: 1fr; }
+  @include mobile {
+    gap: 16px;
+    justify-content: center;
+  }
 }
 
-.stat-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 20px;
-  background: $bg-card;
-  border: 1px solid $border-subtle;
-  border-radius: $radius-lg;
-}
-
-.stat-icon {
-  width: 44px; height: 44px;
-  border-radius: $radius-md;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.plays-icon { background: rgba($accent-violet, 0.12); color: $accent-violet; }
-.followers-icon { background: rgba($accent-blue, 0.12); color: $accent-blue; }
-.reactions-icon { background: rgba($accent-pink, 0.12); color: $accent-pink; }
-.songs-icon { background: rgba($accent-orange, 0.12); color: $accent-orange; }
-
-.stat-data {
-  flex: 1;
-  strong { display: block; font-size: 1.4rem; font-weight: 700; }
+.stat {
+  display: flex;
+  flex-direction: column;
+  strong { font-size: 1.3rem; font-weight: 700; }
   span { font-size: 0.78rem; color: $text-tertiary; }
 }
 
-.stat-trend {
-  font-size: 0.82rem; font-weight: 600;
+.stat-clickable {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all $transition-base;
+  color: $text-primary;
+  text-align: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba($accent-violet, 0.15);
+    transform: translateY(-1px);
+
+    strong { color: $accent-violet; }
+    span { color: $text-secondary; }
+  }
 }
 
-.trend-up { color: $accent-green; }
-.trend-down { color: $accent-pink; }
-.trend-stable { color: $text-tertiary; }
+.stat-divider {
+  width: 1px;
+  height: 32px;
+  background: $border-medium;
+  flex-shrink: 0;
+
+  @include mobile { display: none; }
+}
+
+.growth-stat strong { color: $accent-green; }
 
 // Dashboard
 .dashboard-grid {
@@ -169,10 +181,10 @@
 }
 
 .chart-card, .cities-card {
-  background: $bg-card;
-  border: 1px solid $border-subtle;
+  @include glass-card;
   border-radius: $radius-lg;
   padding: 24px;
+  &:hover { transform: none; }
 
   h3 { font-size: 1rem; margin-bottom: 20px; }
 }
@@ -200,7 +212,7 @@
   border-radius: 6px 6px 0 0;
   position: relative;
   min-height: 4px;
-  transition: height 0.6s ease;
+  transition: height $transition-slow;
 
   &:hover .bar-tooltip { opacity: 1; transform: translateY(-4px); }
 }
@@ -255,7 +267,7 @@
   height: 100%;
   background: linear-gradient(to right, $accent-violet, $accent-blue);
   border-radius: 3px;
-  transition: width 0.6s ease;
+  transition: width $transition-slow;
 }
 
 .city-plays {
@@ -270,10 +282,10 @@
 }
 
 .settings-card {
-  background: $bg-card;
-  border: 1px solid $border-subtle;
+  @include glass-card;
   border-radius: $radius-lg;
   padding: 24px;
+  &:hover { transform: none; }
 
   h3 { font-size: 1rem; margin-bottom: 20px; }
 }
@@ -287,22 +299,44 @@
 }
 
 .platform-list {
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: 4px;
 }
 
 .platform-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 0;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
   border-bottom: 1px solid $border-subtle;
 
   &:last-child { border-bottom: none; }
-  span { font-size: 0.9rem; }
 }
 
-.btn-connect {
-  @include button-ghost;
-  padding: 6px 16px;
-  font-size: 0.78rem;
+.platform-icon {
+  width: 36px; height: 36px;
+  border-radius: $radius-sm;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.spotify-icon { background: rgba(#1DB954, 0.12); color: #1DB954; }
+.youtube-icon { background: rgba(#FF0000, 0.12); color: #FF0000; }
+.apple-icon { background: rgba(#FC3C44, 0.12); color: #FC3C44; }
+.soundcloud-icon { background: rgba(#FF5500, 0.12); color: #FF5500; }
+.tiktok-icon { background: rgba(#fff, 0.08); color: #fff; }
+.instagram-icon { background: rgba(#E1306C, 0.12); color: #E1306C; }
+
+.platform-name {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: $text-primary;
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+.platform-input {
+  @include input-field;
+  flex: 1;
+  font-size: 0.82rem;
+  padding: 8px 12px;
 }
 
 select {
@@ -332,17 +366,19 @@ select {
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all $transition-fast;
+  transition: all $transition-base;
 
   &:hover {
-    border-color: $accent-blue;
+    border-color: rgba($accent-violet, 0.5);
     color: $text-primary;
+    transform: translateY(-1px);
   }
 
   &.selected {
-    background: rgba($accent-blue, 0.15);
-    border-color: $accent-blue;
+    background: rgba($accent-violet, 0.15);
+    border-color: $accent-violet;
     color: $text-primary;
+    box-shadow: 0 0 12px rgba($accent-violet, 0.1);
   }
 }
 
@@ -439,4 +475,74 @@ select {
   font-size: 0.82rem;
   color: $text-tertiary;
   white-space: nowrap;
+}
+
+// Language selector
+.lang-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lang-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: $radius-md;
+  border: 1px solid $border-subtle;
+  background: transparent;
+  color: $text-secondary;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: rgba($accent-violet, 0.4);
+    color: $text-primary;
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    border-color: $accent-violet;
+    background: rgba($accent-violet, 0.1);
+    color: $text-primary;
+    box-shadow: 0 0 12px rgba($accent-violet, 0.1);
+  }
+
+  .lang-flag { font-size: 1.1rem; }
+}
+
+// Liked Songs
+.liked-songs-section {
+  h3 {
+    font-size: 1.15rem;
+    margin-bottom: 16px;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: $text-tertiary;
+
+  svg {
+    margin-bottom: 16px;
+    opacity: 0.4;
+  }
+
+  p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 4px;
+  }
+
+  span {
+    font-size: 0.85rem;
+  }
 }

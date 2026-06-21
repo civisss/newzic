@@ -3,6 +3,7 @@ package com.newzic.domain.repository
 import com.newzic.domain.entity.ReactionEntity
 import com.newzic.domain.entity.ReactionType
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import java.util.UUID
 
 interface ReactionRepository : JpaRepository<ReactionEntity, UUID> {
@@ -15,5 +16,6 @@ interface ReactionRepository : JpaRepository<ReactionEntity, UUID> {
 
     fun existsByUserIdAndSongIdAndType(userId: UUID, songId: UUID, type: ReactionType): Boolean
 
+    @Modifying
     fun deleteByUserIdAndSongIdAndType(userId: UUID, songId: UUID, type: ReactionType)
 }

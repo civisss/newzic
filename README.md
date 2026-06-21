@@ -76,6 +76,45 @@ cd newzic-fe && npm install && ng serve
 cd newzic-app && npm run sync && npm run open:android
 ```
 
+### Run tests
+
+```bash
+# Backend (Kotlin/JUnit 5 + Mockito)
+cd newzic-be && ./gradlew test
+
+# Frontend (Karma + Jasmine, headless Chrome)
+cd newzic-fe && npx ng test --watch=false
+
+# Run both at once
+cd newzic-be && ./gradlew test && cd ../newzic-fe && npx ng test --watch=false
+```
+
+## Key Features
+
+### Music & Discovery
+- **Personalized recommendations** — matching algorithm based on country/region, genres, listening preferences, popularity, and verified status
+- **Reactions system** — fire 🔥, gem 💎, on point 🎯, star 🌟 (beyond simple likes)
+- **Song likes** — like/unlike songs from the player bar or song cards with animated heart icon
+- **Trending & Fresh Drops** — auto-generated charts and new release streams
+
+### Social
+- **Follow/unfollow** with real-time follower/following counts
+- **Followers & Following modal** — click on follower/following counts to see the full list and navigate to profiles
+- **Real-time messaging** — chat widget with unread badge, conversation list, and message history
+- **Open Mic feed** — social feed for artist updates and previews
+- **Weekly Spotlight** — editorial curated picks
+
+### Profiles
+- **Artist profiles** — music, about, photos tabs with social links, collaboration availability, and genre tags
+- **User profile dashboard** — stats (plays, followers, reactions, tracks, following), liked songs, settings
+- **Clickable follower/following stats** on both profile and artist pages
+
+### Internationalization
+- **4 languages**: English, Italian, German, Spanish
+- Language preference saved per-user (synced to backend)
+- All UI strings use translation keys via `TranslatePipe`
+- Translation files: `src/assets/i18n/{en,it,de,es}.json`
+
 ## Sub-projects
 
 Each sub-project has its own detailed README:

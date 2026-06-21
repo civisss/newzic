@@ -25,7 +25,8 @@ data class UserResponse(
     val weeklyGrowth: Double?,
     val socialLinks: SocialLinksDto,
     val photos: List<String>,
-    val joinedDate: String
+    val joinedDate: String,
+    val preferredLanguage: String?
 )
 
 data class SocialLinksDto(
@@ -49,5 +50,6 @@ data class UpdateProfileRequest(
     val preferredGenres: List<String>? = null,
     val lookingForCollab: Boolean? = null,
     val collabDescription: String? = null,
-    val socialLinks: SocialLinksDto? = null
+    val socialLinks: SocialLinksDto? = null,
+    val preferredLanguage: String? = null
 )

@@ -80,6 +80,16 @@ class UserController(private val userService: UserService) {
         return ResponseEntity.ok(mapOf("following" to userService.isFollowing(userId, id)))
     }
 
+    @GetMapping("/artists/{id}/followers")
+    fun getFollowers(@PathVariable id: UUID): ResponseEntity<List<UserResponse>> {
+        return ResponseEntity.ok(userService.getFollowers(id))
+    }
+
+    @GetMapping("/artists/{id}/following-list")
+    fun getFollowingList(@PathVariable id: UUID): ResponseEntity<List<UserResponse>> {
+        return ResponseEntity.ok(userService.getFollowing(id))
+    }
+
     @GetMapping("/artists/recommended")
     fun getRecommended(
         auth: Authentication,

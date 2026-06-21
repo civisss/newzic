@@ -3,47 +3,53 @@
 // ═══════════════════════════════════════════
 
 // Backgrounds
-$bg-primary: #121212;
-$bg-surface: #1A1A1A;
-$bg-card: #222222;
-$bg-card-hover: #2A2A2A;
-$bg-elevated: #2E2E2E;
+$bg-primary: #0a0a14;
+$bg-surface: #12121f;
+$bg-card: rgba(255, 255, 255, 0.035);
+$bg-card-hover: rgba(255, 255, 255, 0.065);
+$bg-elevated: #1e1e35;
 
 // Accent Colors
-$accent-violet: #B06CFF;
-$accent-blue: #3B82F6;
-$accent-pink: #EC4899;
-$accent-green: #10B981;
-$accent-orange: #F59E0B;
+$accent-violet: #A855F7;
+$accent-blue: #6366F1;
+$accent-cyan: #22D3EE;
+$accent-pink: #F472B6;
+$accent-green: #34D399;
+$accent-orange: #FB923C;
+$accent-gold: #FBBF24;
 
 // Text
-$text-primary: #FFFFFF;
-$text-secondary: #A1A1AA;
-$text-tertiary: #71717A;
-$text-muted: #52525B;
+$text-primary: #F8FAFC;
+$text-secondary: #94A3B8;
+$text-tertiary: #64748B;
+$text-muted: #475569;
 
 // Borders
 $border-subtle: rgba(255, 255, 255, 0.06);
-$border-light: rgba(255, 255, 255, 0.1);
-$border-medium: rgba(255, 255, 255, 0.15);
+$border-light: rgba(255, 255, 255, 0.10);
+$border-medium: rgba(255, 255, 255, 0.16);
 
 // Gradients
 $gradient-violet-blue: linear-gradient(135deg, $accent-violet, $accent-blue);
 $gradient-violet-pink: linear-gradient(135deg, $accent-violet, $accent-pink);
 $gradient-blue-pink: linear-gradient(135deg, $accent-blue, $accent-pink);
-$gradient-hero: linear-gradient(135deg, rgba($accent-violet, 0.15), rgba($accent-blue, 0.1), rgba($accent-pink, 0.08));
+$gradient-violet-cyan: linear-gradient(135deg, $accent-violet, $accent-cyan);
+$gradient-warm: linear-gradient(135deg, $accent-orange, $accent-pink, $accent-violet);
+$gradient-hero: linear-gradient(135deg, rgba($accent-violet, 0.18), rgba($accent-blue, 0.12), rgba($accent-pink, 0.08));
 
 // Shadows
-$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-$shadow-glow-violet: 0 0 24px rgba($accent-violet, 0.45);
-$shadow-glow-blue: 0 0 20px rgba($accent-blue, 0.3);
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+$shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.45);
+$shadow-glow-violet: 0 4px 30px rgba($accent-violet, 0.35), 0 0 60px rgba($accent-violet, 0.15);
+$shadow-glow-blue: 0 4px 30px rgba($accent-blue, 0.25), 0 0 60px rgba($accent-blue, 0.1);
 
 // Glass
-$glass-bg: rgba(26, 26, 36, 0.6);
-$glass-bg-strong: rgba(26, 26, 36, 0.85);
-$glass-blur: 16px;
+$glass-bg: rgba(14, 14, 24, 0.7);
+$glass-bg-strong: rgba(14, 14, 24, 0.92);
+$glass-blur: 20px;
+$glass-card-bg: rgba(255, 255, 255, 0.04);
+$glass-card-border: rgba(255, 255, 255, 0.07);
 
 // Radius
 $radius-sm: 8px;
@@ -53,9 +59,10 @@ $radius-xl: 24px;
 $radius-full: 9999px;
 
 // Transitions
-$transition-fast: 150ms ease;
-$transition-base: 250ms ease;
-$transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 450ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-spring: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
 // Spacing
 $nav-height: 72px;

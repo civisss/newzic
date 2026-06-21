@@ -47,6 +47,12 @@
   object-fit: cover;
   flex-shrink: 0;
   box-shadow: $shadow-md;
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: scale(1.06);
+    box-shadow: 0 4px 20px rgba($accent-violet, 0.2);
+  }
 }
 
 .track-info {
@@ -78,11 +84,22 @@
   border: none;
   color: $text-tertiary;
   padding: 6px;
-  transition: color $transition-fast;
+  cursor: pointer;
+  transition: color $transition-fast, transform $transition-spring;
   flex-shrink: 0;
-  &:hover { color: $accent-pink; }
+  &:hover { color: $accent-pink; transform: scale(1.2); }
+  &.liked { color: $accent-pink; filter: drop-shadow(0 0 6px rgba($accent-pink, 0.4)); }
+  &.like-pop { animation: likeHeartPop 0.6s ease; }
 
   @include mobile { display: none; }
+}
+
+@keyframes likeHeartPop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.4); }
+  50%  { transform: scale(0.9); }
+  75%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
 
 // Controls
@@ -157,13 +174,17 @@
   height: 42px;
   border-radius: 50%;
   border: none;
-  background: $text-primary;
-  color: $bg-primary;
-  transition: transform $transition-fast, box-shadow $transition-fast;
+  background: $gradient-violet-blue;
+  color: white;
+  transition: transform $transition-spring, box-shadow $transition-base;
 
   &:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 16px rgba(255, 255, 255, 0.25);
+    transform: scale(1.12);
+    box-shadow: $shadow-glow-violet;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }
 
@@ -208,10 +229,11 @@
 
 .progress-fill {
   height: 100%;
-  background: $gradient-violet-blue;
+  background: linear-gradient(90deg, $accent-violet, $accent-cyan);
   border-radius: 2px;
   position: relative;
   transition: width 0.3s linear;
+  box-shadow: 0 0 8px rgba($accent-violet, 0.3);
 }
 
 .progress-knob {

@@ -11,10 +11,21 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
+import com.newzic.domain.repository.SongLikeRepository
+import com.newzic.domain.repository.SongRepository
+import com.newzic.domain.repository.UserRepository
+import com.newzic.domain.entity.SongLikeEntity
+import com.newzic.service.SongMapper
 
 @RestController
 @RequestMapping("/api/songs")
-class SongController(private val songService: SongService) {
+class SongController(
+    private val songService: SongService,
+    private val songLikeRepository: SongLikeRepository,
+    private val songRepository: SongRepository,
+    private val userRepository: UserRepository,
+    private val songMapper: SongMapper
+) {
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: UUID): ResponseEntity<SongResponse> {
@@ -92,5 +103,46 @@ class SongController(private val songService: SongService) {
         val userId = auth?.principal as? UUID
         songService.recordPlay(id, userId)
         return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/{id}/like")
+    @org.springframework.transaction.annotation.Transactional
+    fun toggleLike(
+        auth: Authentication,
+        @PathVariable id: UUID
+    ): ResponseEntity<Map<String, Boolean>> {
+        val userId = auth.principal as UUID
+        val existing = songLikeRepository.findByUserIdAndSongId(userId, id)
+        if (existing != null) {
+            songLikeRepository.delete(existing)
+            val song = songRepository.findById(id).orElse(null)
+            song?.let { it.likes = maxOf(0, it.likes - 1); songRepository.save(it) }
+            return ResponseEntity.ok(mapOf("liked" to false))
+        } else {
+            val user = userRepository.findById(userId).orElseThrow { NoSuchElementException("User not found") }
+            val song = songRepository.findById(id).orElseThrow { NoSuchElementException("Song not found") }
+            songLikeRepository.save(SongLikeEntity(user = user, song = song))
+            song.likes += 1
+            songRepository.save(song)
+            return ResponseEntity.ok(mapOf("liked" to true))
+        }
+    }
+
+    @GetMapping("/{id}/liked")
+    fun isLiked(
+        auth: Authentication,
+        @PathVariable id: UUID
+    ): ResponseEntity<Map<String, Boolean>> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.ok(mapOf("liked" to songLikeRepository.existsByUserIdAndSongId(userId, id)))
+    }
+
+    @GetMapping("/liked")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    fun getLikedSongs(auth: Authentication): ResponseEntity<List<SongResponse>> {
+        val userId = auth.principal as UUID
+        val likes = songLikeRepository.findByUserIdOrderByCreatedAtDesc(userId)
+        val songs = likes.map { songMapper.toResponse(it.song) }
+        return ResponseEntity.ok(songs)
     }
 }

@@ -3,6 +3,7 @@ package com.newzic.api.dto
 data class ArtistStatsResponse(
     val totalPlays: Long,
     val totalFollowers: Long,
+    val totalFollowing: Long = 0,
     val totalReactions: Long,
     val totalSongs: Long,
     val weeklyData: List<WeeklyStatsDto>,

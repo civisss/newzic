@@ -1,0 +1,40 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <h3>{{ _mode === 'followers' ? ('artist.followers' | translate) : ('artist.following_list' | translate) }}</h3>
+      <button class="modal-close" (click)="close()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      @if (loading()) {
+        <div class="modal-loading">
+          <span class="spinner"></span>
+        </div>
+      } @else if (users().length === 0) {
+        <div class="modal-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <p>{{ _mode === 'followers' ? ('artist.no_followers' | translate) : ('artist.no_following' | translate) }}</p>
+        </div>
+      } @else {
+        <div class="modal-list">
+          @for (user of users(); track user.id) {
+            <button class="modal-user-row" (click)="goToArtist(user.id)">
+              <img [src]="user.avatar || '/assets/default-avatar.png'" [alt]="user.name" class="modal-user-avatar" />
+              <div class="modal-user-info">
+                <span class="modal-user-name">
+                  {{ user.name }}
+                  @if (user.verified) {
+                    <svg class="modal-verified" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                  }
+                </span>
+                <span class="modal-user-meta">{{ user.genres[0] || '' }} · {{ user.followers | formatNumber }} {{ 'home.fans' | translate }}</span>
+              </div>
+              <svg class="modal-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

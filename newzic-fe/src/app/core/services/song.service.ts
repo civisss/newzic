@@ -59,6 +59,20 @@ export class SongService {
     return this.http.post<{ added: boolean }>(`${environment.apiUrl}/songs/${songId}/react?type=${type}`, {});
   }
 
+  toggleLike(songId: string): Observable<{ liked: boolean }> {
+    return this.http.post<{ liked: boolean }>(`${environment.apiUrl}/songs/${songId}/like`, {});
+  }
+
+  isLiked(songId: string): Observable<{ liked: boolean }> {
+    return this.http.get<{ liked: boolean }>(`${environment.apiUrl}/songs/${songId}/liked`);
+  }
+
+  getLikedSongs(): Observable<Song[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/songs/liked`).pipe(
+      map(list => list.map(s => this.mapSong(s)))
+    );
+  }
+
   private mapSong(s: any): Song {
     return {
       id: s.id,

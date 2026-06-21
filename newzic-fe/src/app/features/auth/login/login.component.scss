@@ -20,23 +20,26 @@
 .orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(140px);
-  opacity: 0.3;
+  filter: blur(120px);
+  opacity: 0.35;
   will-change: transform;
   transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .orb-1 {
-  width: 500px; height: 500px; background: $accent-violet;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, $accent-violet, rgba($accent-blue, 0.5));
   top: -120px; left: -100px;
   animation: orbFloat1 12s ease-in-out infinite;
 }
 .orb-2 {
-  width: 400px; height: 400px; background: $accent-blue;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, $accent-blue, rgba($accent-cyan, 0.5));
   bottom: -100px; right: -60px;
   animation: orbFloat2 15s ease-in-out infinite;
 }
 .orb-3 {
-  width: 300px; height: 300px; background: $accent-pink;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, $accent-pink, rgba($accent-violet, 0.5));
   top: 40%; left: 50%;
   animation: orbFloat3 10s ease-in-out infinite;
 }
@@ -98,8 +101,8 @@
   border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
-  opacity: 0.35;
-  background: $bg-card;
+  opacity: 0.3;
+  background: rgba(255, 255, 255, 0.03);
 
   img {
     width: 100%;
@@ -166,7 +169,7 @@
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, $accent-violet, $accent-blue);
+  background: linear-gradient(135deg, $accent-violet, $accent-cyan);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -206,6 +209,13 @@
     justify-content: center;
     color: $accent-violet;
     flex-shrink: 0;
+    transition: all $transition-base;
+  }
+
+  &:hover .feature-icon {
+    background: rgba($accent-violet, 0.18);
+    box-shadow: 0 0 16px rgba($accent-violet, 0.15);
+    transform: scale(1.05);
   }
 
   strong {
@@ -262,11 +272,12 @@
 .form-card {
   width: 100%;
   max-width: 420px;
-  @include glass(0.6);
-  border: 1px solid $border-subtle;
+  @include glass(0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: $radius-xl;
   padding: 44px 36px;
   animation: fadeIn 0.6s ease;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
   @include mobile {
     padding: 32px 24px;
@@ -383,12 +394,24 @@
   font-weight: 600;
   text-align: center;
   text-decoration: none;
-  transition: all $transition-fast;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: $gradient-violet-blue;
+    opacity: 0;
+    transition: opacity $transition-base;
+  }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: $accent-violet;
-    color: $accent-violet;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px rgba($accent-violet, 0.15);
+    &::before { opacity: 0.12; }
   }
 }
 

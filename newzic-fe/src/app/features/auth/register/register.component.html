@@ -41,28 +41,38 @@
       @if (step() === 1) {
         <div class="form-group">
           <label for="artistName">Artist Name</label>
-          <input id="artistName" type="text" [(ngModel)]="artistName" name="artistName" placeholder="Your stage name" required />
+          <input id="artistName" type="text" [(ngModel)]="artistName" name="artistName" placeholder="Your stage name" required
+            [class.input-error]="hasError('artistName')" (blur)="validateField('artistName')" />
+          @if (hasError('artistName')) { <span class="field-error">{{ fieldErrors()['artistName'] }}</span> }
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="username">Username</label>
-            <input id="username" type="text" [(ngModel)]="username" name="username" placeholder="unique_username" required />
+            <input id="username" type="text" [(ngModel)]="username" name="username" placeholder="unique_username" required
+              [class.input-error]="hasError('username')" (blur)="validateField('username')" />
+            @if (hasError('username')) { <span class="field-error">{{ fieldErrors()['username'] }}</span> }
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="you@email.com" required />
+            <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="you@email.com" required
+              [class.input-error]="hasError('email')" (blur)="validateField('email')" />
+            @if (hasError('email')) { <span class="field-error">{{ fieldErrors()['email'] }}</span> }
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="password">Password</label>
-            <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="Min 8 characters" required />
+            <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="Min 8 characters" required
+              [class.input-error]="hasError('password')" (blur)="validateField('password')" />
+            @if (hasError('password')) { <span class="field-error">{{ fieldErrors()['password'] }}</span> }
           </div>
           <div class="form-group">
             <label for="confirmPassword">Confirm Password</label>
-            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Repeat password" required />
+            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Repeat password" required
+              [class.input-error]="hasError('confirmPassword')" (blur)="validateField('confirmPassword')" />
+            @if (hasError('confirmPassword')) { <span class="field-error">{{ fieldErrors()['confirmPassword'] }}</span> }
           </div>
         </div>
 

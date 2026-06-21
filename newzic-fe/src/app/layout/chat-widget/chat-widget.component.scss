@@ -1,0 +1,346 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+// ── FLOATING ACTION BUTTON ──
+.chat-fab {
+  position: fixed;
+  bottom: calc($player-height + 24px);
+  right: 32px;
+  z-index: $z-modal + 1;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: none;
+  background: $gradient-violet-blue;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-lg, $shadow-glow-violet;
+  transition: transform $transition-spring, box-shadow $transition-base;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.open {
+    background: $bg-elevated;
+    box-shadow: $shadow-md;
+  }
+
+  @include mobile {
+    bottom: calc(60px + $player-height + 12px);
+    right: 16px;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+.fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, $accent-pink, $accent-orange);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  min-width: 22px;
+  height: 22px;
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border: 2px solid $bg-primary;
+  box-shadow: 0 2px 8px rgba($accent-pink, 0.4);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+// ── CHAT BOX ──
+.chat-box {
+  position: fixed;
+  bottom: calc($player-height + 90px);
+  right: 24px;
+  z-index: $z-modal;
+  width: 380px;
+  height: 500px;
+  background: rgba(15, 15, 26, 0.92);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: chatSlideUp 200ms ease-out;
+
+  @include mobile {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+@keyframes chatSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ── HEADER ──
+.cb-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid $border-subtle;
+  background: rgba(255, 255, 255, 0.04);
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.cb-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cb-back {
+  background: none;
+  border: none;
+  color: $text-secondary;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+
+  &:hover { color: $text-primary; }
+}
+
+.cb-chat-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cb-chat-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: $text-primary;
+  text-decoration: none;
+
+  &:hover { color: $accent-violet; }
+}
+
+// ── BODY / CONVERSATION LIST ──
+.cb-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.cb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: $text-tertiary;
+  padding: 24px;
+
+  svg {
+    margin-bottom: 12px;
+    opacity: 0.35;
+  }
+
+  p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 2px;
+  }
+
+  span { font-size: 0.78rem; }
+}
+
+.cb-conv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover { background: rgba(255, 255, 255, 0.04); }
+  &.unread .cb-conv-name { font-weight: 700; }
+}
+
+.cb-conv-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cb-conv-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cb-conv-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.cb-conv-last {
+  font-size: 0.75rem;
+  color: $text-tertiary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cb-conv-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $accent-violet;
+  flex-shrink: 0;
+}
+
+// ── MESSAGES ──
+.cb-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cb-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+
+  &.mine {
+    align-self: flex-end;
+
+    .cb-bubble {
+      background: $accent-violet;
+      color: white;
+      border-radius: $radius-md $radius-md 4px $radius-md;
+    }
+
+    .cb-time { text-align: right; }
+  }
+
+  &:not(.mine) {
+    align-self: flex-start;
+
+    .cb-bubble {
+      background: rgba(255, 255, 255, 0.06);
+      color: $text-primary;
+      border-radius: $radius-md $radius-md $radius-md 4px;
+    }
+  }
+}
+
+.cb-bubble {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  word-wrap: break-word;
+}
+
+.cb-time {
+  font-size: 0.65rem;
+  color: $text-muted;
+  margin-top: 2px;
+  padding: 0 2px;
+}
+
+// ── INPUT ──
+.cb-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 12px 16px;
+  border-top: 1px solid $border-subtle;
+  background: rgba(255, 255, 255, 0.04);
+
+  textarea {
+    flex: 1;
+    resize: none;
+    background: $bg-elevated;
+    border: 1px solid $border-subtle;
+    border-radius: $radius-sm;
+    color: $text-primary;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    min-height: 36px;
+    max-height: 80px;
+    font-family: inherit;
+
+    &::placeholder { color: $text-muted; }
+    &:focus {
+      outline: none;
+      border-color: $accent-violet;
+    }
+  }
+}
+
+.cb-send {
+  background: $gradient-violet-blue;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  flex-shrink: 0;
+  transition: transform $transition-spring, box-shadow $transition-base;
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: $shadow-glow-violet;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+}

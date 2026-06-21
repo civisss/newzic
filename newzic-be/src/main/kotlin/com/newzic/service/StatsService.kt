@@ -23,7 +23,11 @@ class StatsService(
 
         val totalSongs = songRepository.countByArtistId(artistId)
         val totalFollowers = followRepository.countByFollowingId(artistId)
+        val totalFollowing = followRepository.countByFollowerId(artistId)
         val totalPlays = user.totalPlays
+
+        val songs = songRepository.findByArtistId(artistId)
+        val totalReactions = songs.sumOf { it.reactionsFire + it.reactionsGem + it.reactionsOnpoint + it.reactionsStar }
 
         val now = LocalDateTime.now()
         val playsThisWeek = playEventRepository.countByArtistIdSince(artistId, now.minusDays(7))
@@ -46,7 +50,8 @@ class StatsService(
         return ArtistStatsResponse(
             totalPlays = totalPlays,
             totalFollowers = totalFollowers,
-            totalReactions = 0, // computed later if needed
+            totalFollowing = totalFollowing,
+            totalReactions = totalReactions,
             totalSongs = totalSongs,
             weeklyData = emptyList(), // TODO: implement weekly aggregation
             topCities = topCities,

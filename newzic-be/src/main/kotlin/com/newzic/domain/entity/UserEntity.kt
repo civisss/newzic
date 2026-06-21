@@ -91,6 +91,8 @@ class UserEntity(
     @Column(name = "photo_url")
     var photos: MutableSet<String> = mutableSetOf(),
 
+    var preferredLanguage: String? = "en",
+
     val joinedDate: LocalDate = LocalDate.now(),
 
     val createdAt: LocalDateTime = LocalDateTime.now(),

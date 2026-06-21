@@ -2,6 +2,7 @@ package com.newzic.service
 
 import com.newzic.api.dto.CreateSongRequest
 import com.newzic.api.dto.SongResponse
+import com.newzic.domain.entity.NotificationType
 import com.newzic.domain.entity.ReactionEntity
 import com.newzic.domain.entity.ReactionType
 import com.newzic.domain.entity.SongEntity
@@ -22,7 +23,8 @@ class SongService(
     private val userRepository: UserRepository,
     private val albumRepository: AlbumRepository,
     private val reactionRepository: ReactionRepository,
-    private val songMapper: SongMapper
+    private val songMapper: SongMapper,
+    private val notificationService: NotificationService
 ) {
 
     fun getById(id: UUID): SongResponse {
@@ -157,6 +159,22 @@ class SongService(
                 ReactionType.STAR -> song.reactionsStar += 1
             }
             songRepository.save(song)
+
+            val reactionEmoji = when (reactionType) {
+                ReactionType.FIRE -> "🔥"
+                ReactionType.GEM -> "💎"
+                ReactionType.ONPOINT -> "🎯"
+                ReactionType.STAR -> "🌟"
+            }
+            notificationService.create(
+                recipientId = song.artist.id,
+                fromUserId = userId,
+                type = NotificationType.REACTION,
+                message = "${user.displayName} reacted $reactionEmoji to \"${song.title}\"",
+                link = "/artist/${song.artist.id}",
+                songId = songId
+            )
+
             return true // added
         }
     }
