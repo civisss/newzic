@@ -7,6 +7,10 @@ spring:
     username: ${DB_USERNAME:newzic}
     password: ${DB_PASSWORD:newzic}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      data-source-properties:
+        ssl: ${DB_SSL:false}
+        sslmode: ${DB_SSLMODE:prefer}
 
   jpa:
     hibernate:

@@ -9,6 +9,7 @@ RUN ./gradlew bootJar --no-daemon -x test
 
 # ── Stage 2: Runtime ──
 FROM eclipse-temurin:21-jre-alpine
+RUN apk add --no-cache ca-certificates && update-ca-certificates
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
