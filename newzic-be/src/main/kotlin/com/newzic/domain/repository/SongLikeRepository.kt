@@ -15,4 +15,11 @@ interface SongLikeRepository : JpaRepository<SongLikeEntity, UUID> {
     fun findByUserIdOrderByCreatedAtDesc(userId: UUID): List<SongLikeEntity>
 
     fun countByUserId(userId: UUID): Long
+
+    @Query("""
+        SELECT sl.song.genre, COUNT(sl) FROM SongLikeEntity sl 
+        WHERE sl.user.id = :userId AND sl.song.genre IS NOT NULL
+        GROUP BY sl.song.genre ORDER BY COUNT(sl) DESC
+    """)
+    fun findGenreAffinitiesByUserId(userId: UUID): List<Array<Any>>
 }

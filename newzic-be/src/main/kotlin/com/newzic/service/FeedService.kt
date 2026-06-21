@@ -6,9 +6,12 @@ import com.newzic.api.dto.ReactionsDto
 import com.newzic.domain.entity.FeedPostEntity
 import com.newzic.domain.entity.FeedPostType
 import com.newzic.domain.repository.FeedPostRepository
+import com.newzic.domain.repository.FollowRepository
 import com.newzic.domain.repository.SongRepository
 import com.newzic.domain.repository.UserRepository
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,11 +21,50 @@ import java.util.UUID
 class FeedService(
     private val feedPostRepository: FeedPostRepository,
     private val userRepository: UserRepository,
-    private val songRepository: SongRepository
+    private val songRepository: SongRepository,
+    private val followRepository: FollowRepository
 ) {
 
     fun getFeed(pageable: Pageable): Page<FeedPostResponse> {
         return feedPostRepository.findAllByOrderByCreatedAtDesc(pageable).map { toResponse(it) }
+    }
+
+    @Transactional(readOnly = true)
+    fun getPersonalizedFeed(userId: UUID, pageable: Pageable): Page<FeedPostResponse> {
+        val totalSize = pageable.pageSize
+        val followedSize = (totalSize * 0.6).toInt().coerceAtLeast(1)
+        val discoverSize = totalSize - followedSize
+
+        // Get followed artist IDs
+        val followedIds = followRepository.findByFollowerId(userId)
+            .map { it.following.id }
+            .toSet()
+
+        val allPosts = mutableListOf<FeedPostEntity>()
+
+        // ── 60% from followed artists ──
+        if (followedIds.isNotEmpty()) {
+            val followedPosts = feedPostRepository.findByAuthorIds(
+                followedIds, PageRequest.of(pageable.pageNumber, followedSize)
+            ).content
+            allPosts.addAll(followedPosts)
+        }
+
+        // ── 40% discover (from non-followed, sorted by popularity) ──
+        val excludeIds = followedIds + userId
+        if (excludeIds.isNotEmpty()) {
+            val discoverPosts = feedPostRepository.findDiscoverExcluding(
+                excludeIds, PageRequest.of(pageable.pageNumber, discoverSize)
+            ).content
+            allPosts.addAll(discoverPosts)
+        }
+
+        // Sort merged list: followed posts by time, discover by engagement
+        val sorted = allPosts
+            .distinctBy { it.id }
+            .sortedByDescending { it.createdAt }
+
+        return PageImpl(sorted.map { toResponse(it) }, pageable, sorted.size.toLong())
     }
 
     fun getByAuthor(authorId: UUID, pageable: Pageable): Page<FeedPostResponse> {

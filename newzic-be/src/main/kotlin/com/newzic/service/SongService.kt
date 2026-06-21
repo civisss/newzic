@@ -11,6 +11,7 @@ import com.newzic.domain.repository.ReactionRepository
 import com.newzic.domain.repository.SongRepository
 import com.newzic.domain.repository.UserRepository
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,7 +25,8 @@ class SongService(
     private val albumRepository: AlbumRepository,
     private val reactionRepository: ReactionRepository,
     private val songMapper: SongMapper,
-    private val notificationService: NotificationService
+    private val notificationService: NotificationService,
+    private val recommendationService: RecommendationService
 ) {
 
     fun getById(id: UUID): SongResponse {
@@ -54,37 +56,57 @@ class SongService(
         val user = userRepository.findById(userId)
             .orElseThrow { NoSuchElementException("User not found") }
 
-        val preferredGenres = user.preferredGenres
+        val profile = recommendationService.buildTasteProfile(user)
+        val topGenres = profile.topGenres
         val userCountry = user.country
 
-        // Fetch all songs (in a real app we'd use a smarter query, but for demo data this is fine)
-        val allSongs = songRepository.findAll()
-            .filter { it.artist.id != userId }
+        // ── Fetch candidates from DB (filtered, not findAll) ──
+        val candidateLimit = limit * 5 // fetch more than needed for scoring
+        val candidates: List<SongEntity> = if (topGenres.isNotEmpty() && userCountry != null) {
+            songRepository.findRecommendationCandidates(
+                userId, topGenres, userCountry, PageRequest.of(0, candidateLimit)
+            ).content
+        } else if (topGenres.isNotEmpty()) {
+            songRepository.findByGenresExcludingUser(
+                userId, topGenres, PageRequest.of(0, candidateLimit)
+            ).content
+        } else if (userCountry != null) {
+            songRepository.findByArtistCountryExcludingUser(
+                userId, userCountry, PageRequest.of(0, candidateLimit)
+            ).content
+        } else {
+            songRepository.findTrending(PageRequest.of(0, candidateLimit)).content
+                .filter { it.artist.id != userId }
+        }
 
+        // ── Score each candidate using the full taste profile ──
         data class ScoredSong(val entity: SongEntity, val score: Double)
 
-        val scored = allSongs.map { song ->
+        val scored = candidates.map { song ->
             var score = 0.0
 
-            // Genre match: song genre matches user's preferred genres
-            if (preferredGenres.isNotEmpty() && song.genre != null) {
-                if (song.genre in preferredGenres) {
-                    score += 40.0
-                }
+            // Genre affinity from taste profile (weighted by interaction history)
+            if (song.genre != null) {
+                score += profile.genreScores[song.genre] ?: 0.0
             }
 
-            // Tag overlap with preferred genres (tags can be sub-genres)
-            if (preferredGenres.isNotEmpty() && song.tags.isNotEmpty()) {
-                val tagOverlap = preferredGenres.intersect(song.tags).size
+            // Tag overlap with top genres
+            if (topGenres.isNotEmpty() && song.tags.isNotEmpty()) {
+                val tagOverlap = topGenres.intersect(song.tags).size
                 score += tagOverlap * 10.0
             }
 
-            // Same country as artist
-            if (userCountry != null && song.artist.country == userCountry) {
-                score += 20.0
+            // Country affinity from taste profile
+            song.artist.country?.let { artistCountry ->
+                score += profile.countryScores[artistCountry] ?: 0.0
             }
 
-            // Popularity signal
+            // Boost songs from followed artists
+            if (song.artist.id in profile.followedArtistIds) {
+                score += 25.0
+            }
+
+            // Popularity signal (capped)
             score += (song.plays / 100000.0).coerceAtMost(10.0)
 
             // Freshness: recent songs get a boost

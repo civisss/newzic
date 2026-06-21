@@ -22,4 +22,18 @@ interface PlayEventRepository : JpaRepository<PlayEventEntity, UUID> {
 
     @Query("SELECT COUNT(p) FROM PlayEventEntity p WHERE p.song.artist.id = :artistId AND p.createdAt >= :since")
     fun countByArtistIdSince(artistId: UUID, since: LocalDateTime): Long
+
+    @Query("""
+        SELECT p.song.genre, COUNT(p) FROM PlayEventEntity p 
+        WHERE p.user.id = :userId AND p.song.genre IS NOT NULL
+        GROUP BY p.song.genre ORDER BY COUNT(p) DESC
+    """)
+    fun findGenreAffinitiesByUserId(userId: UUID): List<Array<Any>>
+
+    @Query("""
+        SELECT p.song.artist.country, COUNT(p) FROM PlayEventEntity p 
+        WHERE p.user.id = :userId AND p.song.artist.country IS NOT NULL
+        GROUP BY p.song.artist.country ORDER BY COUNT(p) DESC
+    """)
+    fun findCountryAffinitiesByUserId(userId: UUID): List<Array<Any>>
 }

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import java.util.UUID
 
 interface UserRepository : JpaRepository<UserEntity, UUID> {
@@ -45,4 +46,28 @@ interface UserRepository : JpaRepository<UserEntity, UUID> {
 
     @Query("SELECT u FROM UserEntity u WHERE u.id <> :excludeId")
     fun findAllExcept(excludeId: UUID): List<UserEntity>
+
+    @Query("""
+        SELECT DISTINCT u FROM UserEntity u LEFT JOIN u.genres g
+        WHERE u.id <> :excludeId
+        AND (u.country = :country OR g IN :genres)
+        ORDER BY u.followers DESC
+    """)
+    fun findRecommendationCandidates(
+        @Param("excludeId") excludeId: UUID,
+        @Param("country") country: String,
+        @Param("genres") genres: Set<String>,
+        pageable: Pageable
+    ): Page<UserEntity>
+
+    @Query("""
+        SELECT DISTINCT u FROM UserEntity u LEFT JOIN u.genres g
+        WHERE u.id <> :excludeId AND g IN :genres
+        ORDER BY u.followers DESC
+    """)
+    fun findByGenresExcludingUser(
+        @Param("excludeId") excludeId: UUID,
+        @Param("genres") genres: Set<String>,
+        pageable: Pageable
+    ): Page<UserEntity>
 }

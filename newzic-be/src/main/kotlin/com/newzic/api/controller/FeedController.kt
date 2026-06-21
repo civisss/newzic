@@ -18,9 +18,14 @@ class FeedController(private val feedService: FeedService) {
 
     @GetMapping
     fun getFeed(
+        auth: Authentication?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<Page<FeedPostResponse>> {
+        if (auth != null) {
+            val userId = auth.principal as UUID
+            return ResponseEntity.ok(feedService.getPersonalizedFeed(userId, PageRequest.of(page, size)))
+        }
         return ResponseEntity.ok(feedService.getFeed(PageRequest.of(page, size)))
     }
 

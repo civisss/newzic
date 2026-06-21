@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import java.util.UUID
 
 interface SongRepository : JpaRepository<SongEntity, UUID> {
@@ -39,4 +40,44 @@ interface SongRepository : JpaRepository<SongEntity, UUID> {
     fun findByGenre(genre: String, pageable: Pageable): Page<SongEntity>
 
     fun countByArtistId(artistId: UUID): Long
+
+    @EntityGraph(attributePaths = ["artist", "album", "tags"])
+    @Query("""
+        SELECT s FROM SongEntity s 
+        WHERE s.artist.id <> :excludeUserId
+        AND (s.genre IN :genres OR s.artist.country = :country)
+        ORDER BY s.plays DESC
+    """)
+    fun findRecommendationCandidates(
+        @Param("excludeUserId") excludeUserId: UUID,
+        @Param("genres") genres: Set<String>,
+        @Param("country") country: String,
+        pageable: Pageable
+    ): Page<SongEntity>
+
+    @EntityGraph(attributePaths = ["artist", "album", "tags"])
+    @Query("""
+        SELECT s FROM SongEntity s 
+        WHERE s.artist.id <> :excludeUserId
+        AND s.genre IN :genres
+        ORDER BY s.plays DESC
+    """)
+    fun findByGenresExcludingUser(
+        @Param("excludeUserId") excludeUserId: UUID,
+        @Param("genres") genres: Set<String>,
+        pageable: Pageable
+    ): Page<SongEntity>
+
+    @EntityGraph(attributePaths = ["artist", "album", "tags"])
+    @Query("""
+        SELECT s FROM SongEntity s 
+        WHERE s.artist.id <> :excludeUserId
+        AND s.artist.country = :country
+        ORDER BY s.plays DESC
+    """)
+    fun findByArtistCountryExcludingUser(
+        @Param("excludeUserId") excludeUserId: UUID,
+        @Param("country") country: String,
+        pageable: Pageable
+    ): Page<SongEntity>
 }

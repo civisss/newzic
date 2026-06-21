@@ -7,6 +7,7 @@ import com.newzic.domain.entity.NotificationType
 import com.newzic.domain.repository.FollowRepository
 import com.newzic.domain.repository.UserRepository
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +19,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
     private val userMapper: UserMapper,
-    private val notificationService: NotificationService
+    private val notificationService: NotificationService,
+    private val recommendationService: RecommendationService
 ) {
 
     fun getById(id: UUID): UserResponse {
@@ -54,51 +56,60 @@ class UserService(
         val user = userRepository.findById(userId)
             .orElseThrow { NoSuchElementException("User not found") }
 
-        val allOthers = userRepository.findAllExcept(userId)
-        val userPreferredGenres = user.preferredGenres
-        val userProducedGenres = user.genres
+        val profile = recommendationService.buildTasteProfile(user)
+        val topGenres = profile.topGenres
         val userCountry = user.country
 
+        // ── Fetch candidates from DB (filtered, not findAll) ──
+        val candidateLimit = limit * 5
+        val candidates = if (topGenres.isNotEmpty() && userCountry != null) {
+            userRepository.findRecommendationCandidates(
+                userId, userCountry, topGenres, PageRequest.of(0, candidateLimit)
+            ).content
+        } else if (topGenres.isNotEmpty()) {
+            userRepository.findByGenresExcludingUser(
+                userId, topGenres, PageRequest.of(0, candidateLimit)
+            ).content
+        } else {
+            userRepository.findTrending(PageRequest.of(0, candidateLimit)).content
+                .filter { it.id != userId }
+        }
+
+        // ── Score each candidate using the full taste profile ──
         data class ScoredUser(val entity: com.newzic.domain.entity.UserEntity, val score: Double)
 
-        val scored = allOthers.map { other ->
+        val scored = candidates
+            .filter { it.id !in profile.followedArtistIds } // exclude already-followed
+            .map { other ->
             var score = 0.0
 
-            // ── GEOGRAPHY ──
-            if (userCountry != null && other.country != null) {
-                if (other.country == userCountry) {
-                    // Same country → strong affinity
-                    score += 40.0
-                } else if (getRegion(other.country!!) == getRegion(userCountry)) {
-                    // Same region (e.g. both European) → moderate affinity
+            // ── GEOGRAPHY from taste profile ──
+            if (other.country != null) {
+                score += profile.countryScores[other.country] ?: 0.0
+                // Region bonus
+                if (userCountry != null && other.country != userCountry
+                    && getRegion(other.country!!) == getRegion(userCountry)) {
                     score += 15.0
                 }
             }
 
-            // ── GENRE MATCH: user likes ↔ artist produces ──
-            if (userPreferredGenres.isNotEmpty() && other.genres.isNotEmpty()) {
-                val overlap = userPreferredGenres.intersect(other.genres).size
-                // Each matching genre is worth 25 points (strongest signal)
-                score += overlap * 25.0
-            }
-
-            // ── GENRE MATCH: user produces ↔ artist produces (similar taste) ──
-            if (userProducedGenres.isNotEmpty() && other.genres.isNotEmpty()) {
-                val overlap = userProducedGenres.intersect(other.genres).size
-                // Same genre scene → moderate affinity
-                score += overlap * 10.0
+            // ── GENRE MATCH using taste profile scores ──
+            if (other.genres.isNotEmpty()) {
+                other.genres.forEach { genre ->
+                    score += (profile.genreScores[genre] ?: 0.0) * 0.5
+                }
             }
 
             // ── MUTUAL TASTE: user likes ↔ artist likes ──
-            if (userPreferredGenres.isNotEmpty() && other.preferredGenres.isNotEmpty()) {
-                val overlap = userPreferredGenres.intersect(other.preferredGenres).size
+            if (topGenres.isNotEmpty() && other.preferredGenres.isNotEmpty()) {
+                val overlap = topGenres.intersect(other.preferredGenres).size
                 score += overlap * 8.0
             }
 
             // ── POPULARITY BOOST (small, prevents cold-start) ──
             score += (other.followers / 10000.0).coerceAtMost(10.0)
 
-            // ── ENGAGEMENT: artists with more plays are slightly more relevant ──
+            // ── ENGAGEMENT ──
             score += (other.totalPlays / 500000.0).coerceAtMost(5.0)
 
             // ── VERIFIED ARTISTS get a small trust boost ──
