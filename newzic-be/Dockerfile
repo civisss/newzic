@@ -1,6 +1,15 @@
-# ── Runtime-only image (for local use with pre-built JAR) ──
+# ── Stage 1: Build ──
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /app
+COPY gradle gradle
+COPY gradlew build.gradle.kts settings.gradle.kts ./
+RUN chmod +x gradlew && ./gradlew dependencies --no-daemon || true
+COPY src src
+RUN ./gradlew bootJar --no-daemon -x test
+
+# ── Stage 2: Runtime ──
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
