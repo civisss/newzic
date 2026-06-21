@@ -5,6 +5,7 @@ out/
 .idea/
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.log
 application-local.yml
