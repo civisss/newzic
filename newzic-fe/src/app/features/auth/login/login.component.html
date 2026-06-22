@@ -27,8 +27,8 @@
     <!-- LEFT: Brand -->
     <div class="login-brand">
       <app-logo [size]="56" [textSize]="32" [clickable]="false" />
-      <h1 class="brand-motto">Let the world<br><span class="gradient-text">hear you.</span></h1>
-      <p class="brand-desc">The launchpad for emerging artists, producers, and bands. Upload your music, grow your fanbase, and get discovered.</p>
+      <h1 class="brand-motto">{{ 'auth.motto' | translate }}<br><span class="gradient-text">{{ 'auth.motto_highlight' | translate }}</span></h1>
+      <p class="brand-desc">{{ 'auth.brand_desc' | translate }}</p>
 
       <div class="brand-features">
         <div class="feature">
@@ -36,8 +36,8 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           </div>
           <div>
-            <strong>Upload & Share</strong>
-            <span>Drop your tracks and let the world discover your sound.</span>
+            <strong>{{ 'auth.feature_upload' | translate }}</strong>
+            <span>{{ 'auth.feature_upload_desc' | translate }}</span>
           </div>
         </div>
         <div class="feature">
@@ -45,8 +45,8 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <div>
-            <strong>Collaborate</strong>
-            <span>Find producers, vocalists, and bands to create with.</span>
+            <strong>{{ 'auth.feature_collab' | translate }}</strong>
+            <span>{{ 'auth.feature_collab_desc' | translate }}</span>
           </div>
         </div>
         <div class="feature">
@@ -54,48 +54,48 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
           </div>
           <div>
-            <strong>Grow</strong>
-            <span>Track your stats, build your audience, and go viral.</span>
+            <strong>{{ 'auth.feature_grow' | translate }}</strong>
+            <span>{{ 'auth.feature_grow_desc' | translate }}</span>
           </div>
         </div>
       </div>
 
       <div class="brand-stats">
-        <div class="bstat"><strong>10K+</strong><span>Artists</span></div>
+        <div class="bstat"><strong>10K+</strong><span>{{ 'auth.stat_artists' | translate }}</span></div>
         <div class="bstat-divider"></div>
-        <div class="bstat"><strong>50K+</strong><span>Tracks</span></div>
+        <div class="bstat"><strong>50K+</strong><span>{{ 'auth.stat_tracks' | translate }}</span></div>
         <div class="bstat-divider"></div>
-        <div class="bstat"><strong>2M+</strong><span>Plays</span></div>
+        <div class="bstat"><strong>2M+</strong><span>{{ 'auth.stat_plays' | translate }}</span></div>
       </div>
     </div>
 
     <!-- RIGHT: Form -->
     <div class="login-form-wrap">
       <div class="form-card">
-        <h2>Welcome back</h2>
-        <p class="form-subtitle">Sign in to continue to Newzic</p>
+        <h2>{{ 'auth.welcome_back' | translate }}</h2>
+        <p class="form-subtitle">{{ 'auth.sign_in_subtitle' | translate }}</p>
 
         <form (ngSubmit)="login()" class="auth-form">
           <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username">{{ 'auth.username_label' | translate }}</label>
             <input
               id="username"
               type="text"
               [(ngModel)]="username"
               name="username"
-              placeholder="Enter your username"
+              [placeholder]="'auth.enter_username' | translate"
               autocomplete="username"
               required />
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password">{{ 'auth.password_label' | translate }}</label>
             <input
               id="password"
               type="password"
               [(ngModel)]="password"
               name="password"
-              placeholder="Enter your password"
+              [placeholder]="'auth.enter_password' | translate"
               autocomplete="current-password"
               required />
           </div>
@@ -108,16 +108,16 @@
             @if (loading()) {
               <span class="spinner"></span>
             } @else {
-              Sign In
+              {{ 'auth.sign_in' | translate }}
             }
           </button>
         </form>
 
         <div class="auth-divider">
-          <span>or</span>
+          <span>{{ 'auth.or' | translate }}</span>
         </div>
 
-        <a routerLink="/register" class="btn-register">Create an account</a>
+        <a routerLink="/register" class="btn-register">{{ 'auth.create_account_btn' | translate }}</a>
       </div>
     </div>
   </div>
