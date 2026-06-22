@@ -312,21 +312,6 @@
   @include mobile { padding: 8px 14px; font-size: 0.82rem; }
 }
 
-.btn-share {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid $border-light;
-  background: transparent;
-  color: $text-secondary;
-  cursor: pointer;
-  transition: all $transition-fast;
-  &:hover { border-color: $accent-violet; color: $text-primary; }
-}
-
 // ── SOCIAL BAR ──
 .social-bar {
   display: flex;

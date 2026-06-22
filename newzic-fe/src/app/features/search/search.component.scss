@@ -30,6 +30,8 @@
 
   svg { color: $text-tertiary; flex-shrink: 0; transition: color $transition-base; }
   &:focus-within svg { color: $accent-violet; }
+
+  @include mobile { padding: 12px 18px; }
 }
 
 .search-input {
@@ -84,6 +86,18 @@
     border-color: $accent-violet;
     color: $text-primary;
     box-shadow: 0 0 16px rgba($accent-violet, 0.12);
+  }
+
+  @include mobile {
+    &.hidden-genre {
+      display: none;
+    }
+  }
+
+  &.genre-toggle {
+    border-color: rgba($accent-violet, 0.4);
+    color: $accent-violet;
+    font-weight: 600;
   }
 }
 

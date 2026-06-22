@@ -20,10 +20,15 @@
     </div>
 
     <!-- Genre Tags -->
-    <div class="genre-tags">
-      @for (genre of genres; track genre) {
-        <button class="genre-tag" [class.active]="activeGenre() === genre" (click)="selectGenre(genre)">
+    <div class="genre-tags" [class.collapsed]="!showAllGenres()">
+      @for (genre of genres; track genre; let i = $index) {
+        <button class="genre-tag" [class.active]="activeGenre() === genre" [class.hidden-genre]="!showAllGenres() && i >= mobileGenreLimit" (click)="selectGenre(genre)">
           {{ genre }}
+        </button>
+      }
+      @if (genres.length > mobileGenreLimit) {
+        <button class="genre-tag genre-toggle" (click)="toggleGenres()">
+          {{ showAllGenres() ? '−' : '+' + (genres.length - mobileGenreLimit) }}
         </button>
       }
     </div>

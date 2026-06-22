@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
@@ -28,6 +28,12 @@ export class SearchComponent implements OnInit {
     'Neo-Soul', 'R&B', 'Lo-Fi', 'Ambient', 'Future Bass', 'Reggaeton',
     'Hip-Hop', 'Pop', 'Post-Rock', 'Latin Pop', 'Electronic', 'Jazz'
   ];
+  showAllGenres = signal(false);
+  mobileGenreLimit = 8;
+
+  toggleGenres(): void {
+    this.showAllGenres.update(v => !v);
+  }
 
   constructor(
     private artistService: ArtistService,

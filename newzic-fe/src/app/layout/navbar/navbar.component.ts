@@ -24,7 +24,15 @@ export class NavbarComponent implements OnInit {
     public auth: AuthService,
     public notifService: NotificationService,
     public i18n: I18nService
-  ) {}
+  ) {
+    effect(() => {
+      if (this.showNotifications()) {
+        document.body.classList.add('notif-panel-open');
+      } else {
+        document.body.classList.remove('notif-panel-open');
+      }
+    });
+  }
 
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {

@@ -14,6 +14,8 @@ html {
   scroll-behavior: smooth;
   background: $bg-primary;
   min-height: 100%;
+  height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
@@ -179,4 +181,11 @@ h1, h2, h3, h4, h5, h6 {
 ::selection {
   background: rgba($accent-violet, 0.3);
   color: $text-primary;
+}
+
+// Hide chat FAB when notification panel is open (mobile)
+@include mobile {
+  body.notif-panel-open app-chat-widget {
+    display: none !important;
+  }
 }

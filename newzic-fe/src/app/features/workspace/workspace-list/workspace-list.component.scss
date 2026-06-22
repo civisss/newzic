@@ -4,6 +4,8 @@
 // ── PAGE ──
 .workspace-page {
   padding: 40px 0 80px;
+
+  @include mobile { padding: 24px 16px 80px; }
 }
 
 // ── HEADER ──
