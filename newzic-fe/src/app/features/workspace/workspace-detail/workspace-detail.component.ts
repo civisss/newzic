@@ -6,6 +6,8 @@ import { WorkspaceService } from '../../../core/services/workspace.service';
 import { AuthService, DEFAULT_AVATAR } from '../../../core/services/auth.service';
 import { PlayerService } from '../../../core/services/player.service';
 import { ArtistService } from '../../../core/services/artist.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { I18nService } from '../../../core/services/i18n.service';
 import { Artist } from '../../../core/models';
 import {
   Workspace,
@@ -18,7 +20,7 @@ import {
 @Component({
   selector: 'app-workspace-detail',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, TranslatePipe],
   templateUrl: './workspace-detail.component.html',
   styleUrl: './workspace-detail.component.scss'
 })
@@ -111,8 +113,13 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
     private authService: AuthService,
     private artistService: ArtistService,
     private playerService: PlayerService,
+    private i18n: I18nService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  getStatusLabel(status: string): string {
+    return this.i18n.t('workspace.status.' + status);
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;

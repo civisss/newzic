@@ -54,7 +54,7 @@ class MessageController(
                 displayName = other.displayName,
                 avatar = other.avatar,
                 lastMessage = m.content.take(100),
-                lastMessageTime = m.createdAt.toString(),
+                lastMessageTime = m.createdAt.toString() + "Z",
                 unread = !m.isRead && m.recipient.id == userId
             )
         }
@@ -121,6 +121,6 @@ class MessageController(
         recipientAvatar = m.recipient.avatar,
         content = m.content,
         isRead = m.isRead,
-        createdAt = m.createdAt.toString()
+        createdAt = m.createdAt.toString() + "Z"
     )
 }

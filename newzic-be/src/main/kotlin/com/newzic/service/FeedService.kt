@@ -108,7 +108,7 @@ class FeedService(
             songId = post.song?.id?.toString(),
             songTitle = post.song?.title,
             songCover = post.song?.cover,
-            timestamp = post.createdAt.toString(),
+            timestamp = post.createdAt.toString() + "Z",
             likes = post.likes,
             comments = post.comments,
             reactions = ReactionsDto(

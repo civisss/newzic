@@ -70,7 +70,7 @@ class NotificationService(
             fromUserId = n.fromUser?.id?.toString(),
             fromUser = n.fromUser?.displayName,
             songId = n.songId?.toString(),
-            timestamp = n.createdAt.toString(),
+            timestamp = n.createdAt.toString() + "Z",
             read = n.isRead,
             link = n.link
         )

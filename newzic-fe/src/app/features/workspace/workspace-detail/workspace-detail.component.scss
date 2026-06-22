@@ -77,6 +77,9 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid $border-subtle;
   font-size: 0.8rem;
+  text-decoration: none; color: inherit; cursor: pointer;
+  transition: all $transition-fast;
+  &:hover { background: rgba($accent-violet, 0.1); border-color: rgba($accent-violet, 0.3); }
 
   img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
   .owner-badge {

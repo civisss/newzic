@@ -95,16 +95,23 @@
   "profile.connect": "Conectar",
   "profile.language": "Idioma",
 
-  "search.placeholder": "Buscar artistas, canciones, álbumes...",
+  "search.discover": "Descubrir",
+  "search.discover_desc": "Encuentra tu próximo artista, pista o colaborador favorito.",
+  "search.placeholder": "Buscar artistas, pistas, géneros, tags...",
   "search.artists": "Artistas",
+  "search.tracks": "Pistas",
   "search.songs": "Canciones",
+  "search.filter_all": "Todos",
+  "search.open_collabs": "Abierto a colaboraciones",
   "search.no_results": "No se encontraron resultados",
+  "search.no_results_hint": "Prueba otro término de búsqueda o explora los tags de género arriba.",
 
   "upload.title": "Subir Nueva Canción",
   "upload.song_title": "Título de la Canción",
   "upload.genre": "Género",
   "upload.cover_art": "Portada",
   "upload.audio_file": "Archivo de Audio",
+  "upload.select_genre": "Selecciona un género",
   "upload.publish": "Publicar",
 
   "player.now_playing": "Reproduciendo",
@@ -228,5 +235,10 @@
   "workspace.filter_review": "Revisión",
   "workspace.filter_done": "Completado",
 
-  "nav.workspaces": "Workspaces"
+  "nav.workspaces": "Workspaces",
+
+  "workspace.status.draft": "Borrador",
+  "workspace.status.in_progress": "En Progreso",
+  "workspace.status.review": "Revisión",
+  "workspace.status.done": "Completado"
 }

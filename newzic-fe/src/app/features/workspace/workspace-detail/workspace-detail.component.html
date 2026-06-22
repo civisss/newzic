@@ -17,14 +17,14 @@
       <div class="header-actions">
         <div class="status-selector">
           <button class="status-btn" [class]="'status-' + ws.status" (click)="showStatusDropdown.set(!showStatusDropdown())">
-            {{ getStatusIcon(ws.status) }} {{ ws.status.replace('_', ' ') }}
+            {{ getStatusIcon(ws.status) }} {{ getStatusLabel(ws.status) }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           @if (showStatusDropdown()) {
             <div class="status-dropdown">
               @for (s of statuses; track s) {
                 <button (click)="updateStatus(s)" [class.active]="ws.status === s">
-                  {{ getStatusIcon(s) }} {{ s.replace('_', ' ') }}
+                  {{ getStatusIcon(s) }} {{ getStatusLabel(s) }}
                 </button>
               }
             </div>
@@ -39,13 +39,13 @@
     <!-- Members -->
     <div class="members-row">
       @for (m of ws.members; track m.id) {
-        <div class="member-chip">
+        <a class="member-chip" [routerLink]="['/artist', m.userId]">
           <img [src]="getAvatar(m.avatar)" [alt]="m.displayName" />
           <span>{{ m.displayName }}</span>
           @if (m.role === 'owner') {
             <span class="owner-badge">Owner</span>
           }
-        </div>
+        </a>
       }
     </div>
   </div>

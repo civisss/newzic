@@ -85,9 +85,12 @@ class UserRecommendationTest {
         whenever(userRepository.findRecommendationCandidates(eq(user.id), eq("IT"), any(), any()))
             .thenReturn(PageImpl(listOf(trapArtist, popArtist)))
 
+        val fillers = (1..5).map { createUser("Filler$it", country = "DE", genres = mutableSetOf("Rock")) }
+        whenever(userRepository.findTrending(any())).thenReturn(PageImpl(fillers))
+
         val result = userService.getRecommended(user.id, 10)
 
-        assertTrue(result.isNotEmpty())
+        assertTrue(result.size >= 4)
         // Trap artist from IT should rank higher: Trap genre (80 * 0.5 = 40) + IT country (50) = 90
         assertEquals("TrapArtist", result[0].displayName)
     }
@@ -104,14 +107,18 @@ class UserRecommendationTest {
             followedArtistIds = setOf(followedArtist.id) // already followed
         )
 
+        val fillers = (1..5).map { createUser("Filler$it", country = "US", genres = mutableSetOf("Pop")) }
+
         whenever(userRepository.findById(user.id)).thenReturn(Optional.of(user))
         whenever(recommendationService.buildTasteProfile(user)).thenReturn(profile)
         whenever(userRepository.findRecommendationCandidates(eq(user.id), eq("IT"), any(), any()))
             .thenReturn(PageImpl(listOf(followedArtist, newArtist)))
+        whenever(userRepository.findTrending(any())).thenReturn(PageImpl(fillers))
 
         val result = userService.getRecommended(user.id, 10)
 
-        assertEquals(1, result.size)
+        // newArtist is the only scored result (1 < 4), so trending fillers are added
+        assertTrue(result.size >= 4)
         assertEquals("NewArtist", result[0].displayName)
     }
 
@@ -127,15 +134,19 @@ class UserRecommendationTest {
             followedArtistIds = emptySet()
         )
 
+        val fillers = (1..5).map { createUser("Filler$it", country = "US", genres = mutableSetOf("Pop")) }
+
         whenever(userRepository.findById(user.id)).thenReturn(Optional.of(user))
         whenever(recommendationService.buildTasteProfile(user)).thenReturn(profile)
         whenever(userRepository.findRecommendationCandidates(eq(user.id), eq("IT"), any(), any()))
             .thenReturn(PageImpl(listOf(spanishArtist)))
+        whenever(userRepository.findTrending(any())).thenReturn(PageImpl(fillers))
 
         val result = userService.getRecommended(user.id, 10)
 
-        assertEquals(1, result.size)
-        // Spanish artist should get +15 region bonus (both EUROPE)
+        assertTrue(result.size >= 4)
+        // Spanish artist should get +15 region bonus (both EUROPE) and rank first
+        assertEquals("SpanishArtist", result[0].displayName)
     }
 
     @Test
@@ -151,14 +162,17 @@ class UserRecommendationTest {
             followedArtistIds = emptySet()
         )
 
+        val fillers = (1..5).map { createUser("Filler$it", country = "US", genres = mutableSetOf("Pop")) }
+
         whenever(userRepository.findById(user.id)).thenReturn(Optional.of(user))
         whenever(recommendationService.buildTasteProfile(user)).thenReturn(profile)
         whenever(userRepository.findRecommendationCandidates(eq(user.id), eq("IT"), any(), any()))
             .thenReturn(PageImpl(listOf(verifiedArtist, normalArtist)))
+        whenever(userRepository.findTrending(any())).thenReturn(PageImpl(fillers))
 
         val result = userService.getRecommended(user.id, 10)
 
-        assertEquals(2, result.size)
+        assertTrue(result.size >= 4)
         // Verified artist gets +3 boost → should rank higher
         assertEquals("Verified", result[0].displayName)
     }
@@ -177,12 +191,15 @@ class UserRecommendationTest {
         whenever(recommendationService.buildTasteProfile(userNoCountry)).thenReturn(profile)
 
         val artist = createUser("TrapProd", genres = mutableSetOf("Trap"))
+        val fillers = (1..5).map { createUser("Filler$it", genres = mutableSetOf("Pop")) }
         whenever(userRepository.findByGenresExcludingUser(eq(userNoCountry.id), any(), any()))
             .thenReturn(PageImpl(listOf(artist)))
+        whenever(userRepository.findTrending(any())).thenReturn(PageImpl(fillers))
 
         val result = userService.getRecommended(userNoCountry.id, 10)
 
-        assertEquals(1, result.size)
+        assertTrue(result.size >= 4)
+        assertEquals("TrapProd", result[0].displayName)
         verify(userRepository).findByGenresExcludingUser(eq(userNoCountry.id), any(), any())
         verify(userRepository, never()).findRecommendationCandidates(any(), any(), any(), any())
     }
@@ -202,7 +219,8 @@ class UserRecommendationTest {
 
         userService.getRecommended(emptyUser.id, 10)
 
-        verify(userRepository).findTrending(any())
+        // findTrending is called for candidates AND possibly for filler
+        verify(userRepository, atLeast(1)).findTrending(any())
     }
 
     @Test
@@ -234,6 +252,82 @@ class UserRecommendationTest {
         assertThrows(NoSuchElementException::class.java) {
             userService.getRecommended(randomId)
         }
+    }
+
+    @Test
+    fun `getRecommended fills with trending when scored results are below minimum`() {
+        stubUserMapper()
+        // Only 1 scored candidate, but minimum is 4
+        val singleArtist = createUser("OnlyMatch", country = "IT", genres = mutableSetOf("Trap"))
+
+        val profile = RecommendationService.TasteProfile(
+            genreScores = mapOf("Trap" to 80.0),
+            countryScores = mapOf("IT" to 50.0),
+            followedArtistIds = emptySet()
+        )
+
+        val trendingArtists = (1..5).map { createUser("Trending$it", country = "US", genres = mutableSetOf("Pop")) }
+
+        whenever(userRepository.findById(user.id)).thenReturn(Optional.of(user))
+        whenever(recommendationService.buildTasteProfile(user)).thenReturn(profile)
+        whenever(userRepository.findRecommendationCandidates(eq(user.id), eq("IT"), any(), any()))
+            .thenReturn(PageImpl(listOf(singleArtist)))
+        whenever(userRepository.findTrending(any())).thenReturn(PageImpl(trendingArtists))
+
+        val result = userService.getRecommended(user.id, 10)
+
+        assertEquals(4, result.size)
+        assertEquals("OnlyMatch", result[0].displayName)
+        // Remaining 3 are from trending
+        assertTrue(result.subList(1, 4).all { it.displayName.startsWith("Trending") })
+    }
+
+    @Test
+    fun `getRecommended does not fill when scored results meet minimum`() {
+        stubUserMapper()
+        val artists = (1..6).map { createUser("Match$it", country = "IT", genres = mutableSetOf("Trap")) }
+
+        val profile = RecommendationService.TasteProfile(
+            genreScores = mapOf("Trap" to 80.0),
+            countryScores = mapOf("IT" to 50.0),
+            followedArtistIds = emptySet()
+        )
+
+        whenever(userRepository.findById(user.id)).thenReturn(Optional.of(user))
+        whenever(recommendationService.buildTasteProfile(user)).thenReturn(profile)
+        whenever(userRepository.findRecommendationCandidates(eq(user.id), eq("IT"), any(), any()))
+            .thenReturn(PageImpl(artists))
+
+        val result = userService.getRecommended(user.id, 10)
+
+        assertEquals(6, result.size)
+        // findTrending should NOT be called because we have >= 4 results
+        verify(userRepository, never()).findTrending(any())
+    }
+
+    @Test
+    fun `getRecommended trending filler excludes already-followed and self`() {
+        stubUserMapper()
+        val profile = RecommendationService.TasteProfile(
+            genreScores = mapOf("Trap" to 80.0),
+            countryScores = mapOf("IT" to 50.0),
+            followedArtistIds = emptySet()
+        )
+
+        // No scored candidates at all
+        whenever(userRepository.findById(user.id)).thenReturn(Optional.of(user))
+        whenever(recommendationService.buildTasteProfile(user)).thenReturn(profile)
+        whenever(userRepository.findRecommendationCandidates(eq(user.id), eq("IT"), any(), any()))
+            .thenReturn(PageImpl(emptyList()))
+
+        // Trending includes the user itself — should be excluded
+        val trendingArtists = (1..6).map { createUser("Trending$it") }
+        whenever(userRepository.findTrending(any())).thenReturn(PageImpl(listOf(user) + trendingArtists))
+
+        val result = userService.getRecommended(user.id, 10)
+
+        assertEquals(4, result.size)
+        assertTrue(result.none { it.displayName == user.displayName })
     }
 
     // ── Helpers ──

@@ -118,11 +118,25 @@ class UserService(
             ScoredUser(other, score)
         }
 
-        return scored
+        val minResults = 4.coerceAtMost(limit)
+        val matched = scored
             .filter { it.score > 0 }
             .sortedByDescending { it.score }
             .take(limit)
-            .map { userMapper.toResponse(it.entity) }
+            .map { it.entity }
+
+        if (matched.size >= minResults) {
+            return matched.map { userMapper.toResponse(it) }
+        }
+
+        // Not enough scored results — fill with trending artists
+        val excludeIds = matched.map { it.id }.toSet() + profile.followedArtistIds + userId
+        val fillCount = minResults - matched.size
+        val filler = userRepository.findTrending(PageRequest.of(0, fillCount + 10)).content
+            .filter { it.id !in excludeIds }
+            .take(fillCount)
+
+        return (matched + filler).map { userMapper.toResponse(it) }
     }
 
     private fun getRegion(countryCode: String): String {

@@ -78,7 +78,7 @@ class CollaborationService(
             category = c.category.name.lowercase(),
             genres = c.genres.toList(),
             status = c.status.name.lowercase(),
-            createdAt = c.createdAt.toString(),
+            createdAt = c.createdAt.toString() + "Z",
             responses = c.responses,
             tags = c.tags.toList()
         )

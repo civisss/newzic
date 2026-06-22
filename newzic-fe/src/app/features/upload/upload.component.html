@@ -71,7 +71,7 @@
               <div class="form-group flex-1">
                 <label>{{ 'upload.genre' | translate }}</label>
                 <select [(ngModel)]="genre" name="genre" required>
-                  <option value="" disabled>Select a genre</option>
+                  <option value="" disabled>{{ 'upload.select_genre' | translate }}</option>
                   @for (g of genres; track g) {
                     <option [value]="g">{{ g }}</option>
                   }

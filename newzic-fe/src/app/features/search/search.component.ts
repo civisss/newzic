@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { ArtistService } from '../../core/services/artist.service';
 import { SongService } from '../../core/services/song.service';
 import { PlayerService } from '../../core/services/player.service';
@@ -11,7 +12,7 @@ import { Artist, Song } from '../../core/models';
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [RouterLink, FormsModule, FormatNumberPipe, DurationPipe],
+  imports: [RouterLink, FormsModule, FormatNumberPipe, DurationPipe, TranslatePipe],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })

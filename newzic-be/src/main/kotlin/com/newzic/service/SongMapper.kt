@@ -21,7 +21,7 @@ class SongMapper {
             duration = song.duration,
             genre = song.genre,
             tags = song.tags.toList(),
-            releaseDate = song.releaseDate.toString(),
+            releaseDate = song.releaseDate.toString() + "Z",
             plays = song.plays,
             likes = song.likes,
             reactions = ReactionsDto(

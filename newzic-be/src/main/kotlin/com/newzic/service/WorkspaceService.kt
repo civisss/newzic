@@ -386,8 +386,8 @@ class WorkspaceService(
             versionCount = versionCount,
             commentCount = commentCount,
             fileCount = fileCount,
-            createdAt = ws.createdAt.toString(),
-            updatedAt = ws.updatedAt.toString()
+            createdAt = ws.createdAt.toString() + "Z",
+            updatedAt = ws.updatedAt.toString() + "Z"
         )
     }
 
@@ -397,7 +397,7 @@ class WorkspaceService(
         displayName = m.user.displayName,
         avatar = m.user.avatar,
         role = m.role.name.lowercase(),
-        joinedAt = m.joinedAt.toString()
+        joinedAt = m.joinedAt.toString() + "Z"
     )
 
     private fun toVersionResponse(v: WorkspaceVersionEntity): WorkspaceVersionResponse {
@@ -412,7 +412,7 @@ class WorkspaceService(
             uploadedByAvatar = v.uploadedBy.avatar,
             duration = v.duration,
             commentCount = commentCount,
-            createdAt = v.createdAt.toString()
+            createdAt = v.createdAt.toString() + "Z"
         )
     }
 
@@ -425,7 +425,7 @@ class WorkspaceService(
         timestampSeconds = c.timestampSeconds,
         parentId = c.parent?.id?.toString(),
         replies = emptyList(),
-        createdAt = c.createdAt.toString()
+        createdAt = c.createdAt.toString() + "Z"
     )
 
     private fun toCommentResponseWithReplies(c: WorkspaceCommentEntity): WorkspaceCommentResponse {
@@ -439,7 +439,7 @@ class WorkspaceService(
             timestampSeconds = c.timestampSeconds,
             parentId = null,
             replies = replies.map { toCommentResponse(it) },
-            createdAt = c.createdAt.toString()
+            createdAt = c.createdAt.toString() + "Z"
         )
     }
 
@@ -451,7 +451,7 @@ class WorkspaceService(
         sizeBytes = f.sizeBytes,
         uploadedById = f.uploadedBy.id.toString(),
         uploadedByName = f.uploadedBy.displayName,
-        createdAt = f.createdAt.toString()
+        createdAt = f.createdAt.toString() + "Z"
     )
 
     private fun toChatResponse(m: WorkspaceChatEntity) = WorkspaceChatMessageResponse(
@@ -460,6 +460,6 @@ class WorkspaceService(
         senderName = m.sender.displayName,
         senderAvatar = m.sender.avatar,
         content = m.content,
-        createdAt = m.createdAt.toString()
+        createdAt = m.createdAt.toString() + "Z"
     )
 }

@@ -94,4 +94,42 @@ describe('AuthService', () => {
     expect(DEFAULT_AVATAR).toContain('data:image/svg+xml');
     expect(DEFAULT_AVATAR).toContain('viewBox');
   });
+
+  it('should NOT override local language on login when user already chose one', () => {
+    const i18n = TestBed.inject(I18nService) as unknown as MockI18nService;
+    spyOn(i18n, 'setLanguage');
+    localStorage.setItem('newzic_lang', 'de');
+
+    service.login('test', 'password').subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
+    req.flush({
+      token: 'fake-token',
+      user: {
+        id: '1', username: 'test', email: 'test@test.com',
+        displayName: 'Test', avatar: null, roles: ['singer'],
+        followers: 0, following: 0, preferredLanguage: 'it'
+      }
+    });
+
+    expect(i18n.setLanguage).not.toHaveBeenCalled();
+  });
+
+  it('should apply server language on login when no local language is set', () => {
+    const i18n = TestBed.inject(I18nService) as unknown as MockI18nService;
+    spyOn(i18n, 'setLanguage');
+    localStorage.removeItem('newzic_lang');
+
+    service.login('test', 'password').subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
+    req.flush({
+      token: 'fake-token',
+      user: {
+        id: '1', username: 'test', email: 'test@test.com',
+        displayName: 'Test', avatar: null, roles: ['singer'],
+        followers: 0, following: 0, preferredLanguage: 'it'
+      }
+    });
+
+    expect(i18n.setLanguage).toHaveBeenCalledWith('it');
+  });
 });
