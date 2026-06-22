@@ -31,6 +31,9 @@ class UserServiceTest {
     @Mock
     private lateinit var notificationService: NotificationService
 
+    @Mock
+    private lateinit var recommendationService: RecommendationService
+
     @InjectMocks
     private lateinit var userService: UserService
 

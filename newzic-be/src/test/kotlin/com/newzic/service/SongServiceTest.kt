@@ -24,6 +24,7 @@ class SongServiceTest {
     @Mock private lateinit var reactionRepository: ReactionRepository
     @Mock private lateinit var songMapper: SongMapper
     @Mock private lateinit var notificationService: NotificationService
+    @Mock private lateinit var recommendationService: RecommendationService
 
     @InjectMocks
     private lateinit var songService: SongService
