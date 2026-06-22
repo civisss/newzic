@@ -57,7 +57,7 @@ export class NavbarComponent implements OnInit {
   }
 
   selectLang(code: string): void {
-    this.i18n.setLanguage(code);
+    this.i18n.setLanguage(code, this.auth.isLoggedIn());
     this.showLangMenu.set(false);
   }
 

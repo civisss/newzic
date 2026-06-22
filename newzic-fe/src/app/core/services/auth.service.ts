@@ -79,7 +79,9 @@ export class AuthService {
     const user = this.mapUser(res.user);
     this.currentUser.set(user);
     localStorage.setItem('newzic_user', JSON.stringify(user));
-    if (user.preferredLanguage) {
+    // Only apply server language if user hasn't manually chosen one locally
+    const localLang = localStorage.getItem('newzic_lang');
+    if (!localLang && user.preferredLanguage) {
       this.i18n.setLanguage(user.preferredLanguage);
     }
   }
