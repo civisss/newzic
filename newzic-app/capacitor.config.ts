@@ -10,9 +10,13 @@ const config: CapacitorConfig = {
     // cleartext: true,
 
     // In production, it uses the bundled www/ folder
-    androidScheme: 'https'
+    androidScheme: 'https',
+    iosScheme: 'https'
   },
   plugins: {
+    CapacitorHttp: {
+      enabled: false
+    },
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 2000,

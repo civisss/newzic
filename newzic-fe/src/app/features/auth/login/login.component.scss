@@ -188,7 +188,7 @@
   flex-direction: column;
   gap: 20px;
 
-  @include mobile { align-items: center; }
+  @include mobile { align-items: stretch; }
 }
 
 .feature {
@@ -196,7 +196,7 @@
   align-items: flex-start;
   gap: 16px;
 
-  @include mobile { text-align: left; }
+  @include mobile { text-align: left; width: 100%; }
 
   .feature-icon {
     width: 44px;
