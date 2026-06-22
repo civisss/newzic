@@ -380,13 +380,47 @@
   <div class="modal-overlay" (click)="showInviteModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
       <h2>Invite Collaborator</h2>
-      <div class="form-group">
-        <label>User ID</label>
-        <input type="text" [(ngModel)]="inviteUserId" placeholder="Paste user ID" />
+      <div class="form-group invite-search-group">
+        <label>Search by name or username</label>
+        @if (selectedInvitee(); as invitee) {
+          <div class="invite-selected">
+            <img [src]="getAvatar(invitee.avatar)" class="invite-avatar" />
+            <div class="invite-selected-info">
+              <strong>{{ invitee.name }}</strong>
+              <span>&#64;{{ invitee.username }}</span>
+            </div>
+            <button class="invite-clear-btn" (click)="clearInvitee()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        } @else {
+          <div class="invite-search-wrap">
+            <svg class="invite-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" [(ngModel)]="inviteSearch"
+                   (input)="onInviteSearchInput()"
+                   placeholder="Type a name or @username..."
+                   autocomplete="off" />
+          </div>
+          @if (inviteResults().length > 0) {
+            <div class="invite-results">
+              @for (artist of inviteResults(); track artist.id) {
+                <button class="invite-result-item" (click)="selectInvitee(artist)">
+                  <img [src]="getAvatar(artist.avatar)" class="invite-result-avatar" />
+                  <div class="invite-result-info">
+                    <strong>{{ artist.name }}</strong>
+                    <span>&#64;{{ artist.username }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+          } @else if (inviteSearch.trim().length >= 2 && inviteResults().length === 0) {
+            <div class="invite-no-results">No users found</div>
+          }
+        }
       </div>
       <div class="modal-actions">
         <button class="btn-ghost" (click)="showInviteModal.set(false)">Cancel</button>
-        <button class="btn-primary" (click)="inviteMember()" [disabled]="!inviteUserId.trim()">Invite</button>
+        <button class="btn-primary" (click)="inviteMember()" [disabled]="!selectedInvitee()">Invite</button>
       </div>
     </div>
   </div>

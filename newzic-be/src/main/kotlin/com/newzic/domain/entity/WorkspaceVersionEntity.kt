@@ -18,7 +18,7 @@ class WorkspaceVersionEntity(
     @Column(nullable = false)
     val versionNumber: Int,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     var audioUrl: String,
 
     @Column(columnDefinition = "TEXT")

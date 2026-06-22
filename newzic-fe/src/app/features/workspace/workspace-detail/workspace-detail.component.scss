@@ -214,31 +214,39 @@
 
 // ── Comment Input Bar ──
 .comment-input-bar {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 12px;
   margin-top: 14px;
-  padding: 10px 16px;
+  padding: 8px 12px;
   background: rgba($accent-violet, 0.06);
   border: 1px solid rgba($accent-violet, 0.2);
   border-radius: $radius-lg;
   animation: slideIn 200ms ease;
+  min-height: 48px;
 
   .comment-at {
     font-size: 0.78rem; font-weight: 700;
     color: $accent-pink;
     white-space: nowrap;
+    padding: 5px 12px;
+    background: rgba($accent-pink, 0.12);
+    border-radius: $radius-full;
+    line-height: 1;
+    flex-shrink: 0;
   }
 
   input {
     flex: 1; background: none; border: none; outline: none;
     color: $text-primary; font-size: 0.88rem;
+    height: 32px; line-height: 32px;
     &::placeholder { color: $text-muted; }
   }
 
   .send-comment-btn, .cancel-comment-btn {
-    width: 32px; height: 32px;
+    width: 32px; height: 32px; min-width: 32px;
     border-radius: 50%; border: none;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: all $transition-fast;
+    flex-shrink: 0;
   }
 
   .send-comment-btn {
@@ -563,8 +571,8 @@
 }
 
 .file-drop-label {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 32px 20px; cursor: pointer; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 40px 24px; cursor: pointer; text-align: center;
   color: $text-tertiary; transition: all $transition-base;
 
   &:hover {
@@ -572,8 +580,8 @@
     border-color: rgba($accent-violet, 0.4);
   }
 
-  .file-drop-title { font-size: 0.88rem; font-weight: 600; color: $text-secondary; }
-  .file-drop-hint { font-size: 0.75rem; color: $text-muted; }
+  .file-drop-title { font-size: 0.88rem; font-weight: 600; color: $text-secondary; margin-top: 4px; }
+  .file-drop-hint { font-size: 0.75rem; color: $text-muted; line-height: 1.5; }
 }
 
 .file-selected {
@@ -595,6 +603,75 @@
   display: flex; align-items: center; justify-content: center;
   transition: all $transition-fast;
   &:hover { color: #ef4444; background: rgba(#ef4444, 0.1); }
+}
+
+// ── Invite Search Autocomplete ──
+.invite-search-group { position: relative; }
+
+.invite-search-wrap {
+  position: relative;
+  input { @include input-field; padding-left: 38px; }
+  .invite-search-icon {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    color: $text-muted; pointer-events: none;
+  }
+}
+
+.invite-results {
+  position: absolute; left: 0; right: 0; top: 100%;
+  margin-top: 4px; z-index: $z-dropdown;
+  background: $bg-elevated; border: 1px solid $border-light;
+  border-radius: $radius-md; overflow: hidden;
+  box-shadow: $shadow-lg; max-height: 240px; overflow-y: auto;
+  @include scrollbar;
+}
+
+.invite-result-item {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 10px 14px;
+  border: none; background: transparent;
+  color: $text-primary; cursor: pointer;
+  text-align: left; transition: background $transition-fast;
+  &:hover { background: rgba($accent-violet, 0.08); }
+  & + & { border-top: 1px solid $border-subtle; }
+}
+
+.invite-result-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+.invite-result-info {
+  display: flex; flex-direction: column;
+  strong { font-size: 0.86rem; }
+  span { font-size: 0.74rem; color: $text-muted; }
+}
+
+.invite-selected {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba($accent-violet, 0.3);
+  border-radius: $radius-md;
+  background: rgba($accent-violet, 0.04);
+}
+
+.invite-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+.invite-selected-info {
+  flex: 1; display: flex; flex-direction: column;
+  strong { font-size: 0.9rem; }
+  span { font-size: 0.76rem; color: $text-muted; }
+}
+
+.invite-clear-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: rgba(255, 255, 255, 0.06);
+  color: $text-muted; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all $transition-fast;
+  &:hover { color: #ef4444; background: rgba(#ef4444, 0.1); }
+}
+
+.invite-no-results {
+  text-align: center; padding: 16px;
+  font-size: 0.82rem; color: $text-muted;
 }
 
 // ── Loading ──

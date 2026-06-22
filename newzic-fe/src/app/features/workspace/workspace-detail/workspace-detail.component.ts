@@ -1,9 +1,11 @@
-import { Component, OnInit, signal, computed, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { WorkspaceService } from '../../../core/services/workspace.service';
 import { AuthService, DEFAULT_AVATAR } from '../../../core/services/auth.service';
+import { ArtistService } from '../../../core/services/artist.service';
+import { Artist } from '../../../core/models';
 import {
   Workspace,
   WorkspaceVersion,
@@ -58,7 +60,10 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   newFileType = 'OTHER';
 
   showInviteModal = signal(false);
-  inviteUserId = '';
+  inviteSearch = '';
+  inviteResults = signal<Artist[]>([]);
+  selectedInvitee = signal<Artist | null>(null);
+  private inviteSearchTimeout: any = null;
 
   defaultAvatar = DEFAULT_AVATAR;
 
@@ -95,10 +100,15 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
 
   statuses = ['draft', 'in_progress', 'review', 'done'];
 
+  private onMetadataLoaded = () => {};
+  private onAudioEnded = () => {};
+
   constructor(
     private route: ActivatedRoute,
     private workspaceService: WorkspaceService,
-    private authService: AuthService
+    private authService: AuthService,
+    private artistService: ArtistService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -143,19 +153,36 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
     this.loadComments();
     this.generateWaveform();
 
-    // Setup audio
+    // Force change detection so the template renders the player section
+    this.cdr.detectChanges();
+
+    // Setup audio after DOM is ready
+    this.setupAudio(version);
+  }
+
+  private setupAudio(version: WorkspaceVersion): void {
+    // Clean up previous listeners
+    if (this.audio) {
+      this.audio.removeEventListener('loadedmetadata', this.onMetadataLoaded);
+      this.audio.removeEventListener('ended', this.onAudioEnded);
+    }
+
     setTimeout(() => {
       if (this.audioElement?.nativeElement) {
         this.audio = this.audioElement.nativeElement;
-        this.audio.src = version.audioUrl;
-        this.audio.load();
-        this.audio.addEventListener('loadedmetadata', () => {
+
+        this.onMetadataLoaded = () => {
           this.duration.set(this.audio!.duration);
           this.drawWaveform();
-        });
-        this.audio.addEventListener('ended', () => {
+        };
+        this.onAudioEnded = () => {
           this.isPlaying.set(false);
-        });
+        };
+
+        this.audio.addEventListener('loadedmetadata', this.onMetadataLoaded);
+        this.audio.addEventListener('ended', this.onAudioEnded);
+        this.audio.src = version.audioUrl;
+        this.audio.load();
       }
     });
   }
@@ -357,13 +384,43 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
 
   // ── Members ──
 
+  onInviteSearchInput(): void {
+    clearTimeout(this.inviteSearchTimeout);
+    this.selectedInvitee.set(null);
+    const q = this.inviteSearch.trim();
+    if (q.length < 2) {
+      this.inviteResults.set([]);
+      return;
+    }
+    this.inviteSearchTimeout = setTimeout(() => {
+      this.artistService.search(q).subscribe(results => {
+        // Exclude current members
+        const memberIds = new Set(this.workspace()?.members.map(m => m.id) || []);
+        this.inviteResults.set(results.filter(a => !memberIds.has(a.id)));
+      });
+    }, 300);
+  }
+
+  selectInvitee(artist: Artist): void {
+    this.selectedInvitee.set(artist);
+    this.inviteSearch = artist.name;
+    this.inviteResults.set([]);
+  }
+
+  clearInvitee(): void {
+    this.selectedInvitee.set(null);
+    this.inviteSearch = '';
+    this.inviteResults.set([]);
+  }
+
   inviteMember(): void {
     const ws = this.workspace();
-    if (!ws || !this.inviteUserId.trim()) return;
+    const invitee = this.selectedInvitee();
+    if (!ws || !invitee) return;
 
-    this.workspaceService.inviteMember(ws.id, this.inviteUserId).subscribe(() => {
+    this.workspaceService.inviteMember(ws.id, invitee.id).subscribe(() => {
       this.showInviteModal.set(false);
-      this.inviteUserId = '';
+      this.clearInvitee();
       this.loadWorkspace(ws.id);
     });
   }
@@ -389,7 +446,19 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
       data.push(0.2 + Math.random() * 0.8);
     }
     this.waveformData.set(data);
-    setTimeout(() => this.drawWaveform());
+    // Retry drawing until canvas is available and has dimensions
+    this.drawWaveformWithRetry(5);
+  }
+
+  private drawWaveformWithRetry(retries: number): void {
+    setTimeout(() => {
+      const canvas = this.waveformCanvas?.nativeElement;
+      if (canvas && canvas.getBoundingClientRect().width > 0) {
+        this.drawWaveform();
+      } else if (retries > 0) {
+        this.drawWaveformWithRetry(retries - 1);
+      }
+    }, 50);
   }
 
   private drawWaveform(): void {
