@@ -1,4 +1,4 @@
-import { Component, signal, effect } from '@angular/core';
+import { Component, signal, computed, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PlayerService } from '../../core/services/player.service';
 import { SongService } from '../../core/services/song.service';
@@ -14,6 +14,11 @@ import { AuthService } from '../../core/services/auth.service';
 export class PlayerComponent {
   liked = signal(false);
   likeAnimating = signal(false);
+  isOwnSong = computed(() => {
+    const song = this.player.currentSong();
+    const user = this.auth.user();
+    return !!(song && user && song.artistId === user.id);
+  });
   private lastCheckedId = '';
 
   constructor(
