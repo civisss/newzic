@@ -7,7 +7,7 @@
     "sync": "npm run build:fe && npx cap sync",
     "sync:ios": "npm run build:fe && npx cap sync ios",
     "sync:android": "npm run build:fe && npx cap sync android",
-    "ios": "npm run build:fe && npx cap sync ios && npx cap run ios --target $(xcrun simctl list devices available | grep 'iPhone' | head -1 | grep -oE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')",
+    "ios": "npm run build:fe && npx cap sync ios && npx cap run ios --target $(xcrun simctl list devices available 'iOS 18' | grep 'iPhone' | head -1 | grep -oE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')",
     "android": "npm run build:fe && npx cap sync android && npx cap run android",
     "open:ios": "npx cap open ios",
     "open:android": "npx cap open android"
