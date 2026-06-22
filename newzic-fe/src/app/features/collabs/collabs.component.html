@@ -1,7 +1,7 @@
 <div class="collabs-page container">
   <div class="collabs-header">
-    <h1>Collaboration Board</h1>
-    <p>Find your next musical partner. Post a request or browse what others are looking for.</p>
+    <h1>{{ 'collabs.title' | translate }}</h1>
+    <p>{{ 'collabs.subtitle' | translate }}</p>
   </div>
 
   <!-- Search -->
@@ -9,7 +9,7 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
-    <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" placeholder="Search collabs by title, genre, tag..." />
+    <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" [placeholder]="'collabs.search_placeholder' | translate" />
   </div>
 
   <!-- Categories -->
@@ -46,21 +46,27 @@
         </div>
         <div class="collab-footer">
           <span class="collab-date">{{ collab.createdAt | date:'mediumDate' }}</span>
-          <span class="collab-responses">{{ collab.responses }} responses</span>
+          <span class="collab-responses">{{ collab.responses }} {{ 'collabs.responses' | translate }}</span>
         </div>
         <div class="collab-tags">
           @for (t of collab.tags; track t) {
             <span>{{ t }}</span>
           }
         </div>
+        @if (collab.status === 'open') {
+          <button class="collab-respond-btn" (click)="respondToCollab(collab.id)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+            {{ 'collabs.start_workspace' | translate }}
+          </button>
+        }
       </div>
     }
   </div>
 
   @if (collabs().length === 0) {
     <div class="no-collabs">
-      <h3>No collaborations found</h3>
-      <p>Try a different category or search term.</p>
+      <h3>{{ 'collabs.no_results' | translate }}</h3>
+      <p>{{ 'collabs.no_results_hint' | translate }}</p>
     </div>
   }
 </div>

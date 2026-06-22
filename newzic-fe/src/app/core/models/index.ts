@@ -7,3 +7,4 @@ export * from './collaboration.model';
 export * from './feed.model';
 export * from './stats.model';
 export * from './spotlight.model';
+export * from './workspace.model';

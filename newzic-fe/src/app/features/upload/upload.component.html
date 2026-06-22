@@ -14,8 +14,8 @@
             <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
           </svg>
         </div>
-        <h1>Drop your next hit</h1>
-        <p>Upload your track, add the details, and let the world hear you.</p>
+        <h1>{{ 'upload.hero_title' | translate }}</h1>
+        <p>{{ 'upload.hero_desc' | translate }}</p>
       </div>
 
       <div class="upload-content">
@@ -35,10 +35,10 @@
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
               </div>
-              <p class="drop-title">Drag & drop your audio file</p>
-              <p class="drop-sub">or click to browse — MP3, WAV, FLAC up to 50MB</p>
+              <p class="drop-title">{{ 'upload.drag_drop' | translate }}</p>
+              <p class="drop-sub">{{ 'upload.drag_drop_sub' | translate }}</p>
               <label class="browse-btn">
-                Choose File
+                {{ 'upload.choose_file' | translate }}
                 <input type="file" accept=".mp3,.wav,.flac" (change)="onFileSelect($event)" hidden />
               </label>
             </div>
@@ -51,7 +51,7 @@
               </div>
               <div class="file-details">
                 <p class="file-name">{{ fileName() }}</p>
-                <span class="file-status">Ready to upload</span>
+                <span class="file-status">{{ 'upload.ready' | translate }}</span>
               </div>
               <button class="change-btn" (click)="fileName.set(''); audioData.set('')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -65,11 +65,11 @@
           <form class="upload-form" (ngSubmit)="submit()">
             <div class="form-row">
               <div class="form-group flex-1">
-                <label>Track Title</label>
-                <input type="text" [(ngModel)]="title" name="title" placeholder="Give your track a name" required />
+                <label>{{ 'upload.track_title' | translate }}</label>
+                <input type="text" [(ngModel)]="title" name="title" [placeholder]="'upload.track_title_placeholder' | translate" required />
               </div>
               <div class="form-group flex-1">
-                <label>Genre</label>
+                <label>{{ 'upload.genre' | translate }}</label>
                 <select [(ngModel)]="genre" name="genre" required>
                   <option value="" disabled>Select a genre</option>
                   @for (g of genres; track g) {
@@ -80,13 +80,13 @@
             </div>
 
             <div class="form-group">
-              <label>Description</label>
-              <textarea [(ngModel)]="description" name="description" placeholder="Tell the story behind this track..." rows="3"></textarea>
+              <label>{{ 'upload.description' | translate }}</label>
+              <textarea [(ngModel)]="description" name="description" [placeholder]="'upload.description_placeholder' | translate" rows="3"></textarea>
             </div>
 
             <div class="form-group">
-              <label>Tags</label>
-              <input type="text" [(ngModel)]="tags" name="tags" placeholder="e.g. chill, summer, vocal" />
+              <label>{{ 'upload.tags' | translate }}</label>
+              <input type="text" [(ngModel)]="tags" name="tags" [placeholder]="'upload.tags_placeholder' | translate" />
             </div>
 
             <!-- Cover Art — dedicated area -->
@@ -96,7 +96,7 @@
                   <img [src]="coverPreview()" alt="Cover preview" class="cover-art-preview" />
                   <div class="cover-art-hover">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    <span>Change Cover</span>
+                    <span>{{ 'upload.change_cover' | translate }}</span>
                   </div>
                 } @else {
                   <div class="cover-art-empty">
@@ -105,11 +105,24 @@
                       <circle cx="8.5" cy="8.5" r="1.5"/>
                       <polyline points="21 15 16 10 5 21"/>
                     </svg>
-                    <span class="cover-art-title">Add Cover Art</span>
-                    <span class="cover-art-hint">Drag an image or click to browse<br>Recommended: 1400×1400px</span>
+                    <span class="cover-art-title">{{ 'upload.add_cover' | translate }}</span>
+                    <span class="cover-art-hint">{{ 'upload.cover_hint' | translate }}<br>{{ 'upload.cover_recommended' | translate }}</span>
                   </div>
                 }
                 <input type="file" accept="image/*" (change)="onCoverSelect($event)" hidden />
+              </label>
+            </div>
+
+            <div class="disclaimer-section">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="acceptRights" name="acceptRights" />
+                <span class="checkmark"></span>
+                <span>{{ 'upload.accept_rights' | translate }}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="acceptGuidelines" name="acceptGuidelines" />
+                <span class="checkmark"></span>
+                <span>{{ 'upload.accept_guidelines' | translate }} <a href="#" class="disclaimer-link">{{ 'upload.content_guidelines' | translate }}</a> {{ 'upload.guidelines_warning' | translate }} <a href="#" class="disclaimer-link">{{ 'auth.terms_of_service' | translate }}</a></span>
               </label>
             </div>
 
@@ -117,13 +130,13 @@
               <div class="error-msg">{{ error() }}</div>
             }
 
-            <button type="submit" class="btn-upload" [disabled]="uploading() || !title || !fileName() || !genre || !coverPreview()">
+            <button type="submit" class="btn-upload" [disabled]="uploading() || !title || !fileName() || !genre || !coverPreview() || !acceptRights || !acceptGuidelines">
               @if (uploading()) {
                 <span class="spinner"></span>
-                Publishing...
+                {{ 'upload.publishing' | translate }}
               } @else {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
-                Publish Track
+                {{ 'upload.publish_track' | translate }}
               }
             </button>
           </form>
@@ -134,11 +147,11 @@
       <div class="upload-tips">
         <div class="tip">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span><strong>Tip:</strong> Tracks with cover art get 3× more plays</span>
+          <span><strong>Tip:</strong> {{ 'upload.tip_cover' | translate }}</span>
         </div>
         <div class="tip">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span><strong>Tip:</strong> Add at least 3 tags for better discoverability</span>
+          <span><strong>Tip:</strong> {{ 'upload.tip_tags' | translate }}</span>
         </div>
       </div>
     </div>
@@ -155,15 +168,15 @@
       <div class="success-icon">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       </div>
-      <h2>Your track is live! 🎉</h2>
+      <h2>{{ 'upload.success_title' | translate }} 🎉</h2>
       <p class="success-track">"{{ title }}"</p>
-      <p class="success-sub">It's now available on Newzic for the world to hear.</p>
+      <p class="success-sub">{{ 'upload.success_sub' | translate }}</p>
       <div class="success-actions">
         <button class="btn-another" (click)="reset()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Upload Another
+          {{ 'upload.upload_another' | translate }}
         </button>
-        <a routerLink="/profile" class="btn-profile">View Profile</a>
+        <a routerLink="/profile" class="btn-profile">{{ 'upload.view_profile' | translate }}</a>
       </div>
     </div>
   }

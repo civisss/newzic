@@ -3,11 +3,13 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LogoComponent } from '../../../shared/components/logo/logo.component';
 import { AuthService } from '../../../core/services/auth.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { I18nService } from '../../../core/services/i18n.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [FormsModule, RouterLink, LogoComponent],
+  imports: [FormsModule, RouterLink, LogoComponent, TranslatePipe],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -20,6 +22,8 @@ export class RegisterComponent {
   country = '';
   selectedRoles: string[] = [];
   selectedGenres: string[] = [];
+  acceptTerms = false;
+  acceptAge = false;
   step = signal(1);
   error = signal('');
   loading = signal(false);
@@ -93,7 +97,7 @@ export class RegisterComponent {
     { value: 'beatmaker', label: 'Beatmaker', icon: '🥁' },
   ];
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router, public i18n: I18nService) {}
 
   toggleRole(value: string): void {
     // Singer and Band are mutually exclusive
@@ -180,7 +184,7 @@ export class RegisterComponent {
     this.error.set('');
     this.fieldErrors.set({});
     if (!this.artistName || !this.username || !this.email || !this.password || !this.confirmPassword) {
-      this.error.set('Please fill in all fields');
+      this.error.set(this.i18n.t('auth.fill_all_fields'));
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
@@ -196,7 +200,7 @@ export class RegisterComponent {
       return;
     }
     if (this.selectedRoles.length === 0) {
-      this.error.set('Please select at least one role');
+      this.error.set(this.i18n.t('auth.select_role'));
       return;
     }
     this.step.set(2);
@@ -215,7 +219,15 @@ export class RegisterComponent {
       return;
     }
     if (this.selectedRoles.length === 0) {
-      this.error.set('Please select at least one role');
+      this.error.set(this.i18n.t('auth.select_role'));
+      return;
+    }
+    if (!this.acceptTerms) {
+      this.error.set(this.i18n.t('auth.must_accept_terms'));
+      return;
+    }
+    if (!this.acceptAge) {
+      this.error.set(this.i18n.t('auth.must_accept_age'));
       return;
     }
 

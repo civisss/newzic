@@ -46,6 +46,7 @@ class SecurityConfig(
                     .requestMatchers(HttpMethod.GET, "/api/albums/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/messages/**").authenticated()
                     .requestMatchers(HttpMethod.POST, "/api/messages/**").authenticated()
+                    .requestMatchers("/api/workspaces/**").authenticated()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)

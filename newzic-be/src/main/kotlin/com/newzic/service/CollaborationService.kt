@@ -1,10 +1,14 @@
 package com.newzic.service
 
+import com.newzic.api.dto.CreateWorkspaceRequest
+import com.newzic.api.dto.WorkspaceResponse
 import com.newzic.domain.entity.CollabStatus
 import com.newzic.domain.repository.CollaborationRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 data class CollaborationResponse(
     val id: String,
@@ -24,7 +28,8 @@ data class CollaborationResponse(
 
 @Service
 class CollaborationService(
-    private val collaborationRepository: CollaborationRepository
+    private val collaborationRepository: CollaborationRepository,
+    private val workspaceService: WorkspaceService
 ) {
 
     fun getAll(pageable: Pageable): Page<CollaborationResponse> {
@@ -34,6 +39,31 @@ class CollaborationService(
     fun getByStatus(status: String, pageable: Pageable): Page<CollaborationResponse> {
         val collabStatus = CollabStatus.valueOf(status.uppercase())
         return collaborationRepository.findByStatus(collabStatus, pageable).map { toResponse(it) }
+    }
+
+    @Transactional
+    fun respondToCollab(collabId: UUID, responderId: UUID): WorkspaceResponse {
+        val collab = collaborationRepository.findById(collabId)
+            .orElseThrow { NoSuchElementException("Collaboration not found") }
+
+        if (collab.status != CollabStatus.OPEN) {
+            throw IllegalStateException("This collaboration is no longer open")
+        }
+
+        collab.status = CollabStatus.IN_PROGRESS
+        collab.responses += 1
+        collaborationRepository.save(collab)
+
+        // Create workspace with collab author + responder
+        return workspaceService.create(
+            userId = collab.author.id,
+            request = CreateWorkspaceRequest(
+                title = collab.title,
+                description = collab.description,
+                collaborationId = collab.id.toString(),
+                inviteUserIds = listOf(responderId.toString())
+            )
+        )
     }
 
     private fun toResponse(c: com.newzic.domain.entity.CollaborationEntity): CollaborationResponse {

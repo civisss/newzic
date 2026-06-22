@@ -26,7 +26,7 @@
   <div class="auth-card">
     <div class="auth-header">
       <app-logo [size]="44" [textSize]="24" [clickable]="false" />
-      <p class="auth-subtitle">Join the next generation of artists.</p>
+      <p class="auth-subtitle">{{ 'auth.join_subtitle' | translate }}</p>
     </div>
 
     <!-- Step indicator -->
@@ -40,22 +40,22 @@
       <!-- STEP 1: Account Info -->
       @if (step() === 1) {
         <div class="form-group">
-          <label for="artistName">Artist Name</label>
-          <input id="artistName" type="text" [(ngModel)]="artistName" name="artistName" placeholder="Your stage name" required
+          <label for="artistName">{{ 'auth.artist_name' | translate }}</label>
+          <input id="artistName" type="text" [(ngModel)]="artistName" name="artistName" [placeholder]="'auth.artist_name_placeholder' | translate" required
             [class.input-error]="hasError('artistName')" (blur)="validateField('artistName')" />
           @if (hasError('artistName')) { <span class="field-error">{{ fieldErrors()['artistName'] }}</span> }
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="username">Username</label>
-            <input id="username" type="text" [(ngModel)]="username" name="username" placeholder="unique_username" required
+            <label for="username">{{ 'auth.username' | translate }}</label>
+            <input id="username" type="text" [(ngModel)]="username" name="username" [placeholder]="'auth.username_placeholder' | translate" required
               [class.input-error]="hasError('username')" (blur)="validateField('username')" />
             @if (hasError('username')) { <span class="field-error">{{ fieldErrors()['username'] }}</span> }
           </div>
           <div class="form-group">
-            <label for="email">Email</label>
-            <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="you@email.com" required
+            <label for="email">{{ 'auth.email' | translate }}</label>
+            <input id="email" type="email" [(ngModel)]="email" name="email" [placeholder]="'auth.email_placeholder' | translate" required
               [class.input-error]="hasError('email')" (blur)="validateField('email')" />
             @if (hasError('email')) { <span class="field-error">{{ fieldErrors()['email'] }}</span> }
           </div>
@@ -63,21 +63,21 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="password">Password</label>
-            <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="Min 8 characters" required
+            <label for="password">{{ 'auth.password' | translate }}</label>
+            <input id="password" type="password" [(ngModel)]="password" name="password" [placeholder]="'auth.password_placeholder' | translate" required
               [class.input-error]="hasError('password')" (blur)="validateField('password')" />
             @if (hasError('password')) { <span class="field-error">{{ fieldErrors()['password'] }}</span> }
           </div>
           <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Repeat password" required
+            <label for="confirmPassword">{{ 'auth.confirm_password' | translate }}</label>
+            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" [placeholder]="'auth.confirm_password_placeholder' | translate" required
               [class.input-error]="hasError('confirmPassword')" (blur)="validateField('confirmPassword')" />
             @if (hasError('confirmPassword')) { <span class="field-error">{{ fieldErrors()['confirmPassword'] }}</span> }
           </div>
         </div>
 
         <div class="form-group">
-          <label>I am a... <span class="label-hint">(select all that apply)</span></label>
+          <label>{{ 'auth.i_am_a' | translate }} <span class="label-hint">({{ 'auth.select_all_apply' | translate }})</span></label>
           <div class="role-row">
             @for (r of primaryRoles; track r.value) {
               <button type="button" class="role-chip" [class.selected]="isSelected(r.value)" (click)="toggleRole(r.value)">
@@ -101,20 +101,20 @@
         }
 
         <button type="button" class="btn-primary" (click)="nextStep()">
-          Continue
+          {{ 'common.continue' | translate }}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       }
 
       <!-- STEP 2: Preferences -->
       @if (step() === 2) {
-        <h3 class="step-title">Tell us about your taste</h3>
-        <p class="step-desc">This helps us personalize your experience and recommend the right artists.</p>
+        <h3 class="step-title">{{ 'auth.step2_title' | translate }}</h3>
+        <p class="step-desc">{{ 'auth.step2_desc' | translate }}</p>
 
         <div class="form-group">
-          <label for="country">Where are you from?</label>
+          <label for="country">{{ 'auth.where_from' | translate }}</label>
           <select id="country" [(ngModel)]="country" name="country">
-            <option value="" disabled>Select your country</option>
+            <option value="" disabled>{{ 'auth.select_country' | translate }}</option>
             @for (c of countries; track c.code) {
               <option [value]="c.code">{{ c.label }}</option>
             }
@@ -122,7 +122,7 @@
         </div>
 
         <div class="form-group">
-          <label>What genres do you love? <span class="label-hint">(select a few)</span></label>
+          <label>{{ 'auth.genres_love' | translate }} <span class="label-hint">({{ 'auth.select_few' | translate }})</span></label>
           <div class="genre-grid">
             @for (g of availableGenres; track g) {
               <button type="button" class="genre-chip" [class.selected]="isGenreSelected(g)" (click)="toggleGenre(g)">
@@ -132,6 +132,19 @@
           </div>
         </div>
 
+        <div class="disclaimer-section">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" />
+            <span class="checkmark"></span>
+            <span>{{ 'auth.accept_terms' | translate }} <a href="#" class="disclaimer-link">{{ 'auth.terms_of_service' | translate }}</a> {{ 'auth.and' | translate }} <a href="#" class="disclaimer-link">{{ 'auth.privacy_policy' | translate }}</a></span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="acceptAge" name="acceptAge" />
+            <span class="checkmark"></span>
+            <span>{{ 'auth.accept_age' | translate }}</span>
+          </label>
+        </div>
+
         @if (error()) {
           <div class="error-msg">{{ error() }}</div>
         }
@@ -139,13 +152,13 @@
         <div class="step-actions">
           <button type="button" class="btn-back" (click)="prevStep()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Back
+            {{ 'common.back' | translate }}
           </button>
-          <button type="submit" class="btn-primary" [disabled]="loading()">
+          <button type="submit" class="btn-primary" [disabled]="loading() || !acceptTerms || !acceptAge">
             @if (loading()) {
               <span class="spinner"></span>
             } @else {
-              Create Account
+              {{ 'auth.create_account' | translate }}
             }
           </button>
         </div>
@@ -153,8 +166,8 @@
     </form>
 
     <div class="auth-footer">
-      <span>Already have an account?</span>
-      <a routerLink="/login">Log in</a>
+      <span>{{ 'auth.already_have_account' | translate }}</span>
+      <a routerLink="/login">{{ 'auth.log_in' | translate }}</a>
     </div>
   </div>
 

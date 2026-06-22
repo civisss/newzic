@@ -2,11 +2,13 @@ import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { SongService } from '../../core/services/song.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-upload',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, TranslatePipe],
   templateUrl: './upload.component.html',
   styleUrl: './upload.component.scss'
 })
@@ -22,6 +24,8 @@ export class UploadComponent {
   uploaded = signal(false);
   dragOver = signal(false);
   error = signal('');
+  acceptRights = false;
+  acceptGuidelines = false;
 
   genres = [
     'Dream Pop', 'Trap', 'Indie Rock', 'K-Pop', 'House', 'Techno',
@@ -29,7 +33,7 @@ export class UploadComponent {
     'Hip-Hop', 'Pop', 'Post-Rock', 'Latin Pop', 'Electronic', 'Jazz', 'Other'
   ];
 
-  constructor(private router: Router, private songService: SongService) {}
+  constructor(private router: Router, private songService: SongService, public i18n: I18nService) {}
 
   onFileDrop(event: DragEvent): void {
     event.preventDefault();
@@ -69,8 +73,16 @@ export class UploadComponent {
   }
 
   submit(): void {
-    this.uploading.set(true);
     this.error.set('');
+    if (!this.acceptRights) {
+      this.error.set(this.i18n.t('upload.must_accept_rights'));
+      return;
+    }
+    if (!this.acceptGuidelines) {
+      this.error.set(this.i18n.t('upload.must_accept_guidelines'));
+      return;
+    }
+    this.uploading.set(true);
 
     const tagList = this.tags
       ? this.tags.split(',').map(t => t.trim()).filter(t => t.length > 0)
@@ -105,5 +117,7 @@ export class UploadComponent {
     this.coverPreview.set('');
     this.uploaded.set(false);
     this.error.set('');
+    this.acceptRights = false;
+    this.acceptGuidelines = false;
   }
 }

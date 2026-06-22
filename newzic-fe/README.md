@@ -46,14 +46,19 @@ newzic-fe/
 │   │   ├── search/          # Search artists & songs
 │   │   ├── feed/            # Social feed page
 │   │   ├── song/            # Song detail page
-│   │   └── collabs/         # Collaboration board
+│   │   ├── collabs/         # Collaboration board
+│   │   └── workspace/
+│   │       ├── workspace-list/    # Workspace listing with filters & create modal
+│   │       └── workspace-detail/  # Workspace detail (waveform player, comments, versions, files, chat)
 │   ├── layout/
 │   │   ├── navbar/          # Top navigation bar
-│   │   └── player/          # Bottom audio player bar
+│   │   ├── player/          # Bottom audio player bar
+│   │   └── chat-widget/     # Floating chat widget
 │   └── shared/
-│       ├── components/      # Reusable components (Logo, etc.)
-│       ├── pipes/           # FormatNumber, Duration pipes
+│       ├── components/      # Reusable components (Logo, FollowersModal, etc.)
+│       ├── pipes/           # FormatNumber, Duration, Translate pipes
 │       └── styles/          # SCSS variables, mixins, global styles
+├── src/assets/i18n/         # Translation files (en, it, de, es)
 ├── nginx.conf               # Production Nginx config (SPA routing + API proxy)
 ├── Dockerfile               # Multi-stage build (Node → Nginx)
 └── angular.json
@@ -81,6 +86,8 @@ The registration form is split into two steps:
 1. **Account info** — artist name, username, email, password, role selection
 2. **Preferences** — country, favorite genres
 
+Both steps include **legal disclaimer checkboxes** (Terms of Service, Privacy Policy, age confirmation) that must be accepted before submission.
+
 ### Profile & Avatar Upload
 - Avatar is clickable with a camera icon overlay
 - Image is read as base64 and saved via `PATCH /api/users/me`
@@ -97,8 +104,32 @@ Songs have four reaction types instead of likes:
 - Clickable buttons on artist page track rows
 - Toggle on/off via `POST /api/songs/{id}/react`
 
+### Legal Disclaimers
+Both the registration and upload forms include required disclaimer checkboxes:
+- **Registration** — Accept Terms of Service & Privacy Policy, confirm age ≥ 13
+- **Upload** — Confirm content ownership/rights, accept Content Guidelines
+
+Checkboxes are custom-styled with animated fill and validation is enforced before submission.
+
+### Collaboration Workspaces
+Full-featured workspace system for collaborative music production:
+- **Workspace list** — filter by status (Draft, In Progress, Review, Done), create via modal
+- **Workspace detail** — waveform audio player with timestamped comments, version management, file sharing, real-time chat
+- **Version upload** — drag & drop or click-to-browse file picker (MP3, WAV, FLAC), same UX as the main upload page
+- **Collaboration board** — browse and respond to collaboration requests, start workspaces directly
+
+### Internationalization (i18n)
+Full multi-language support via `I18nService` and `TranslatePipe`:
+- **Supported languages**: English, Italian, German, Spanish
+- **Translation files**: `src/assets/i18n/{en,it,de,es}.json`
+- **Coverage**: navbar, registration, upload, collabs, workspaces, and all UI labels
+- Language switcher in the navbar with flag icons
+
 ### Infinite Marquees
 Trending artists, fresh drops, and recommended songs use CSS `@keyframes` marquee animations with 4x duplicated content for seamless infinite scrolling.
+
+### Consistent Layout
+All pages use a global `.container` class (`max-width: 1320px`, centered with horizontal padding) for consistent content width across the application.
 
 ## Development
 

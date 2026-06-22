@@ -351,6 +351,72 @@ select {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+// ── DISCLAIMER CHECKBOXES ──
+.disclaimer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: $text-secondary;
+  cursor: pointer;
+  line-height: 1.4;
+
+  input[type="checkbox"] {
+    display: none;
+  }
+
+  .checkmark {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 2px solid $border-light;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all $transition-fast;
+    margin-top: 1px;
+
+    &::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: $accent-violet;
+      transform: scale(0);
+      transition: transform $transition-fast;
+    }
+  }
+
+  input:checked + .checkmark {
+    border-color: $accent-violet;
+    &::after { transform: scale(1); }
+  }
+
+  &:hover .checkmark {
+    border-color: rgba($accent-violet, 0.5);
+  }
+}
+
+.disclaimer-link {
+  color: $accent-violet;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
 .auth-footer {
   text-align: center;
   margin-top: 24px;

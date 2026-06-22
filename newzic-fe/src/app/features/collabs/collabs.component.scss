@@ -153,6 +153,24 @@
   }
 }
 
+.collab-respond-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; justify-content: center;
+  margin-top: 14px; padding: 10px 20px;
+  border-radius: $radius-full;
+  border: none;
+  background: linear-gradient(135deg, $accent-violet, $accent-blue);
+  color: $text-primary;
+  font-size: 0.84rem; font-weight: 600;
+  cursor: pointer; transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba($accent-violet, 0.35);
+  }
+  &:active { transform: translateY(0); }
+}
+
 .no-collabs {
   text-align: center; padding: 60px 20px;
   h3 { font-size: 1.2rem; margin-bottom: 8px; }

@@ -1,0 +1,113 @@
+<div class="workspace-page container">
+  <!-- Header -->
+  <div class="workspace-header">
+    <div>
+      <h1>{{ 'workspace.title' | translate }}</h1>
+      <p>{{ 'workspace.subtitle' | translate }}</p>
+    </div>
+    <button class="create-btn" (click)="showCreateModal.set(true)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      {{ 'workspace.new' | translate }}
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    @for (f of filters; track f.value) {
+      <button class="filter-btn" [class.active]="activeFilter() === f.value" (click)="filterBy(f.value)">
+        <span class="filter-icon">{{ f.icon }}</span>
+        {{ f.labelKey | translate }}
+      </button>
+    }
+  </div>
+
+  <!-- Workspace Grid -->
+  @if (workspaces().length > 0) {
+    <div class="workspace-grid">
+      @for (ws of workspaces(); track ws.id) {
+        <a [routerLink]="['/workspace', ws.id]" class="workspace-card">
+          <div class="card-top">
+            <span class="ws-status" [class]="getStatusClass(ws.status)">
+              {{ getStatusIcon(ws.status) }} {{ ws.status.replace('_', ' ') }}
+            </span>
+            <span class="ws-date">{{ ws.updatedAt | date:'mediumDate' }}</span>
+          </div>
+
+          <h3 class="ws-title">{{ ws.title }}</h3>
+
+          @if (ws.description) {
+            <p class="ws-desc">{{ ws.description }}</p>
+          }
+
+          <div class="ws-stats">
+            <span class="stat">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              {{ ws.versionCount }} versions
+            </span>
+            <span class="stat">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              {{ ws.commentCount }} comments
+            </span>
+            <span class="stat">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+              {{ ws.fileCount }} files
+            </span>
+          </div>
+
+          <div class="ws-members">
+            @for (m of getMemberAvatars(ws); track m.name) {
+              <img [src]="m.avatar" [alt]="m.name" [title]="m.name" class="member-avatar" />
+            }
+            @if (ws.members.length > 4) {
+              <span class="more-members">+{{ ws.members.length - 4 }}</span>
+            }
+          </div>
+        </a>
+      }
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-visual">
+        <div class="empty-orb empty-orb-1"></div>
+        <div class="empty-orb empty-orb-2"></div>
+        <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="18" cy="16" r="3"/>
+        </svg>
+      </div>
+      <h3>{{ 'workspace.empty_title' | translate }}</h3>
+      <p>{{ 'workspace.empty_desc' | translate }}<br/>{{ 'workspace.empty_desc_2' | translate }}</p>
+    </div>
+  }
+
+  <!-- Create Modal -->
+  @if (showCreateModal()) {
+    <div class="modal-overlay" (click)="showCreateModal.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h2>{{ 'workspace.create_modal_title' | translate }}</h2>
+        <p class="modal-subtitle">{{ 'workspace.create_modal_subtitle' | translate }}</p>
+
+        <div class="form-group">
+          <label>{{ 'workspace.project_title' | translate }}</label>
+          <input type="text" [(ngModel)]="newTitle" [placeholder]="'workspace.project_title_placeholder' | translate"
+                 (keydown.enter)="createWorkspace()" />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'workspace.description' | translate }}</label>
+          <textarea [(ngModel)]="newDescription" rows="3"
+                    [placeholder]="'workspace.description_placeholder' | translate"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-ghost" (click)="showCreateModal.set(false)">{{ 'common.cancel' | translate }}</button>
+          <button class="btn-primary" (click)="createWorkspace()" [disabled]="!newTitle.trim()">
+            {{ 'workspace.create' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

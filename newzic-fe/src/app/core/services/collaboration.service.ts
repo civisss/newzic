@@ -33,6 +33,10 @@ export class CollaborationService {
     );
   }
 
+  respondToCollab(collabId: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/collaborations/${collabId}/respond`, {});
+  }
+
   private mapCollab(c: any): Collaboration {
     return {
       id: c.id,

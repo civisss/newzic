@@ -1,14 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { CollaborationService } from '../../core/services/collaboration.service';
 import { Collaboration, CollabCategory } from '../../core/models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-collabs',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, TranslatePipe],
   templateUrl: './collabs.component.html',
   styleUrl: './collabs.component.scss'
 })
@@ -28,7 +30,7 @@ export class CollabsComponent implements OnInit {
     { value: 'songwriter', label: 'Songwriter', icon: '✍️' }
   ];
 
-  constructor(private collabService: CollaborationService) {}
+  constructor(private collabService: CollaborationService, private router: Router, public i18n: I18nService) {}
 
   ngOnInit(): void {
     this.collabService.getAll().subscribe(c => this.collabs.set(c));
@@ -60,5 +62,11 @@ export class CollabsComponent implements OnInit {
   getCategoryLabel(cat: string): string {
     const found = this.categories.find(c => c.value === cat);
     return found ? found.label : cat;
+  }
+
+  respondToCollab(collabId: string): void {
+    this.collabService.respondToCollab(collabId).subscribe(workspace => {
+      this.router.navigate(['/workspace', workspace.id]);
+    });
   }
 }

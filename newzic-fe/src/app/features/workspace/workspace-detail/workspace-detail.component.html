@@ -1,0 +1,396 @@
+@if (workspace(); as ws) {
+<div class="workspace-detail container">
+
+  <!-- Header -->
+  <div class="ws-header">
+    <a routerLink="/workspaces" class="back-link">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Workspaces
+    </a>
+    <div class="header-main">
+      <div class="header-info">
+        <h1>{{ ws.title }}</h1>
+        @if (ws.description) {
+          <p class="ws-description">{{ ws.description }}</p>
+        }
+      </div>
+      <div class="header-actions">
+        <div class="status-selector">
+          <button class="status-btn" [class]="'status-' + ws.status" (click)="showStatusDropdown.set(!showStatusDropdown())">
+            {{ getStatusIcon(ws.status) }} {{ ws.status.replace('_', ' ') }}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          @if (showStatusDropdown()) {
+            <div class="status-dropdown">
+              @for (s of statuses; track s) {
+                <button (click)="updateStatus(s)" [class.active]="ws.status === s">
+                  {{ getStatusIcon(s) }} {{ s.replace('_', ' ') }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <button class="action-btn" (click)="showInviteModal.set(true)" title="Invite collaborator">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Members -->
+    <div class="members-row">
+      @for (m of ws.members; track m.id) {
+        <div class="member-chip">
+          <img [src]="getAvatar(m.avatar)" [alt]="m.displayName" />
+          <span>{{ m.displayName }}</span>
+          @if (m.role === 'owner') {
+            <span class="owner-badge">Owner</span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Audio Player with Waveform -->
+  @if (activeVersion(); as ver) {
+    <div class="player-section">
+      <div class="version-label">
+        <span class="version-badge">v{{ ver.versionNumber }}</span>
+        <span class="version-meta">by {{ ver.uploadedByName }} — {{ ver.createdAt | date:'mediumDate' }}</span>
+        @if (ver.notes) {
+          <span class="version-notes">{{ ver.notes }}</span>
+        }
+      </div>
+
+      <audio #audioElement [src]="ver.audioUrl" preload="metadata"></audio>
+
+      <div class="waveform-container">
+        <!-- Comment pins above waveform -->
+        <div class="comment-pins-layer">
+          @for (pin of commentPins(); track pin.id) {
+            <button class="comment-pin"
+                    [style.left.%]="pin.leftPercent"
+                    [title]="pin.authorName + ' @' + formatTimestamp(pin.timestampSeconds) + ': ' + pin.content"
+                    (click)="jumpToTimestamp(pin.timestampSeconds); $event.stopPropagation()">
+              <span class="pin-dot"></span>
+              <span class="pin-tooltip">
+                <strong>{{ pin.authorName }}</strong> @{{ formatTimestamp(pin.timestampSeconds) }}
+                <br/>{{ pin.content }}
+              </span>
+            </button>
+          }
+        </div>
+
+        <!-- Waveform Canvas -->
+        <canvas #waveformCanvas
+                class="waveform-canvas"
+                (click)="onWaveformClick($event)">
+        </canvas>
+
+        <!-- Click hint -->
+        <div class="waveform-hint">Click on the waveform to add a comment at that moment</div>
+      </div>
+
+      <!-- Transport controls -->
+      <div class="transport">
+        <button class="play-btn" (click)="togglePlay()">
+          @if (isPlaying()) {
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          } @else {
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          }
+        </button>
+        <span class="time-display">{{ formattedCurrentTime() }} / {{ formattedDuration() }}</span>
+      </div>
+
+      <!-- Inline comment input (appears when clicking waveform) -->
+      @if (showCommentInput()) {
+        <div class="comment-input-bar">
+          <span class="comment-at">@{{ formatTimestamp(commentTimestamp()) }}</span>
+          <input type="text" [(ngModel)]="newComment"
+                 placeholder="Type your comment..."
+                 (keydown.enter)="submitComment()"
+                 (keydown.escape)="cancelComment()" />
+          <button class="send-comment-btn" (click)="submitComment()" [disabled]="!newComment.trim()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+          <button class="cancel-comment-btn" (click)="cancelComment()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="no-version">
+      <div class="no-version-icon">🎵</div>
+      <h3>No audio yet</h3>
+      <p>Upload the first version to start collaborating</p>
+      <button class="upload-btn" (click)="showVersionModal.set(true)">Upload Audio</button>
+    </div>
+  }
+
+  <!-- Tabs -->
+  <div class="tabs-section">
+    <div class="tab-bar">
+      <button class="tab" [class.active]="activeTab() === 'comments'" (click)="activeTab.set('comments')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Comments
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'versions'" (click)="activeTab.set('versions')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Versions
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'files'" (click)="activeTab.set('files')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        Files
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'chat'" (click)="activeTab.set('chat')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Chat
+      </button>
+    </div>
+
+    <!-- Comments Tab -->
+    @if (activeTab() === 'comments') {
+      <div class="tab-content">
+        @if (comments().length > 0) {
+          <div class="comments-list">
+            @for (c of comments(); track c.id) {
+              <div class="comment-item">
+                <img [src]="getAvatar(c.authorAvatar)" class="comment-avatar" />
+                <div class="comment-body">
+                  <div class="comment-header">
+                    <strong>{{ c.authorName }}</strong>
+                    <button class="timestamp-link" (click)="jumpToTimestamp(c.timestampSeconds)">
+                      @{{ formatTimestamp(c.timestampSeconds) }}
+                    </button>
+                    <span class="comment-date">{{ c.createdAt | date:'short' }}</span>
+                  </div>
+                  <p class="comment-text">{{ c.content }}</p>
+                  <button class="reply-btn" (click)="replyTo(c)">Reply</button>
+
+                  <!-- Replies -->
+                  @if (c.replies.length > 0) {
+                    <div class="replies">
+                      @for (r of c.replies; track r.id) {
+                        <div class="reply-item">
+                          <img [src]="getAvatar(r.authorAvatar)" class="reply-avatar" />
+                          <div class="reply-body">
+                            <strong>{{ r.authorName }}</strong>
+                            <span class="comment-date">{{ r.createdAt | date:'short' }}</span>
+                            <p>{{ r.content }}</p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="tab-empty">
+            <p>No comments yet. Click on the waveform to leave a timestamped comment.</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Versions Tab -->
+    @if (activeTab() === 'versions') {
+      <div class="tab-content">
+        <div class="tab-actions">
+          <button class="action-btn-sm" (click)="showVersionModal.set(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Upload Version
+          </button>
+        </div>
+        @if (versions().length > 0) {
+          <div class="versions-list">
+            @for (v of versions(); track v.id) {
+              <button class="version-item" [class.active]="activeVersion()?.id === v.id"
+                      (click)="selectVersion(v)">
+                <div class="version-num">v{{ v.versionNumber }}</div>
+                <div class="version-info">
+                  <strong>{{ v.uploadedByName }}</strong>
+                  <span>{{ v.createdAt | date:'medium' }}</span>
+                  @if (v.notes) {
+                    <p class="version-note">{{ v.notes }}</p>
+                  }
+                </div>
+                <div class="version-stats">
+                  <span>{{ v.commentCount }} comments</span>
+                </div>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Files Tab -->
+    @if (activeTab() === 'files') {
+      <div class="tab-content">
+        <div class="tab-actions">
+          <button class="action-btn-sm" (click)="showFileModal.set(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Upload File
+          </button>
+        </div>
+        @if (files().length > 0) {
+          <div class="files-list">
+            @for (f of files(); track f.id) {
+              <div class="file-item">
+                <span class="file-icon">{{ getFileIcon(f.fileType) }}</span>
+                <div class="file-info">
+                  <a [href]="f.url" target="_blank" class="file-name">{{ f.name }}</a>
+                  <span class="file-meta">{{ f.uploadedByName }} · {{ formatFileSize(f.sizeBytes) }} · {{ f.createdAt | date:'mediumDate' }}</span>
+                </div>
+                <span class="file-type-badge">{{ f.fileType }}</span>
+                <button class="delete-file-btn" (click)="deleteFile(f.id)" title="Delete file">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="tab-empty">
+            <p>No files shared yet. Upload stems, samples, or references.</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Chat Tab -->
+    @if (activeTab() === 'chat') {
+      <div class="tab-content chat-tab">
+        <div class="chat-messages">
+          @for (msg of chatMessages(); track msg.id) {
+            <div class="chat-msg" [class.own]="msg.senderId === currentUser()?.id">
+              <img [src]="getAvatar(msg.senderAvatar)" class="chat-avatar" />
+              <div class="chat-bubble">
+                <strong>{{ msg.senderName }}</strong>
+                <p>{{ msg.content }}</p>
+                <span class="chat-time">{{ msg.createdAt | date:'shortTime' }}</span>
+              </div>
+            </div>
+          }
+          @if (chatMessages().length === 0) {
+            <div class="tab-empty">
+              <p>Start the conversation about this project.</p>
+            </div>
+          }
+        </div>
+        <div class="chat-input-row">
+          <input type="text" [(ngModel)]="newChatMessage"
+                 placeholder="Type a message..."
+                 (keydown.enter)="sendChat()" />
+          <button class="send-btn" (click)="sendChat()" [disabled]="!newChatMessage.trim()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- Upload Version Modal -->
+@if (showVersionModal()) {
+  <div class="modal-overlay" (click)="showVersionModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Upload New Version</h2>
+      <div class="form-group">
+        <label>Audio File</label>
+        <div class="file-drop-area"
+             [class.has-file]="!!newVersionFileName"
+             [class.drag-over]="versionDragOver()"
+             (drop)="onVersionFileDrop($event)"
+             (dragover)="onVersionDragOver($event)"
+             (dragleave)="onVersionDragLeave()">
+          @if (newVersionFileName) {
+            <div class="file-selected">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+              </svg>
+              <div class="file-selected-info">
+                <span class="file-selected-name">{{ newVersionFileName }}</span>
+                <span class="file-selected-ready">Ready to upload</span>
+              </div>
+              <button class="file-remove-btn" (click)="newVersionAudioData = ''; newVersionFileName = ''; $event.stopPropagation()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          } @else {
+            <label class="file-drop-label">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span class="file-drop-title">Drag & drop your audio file</span>
+              <span class="file-drop-hint">or click to browse — MP3, WAV, FLAC up to 50MB</span>
+              <input type="file" accept=".mp3,.wav,.flac" (change)="onVersionFileSelect($event)" hidden />
+            </label>
+          }
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes (optional)</label>
+        <textarea [(ngModel)]="newVersionNotes" rows="2" placeholder="What changed in this version?"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" (click)="showVersionModal.set(false)">Cancel</button>
+        <button class="btn-primary" (click)="uploadVersion()" [disabled]="!newVersionAudioData">Upload</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Upload File Modal -->
+@if (showFileModal()) {
+  <div class="modal-overlay" (click)="showFileModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Share File</h2>
+      <div class="form-group">
+        <label>File Name</label>
+        <input type="text" [(ngModel)]="newFileName" placeholder="vocals_v2.wav" />
+      </div>
+      <div class="form-group">
+        <label>File URL</label>
+        <input type="text" [(ngModel)]="newFileUrl" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select [(ngModel)]="newFileType">
+          @for (ft of fileTypes; track ft.value) {
+            <option [value]="ft.value">{{ ft.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" (click)="showFileModal.set(false)">Cancel</button>
+        <button class="btn-primary" (click)="uploadFile()" [disabled]="!newFileName.trim() || !newFileUrl.trim()">Share</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Invite Modal -->
+@if (showInviteModal()) {
+  <div class="modal-overlay" (click)="showInviteModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Invite Collaborator</h2>
+      <div class="form-group">
+        <label>User ID</label>
+        <input type="text" [(ngModel)]="inviteUserId" placeholder="Paste user ID" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" (click)="showInviteModal.set(false)">Cancel</button>
+        <button class="btn-primary" (click)="inviteMember()" [disabled]="!inviteUserId.trim()">Invite</button>
+      </div>
+    </div>
+  </div>
+}
+} @else {
+  <div class="loading">Loading workspace...</div>
+}

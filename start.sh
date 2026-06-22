@@ -101,7 +101,7 @@ cd "$SCRIPT_DIR/newzic-be"
 echo "🔨 Building frontend..."
 cd "$SCRIPT_DIR/newzic-fe"
 npm install
-npx ng build --configuration=production
+npx ng build --configuration=development
 
 # ─────────────────────────────────────────────
 # 3. START

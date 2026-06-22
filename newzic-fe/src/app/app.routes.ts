@@ -61,5 +61,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/messages/messages.component').then(m => m.MessagesComponent)
   },
+  {
+    path: 'workspaces',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/workspace/workspace-list/workspace-list.component').then(m => m.WorkspaceListComponent)
+  },
+  {
+    path: 'workspace/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/workspace/workspace-detail/workspace-detail.component').then(m => m.WorkspaceDetailComponent)
+  },
   { path: '**', redirectTo: 'login' }
 ];

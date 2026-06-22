@@ -8,3 +8,4 @@ export * from './feed.service';
 export * from './collaboration.service';
 export * from './spotlight.service';
 export * from './stats.service';
+export * from './workspace.service';

@@ -1,0 +1,611 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.workspace-detail { padding: 32px 0 80px; }
+
+// ── Header ──
+.ws-header { margin-bottom: 24px; }
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: $text-tertiary; font-size: 0.82rem; text-decoration: none;
+  margin-bottom: 16px; transition: color $transition-fast;
+  &:hover { color: $accent-violet; }
+}
+
+.header-main {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+
+.header-info {
+  h1 { font-size: 1.8rem; margin-bottom: 6px; }
+  .ws-description { color: $text-secondary; font-size: 0.92rem; }
+}
+
+.header-actions { display: flex; align-items: center; gap: 10px; }
+
+.status-selector { position: relative; }
+
+.status-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: $radius-full;
+  border: 1px solid $border-light; background: transparent;
+  color: $text-primary; font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; text-transform: capitalize;
+  transition: all $transition-base;
+
+  &.status-draft { border-color: rgba($text-tertiary, 0.3); }
+  &.status-in_progress { border-color: rgba($accent-orange, 0.4); color: $accent-orange; }
+  &.status-review { border-color: rgba($accent-cyan, 0.4); color: $accent-cyan; }
+  &.status-done { border-color: rgba($accent-green, 0.4); color: $accent-green; }
+}
+
+.status-dropdown {
+  position: absolute; top: 100%; right: 0; margin-top: 8px;
+  background: $bg-surface; border: 1px solid $border-light;
+  border-radius: $radius-md; overflow: hidden; z-index: $z-dropdown;
+  box-shadow: $shadow-lg; min-width: 160px;
+
+  button {
+    display: block; width: 100%; padding: 10px 16px;
+    border: none; background: transparent; color: $text-secondary;
+    font-size: 0.82rem; text-align: left; cursor: pointer;
+    text-transform: capitalize; transition: background $transition-fast;
+    &:hover { background: rgba($accent-violet, 0.08); color: $text-primary; }
+    &.active { color: $accent-violet; font-weight: 600; }
+  }
+}
+
+.action-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid $border-light; background: transparent;
+  color: $text-secondary; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all $transition-base;
+  &:hover { border-color: $accent-violet; color: $accent-violet; transform: scale(1.05); }
+}
+
+.members-row {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+}
+
+.member-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 14px 4px 4px;
+  border-radius: $radius-full;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border-subtle;
+  font-size: 0.8rem;
+
+  img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+  .owner-badge {
+    font-size: 0.65rem; padding: 2px 8px;
+    border-radius: $radius-full;
+    background: rgba($accent-violet, 0.15); color: $accent-violet;
+    font-weight: 600;
+  }
+}
+
+// ── Player Section (CORE) ──
+.player-section {
+  @include glass-card;
+  border-radius: $radius-xl; padding: 24px;
+  margin-bottom: 24px;
+  &:hover { transform: none; } // Disable card hover lift
+}
+
+.version-label {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; flex-wrap: wrap;
+
+  .version-badge {
+    @include gradient-text($gradient-violet-blue);
+    font-size: 0.88rem; font-weight: 700;
+    padding: 4px 12px; border-radius: $radius-full;
+    background: rgba($accent-violet, 0.12);
+    // Override gradient text for badge
+    -webkit-text-fill-color: $accent-violet;
+  }
+  .version-meta { font-size: 0.78rem; color: $text-tertiary; }
+  .version-notes {
+    font-size: 0.8rem; color: $text-secondary; font-style: italic;
+    &::before { content: '— '; }
+  }
+}
+
+.waveform-container {
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 12px;
+  border-radius: $radius-md;
+  overflow: visible;
+
+  &:hover .waveform-hint { opacity: 1; }
+}
+
+.waveform-canvas {
+  width: 100%; height: 80px;
+  display: block;
+  border-radius: $radius-md;
+}
+
+.waveform-hint {
+  position: absolute; bottom: -20px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.68rem; color: $text-muted;
+  opacity: 0; transition: opacity $transition-base;
+  white-space: nowrap;
+}
+
+// ── Comment Pins on Waveform ──
+.comment-pins-layer {
+  position: absolute; top: -8px; left: 0; right: 0;
+  height: calc(100% + 8px); pointer-events: none;
+  z-index: 2;
+}
+
+.comment-pin {
+  position: absolute; top: 0;
+  transform: translateX(-50%);
+  pointer-events: all;
+  background: none; border: none; cursor: pointer;
+  padding: 0; z-index: 3;
+
+  .pin-dot {
+    display: block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: $accent-pink;
+    border: 2px solid $bg-primary;
+    box-shadow: 0 0 8px rgba($accent-pink, 0.5);
+    transition: transform $transition-fast, box-shadow $transition-fast;
+  }
+
+  &:hover .pin-dot {
+    transform: scale(1.4);
+    box-shadow: 0 0 16px rgba($accent-pink, 0.7);
+  }
+
+  .pin-tooltip {
+    display: none;
+    position: absolute; top: 18px; left: 50%;
+    transform: translateX(-50%);
+    background: $bg-elevated;
+    border: 1px solid $border-light;
+    border-radius: $radius-sm;
+    padding: 8px 12px;
+    font-size: 0.72rem; color: $text-primary;
+    white-space: nowrap; max-width: 250px;
+    box-shadow: $shadow-md;
+    z-index: 10;
+    white-space: normal;
+    line-height: 1.4;
+
+    strong { color: $accent-violet; }
+  }
+
+  &:hover .pin-tooltip { display: block; }
+}
+
+// ── Transport Controls ──
+.transport {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.play-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: $gradient-violet-blue;
+  color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform $transition-fast, box-shadow $transition-base;
+  box-shadow: 0 4px 20px rgba($accent-violet, 0.3);
+
+  &:hover { transform: scale(1.08); box-shadow: $shadow-glow-violet; }
+  &:active { transform: scale(0.96); }
+}
+
+.time-display {
+  font-size: 0.82rem; color: $text-tertiary;
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Comment Input Bar ──
+.comment-input-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: rgba($accent-violet, 0.06);
+  border: 1px solid rgba($accent-violet, 0.2);
+  border-radius: $radius-lg;
+  animation: slideIn 200ms ease;
+
+  .comment-at {
+    font-size: 0.78rem; font-weight: 700;
+    color: $accent-pink;
+    white-space: nowrap;
+  }
+
+  input {
+    flex: 1; background: none; border: none; outline: none;
+    color: $text-primary; font-size: 0.88rem;
+    &::placeholder { color: $text-muted; }
+  }
+
+  .send-comment-btn, .cancel-comment-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%; border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all $transition-fast;
+  }
+
+  .send-comment-btn {
+    background: $gradient-violet-blue; color: white;
+    &:disabled { opacity: 0.3; pointer-events: none; }
+    &:hover { transform: scale(1.1); }
+  }
+
+  .cancel-comment-btn {
+    background: rgba(255, 255, 255, 0.06); color: $text-tertiary;
+    &:hover { color: $text-primary; background: rgba(255, 255, 255, 0.1); }
+  }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// ── No Version State ──
+.no-version {
+  @include glass-card;
+  border-radius: $radius-xl; padding: 60px 24px;
+  text-align: center; margin-bottom: 24px;
+  &:hover { transform: none; }
+
+  .no-version-icon { font-size: 3rem; margin-bottom: 12px; }
+  h3 { margin-bottom: 6px; }
+  p { color: $text-tertiary; margin-bottom: 20px; }
+  .upload-btn { @include button-primary; font-size: 0.88rem; }
+}
+
+// ── Tabs ──
+.tabs-section {
+  @include glass-card;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  &:hover { transform: none; }
+}
+
+.tab-bar {
+  display: flex; border-bottom: 1px solid $border-subtle;
+}
+
+.tab {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 16px;
+  border: none; background: transparent;
+  color: $text-tertiary; font-size: 0.84rem; font-weight: 500;
+  cursor: pointer; transition: all $transition-base;
+  border-bottom: 2px solid transparent;
+
+  &:hover { color: $text-primary; background: rgba(255, 255, 255, 0.02); }
+  &.active {
+    color: $accent-violet; border-bottom-color: $accent-violet;
+    background: rgba($accent-violet, 0.04);
+  }
+}
+
+.tab-content { padding: 20px 24px; }
+.tab-actions {
+  display: flex; justify-content: flex-end; margin-bottom: 16px;
+}
+
+.action-btn-sm {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: $radius-full;
+  border: 1px solid rgba($accent-violet, 0.3);
+  background: rgba($accent-violet, 0.08);
+  color: $accent-violet; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all $transition-base;
+  &:hover { background: rgba($accent-violet, 0.15); transform: translateY(-1px); }
+}
+
+.tab-empty {
+  text-align: center; padding: 40px 20px;
+  p { color: $text-muted; font-size: 0.88rem; }
+}
+
+// ── Comments List ──
+.comments-list { display: flex; flex-direction: column; gap: 16px; }
+
+.comment-item {
+  display: flex; gap: 12px;
+  .comment-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+}
+
+.comment-body { flex: 1; }
+
+.comment-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 4px;
+  strong { font-size: 0.84rem; }
+}
+
+.timestamp-link {
+  background: rgba($accent-pink, 0.12);
+  color: $accent-pink;
+  border: none; border-radius: $radius-full;
+  padding: 2px 10px; font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; transition: all $transition-fast;
+  &:hover { background: rgba($accent-pink, 0.25); transform: scale(1.05); }
+}
+
+.comment-date { font-size: 0.7rem; color: $text-muted; }
+.comment-text { font-size: 0.86rem; color: $text-secondary; line-height: 1.5; margin-bottom: 6px; }
+
+.reply-btn {
+  background: none; border: none;
+  color: $text-muted; font-size: 0.72rem;
+  cursor: pointer; transition: color $transition-fast;
+  &:hover { color: $accent-violet; }
+}
+
+.replies {
+  margin-top: 10px; padding-left: 12px;
+  border-left: 2px solid rgba($accent-violet, 0.15);
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.reply-item {
+  display: flex; gap: 8px;
+  .reply-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .reply-body {
+    strong { font-size: 0.78rem; margin-right: 6px; }
+    p { font-size: 0.82rem; color: $text-secondary; margin-top: 2px; }
+  }
+}
+
+// ── Versions List ──
+.versions-list { display: flex; flex-direction: column; gap: 8px; }
+
+.version-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 18px; border-radius: $radius-md;
+  border: 1px solid $border-subtle; background: transparent;
+  cursor: pointer; transition: all $transition-base;
+  width: 100%; text-align: left; color: inherit;
+
+  &:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba($accent-violet, 0.2); }
+  &.active {
+    border-color: $accent-violet;
+    background: rgba($accent-violet, 0.06);
+    .version-num { color: $accent-violet; }
+  }
+}
+
+.version-num {
+  font-size: 1.1rem; font-weight: 700; color: $text-secondary;
+  min-width: 40px;
+}
+
+.version-info {
+  flex: 1;
+  strong { display: block; font-size: 0.84rem; }
+  span { font-size: 0.72rem; color: $text-muted; }
+  .version-note { font-size: 0.78rem; color: $text-tertiary; margin-top: 4px; font-style: italic; }
+}
+
+.version-stats {
+  font-size: 0.72rem; color: $text-muted; white-space: nowrap;
+}
+
+// ── Files List ──
+.files-list { display: flex; flex-direction: column; gap: 8px; }
+
+.file-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: $radius-md;
+  border: 1px solid $border-subtle;
+  transition: border-color $transition-base;
+  &:hover { border-color: rgba($accent-violet, 0.2); }
+}
+
+.file-icon { font-size: 1.2rem; }
+
+.file-info {
+  flex: 1;
+  .file-name {
+    display: block; font-size: 0.88rem; font-weight: 500;
+    color: $text-primary; text-decoration: none;
+    &:hover { color: $accent-violet; }
+  }
+  .file-meta { font-size: 0.7rem; color: $text-muted; }
+}
+
+.file-type-badge {
+  font-size: 0.65rem; padding: 3px 10px;
+  border-radius: $radius-full;
+  background: rgba($accent-blue, 0.1); color: $accent-blue;
+  font-weight: 600; text-transform: uppercase;
+}
+
+.delete-file-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: transparent;
+  color: $text-muted; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all $transition-fast;
+  &:hover { color: #ef4444; background: rgba(#ef4444, 0.1); }
+}
+
+// ── Chat ──
+.chat-tab {
+  display: flex; flex-direction: column;
+  height: 400px;
+}
+
+.chat-messages {
+  flex: 1; overflow-y: auto; padding-bottom: 12px;
+  @include scrollbar;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.chat-msg {
+  display: flex; gap: 10px; max-width: 80%;
+
+  &.own { margin-left: auto; flex-direction: row-reverse; }
+
+  .chat-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+  .chat-bubble {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid $border-subtle;
+    border-radius: $radius-md;
+    padding: 10px 14px;
+
+    strong { font-size: 0.78rem; display: block; margin-bottom: 3px; }
+    p { font-size: 0.86rem; color: $text-secondary; margin: 0; }
+    .chat-time { font-size: 0.65rem; color: $text-muted; display: block; margin-top: 4px; }
+  }
+
+  &.own .chat-bubble {
+    background: rgba($accent-violet, 0.08);
+    border-color: rgba($accent-violet, 0.15);
+  }
+}
+
+.chat-input-row {
+  display: flex; gap: 10px; padding-top: 12px;
+  border-top: 1px solid $border-subtle;
+
+  input {
+    @include input-field;
+    flex: 1; padding: 10px 16px;
+  }
+
+  .send-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: none; background: $gradient-violet-blue;
+    color: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all $transition-fast;
+    &:disabled { opacity: 0.3; pointer-events: none; }
+    &:hover { transform: scale(1.08); }
+  }
+}
+
+// ── Modals (shared) ──
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: $z-modal;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: $bg-surface;
+  border: 1px solid $border-light;
+  border-radius: $radius-xl;
+  padding: 32px; width: 100%; max-width: 480px;
+  box-shadow: $shadow-lg;
+
+  h2 { font-size: 1.3rem; margin-bottom: 20px; }
+
+  select {
+    @include input-field;
+    cursor: pointer;
+    option { background: $bg-surface; color: $text-primary; }
+  }
+}
+
+.form-group {
+  margin-bottom: 16px;
+  label {
+    display: block; font-size: 0.82rem; font-weight: 600;
+    color: $text-secondary; margin-bottom: 8px;
+  }
+  input, textarea { @include input-field; }
+  textarea { resize: vertical; min-height: 60px; }
+}
+
+.modal-actions {
+  display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;
+}
+
+.btn-ghost { @include button-ghost; padding: 10px 24px; font-size: 0.88rem; }
+.btn-primary {
+  @include button-primary; padding: 10px 24px; font-size: 0.88rem;
+  &:disabled { opacity: 0.4; pointer-events: none; }
+}
+
+// ── File Drop Area (Version Upload) ──
+.file-drop-area {
+  border: 2px dashed $border-light;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+
+  &.has-file {
+    border-style: solid;
+    border-color: rgba($accent-violet, 0.3);
+    background: rgba($accent-violet, 0.04);
+  }
+
+  &.drag-over {
+    border-color: $accent-violet;
+    background: rgba($accent-violet, 0.08);
+    .file-drop-label { color: $accent-violet; }
+  }
+}
+
+.file-drop-label {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 32px 20px; cursor: pointer; text-align: center;
+  color: $text-tertiary; transition: all $transition-base;
+
+  &:hover {
+    color: $accent-violet;
+    border-color: rgba($accent-violet, 0.4);
+  }
+
+  .file-drop-title { font-size: 0.88rem; font-weight: 600; color: $text-secondary; }
+  .file-drop-hint { font-size: 0.75rem; color: $text-muted; }
+}
+
+.file-selected {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px;
+  color: $accent-violet;
+}
+
+.file-selected-info {
+  flex: 1; display: flex; flex-direction: column;
+  .file-selected-name { font-size: 0.88rem; font-weight: 600; color: $text-primary; }
+  .file-selected-ready { font-size: 0.72rem; color: $accent-green; }
+}
+
+.file-remove-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: rgba(255, 255, 255, 0.06);
+  color: $text-muted; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all $transition-fast;
+  &:hover { color: #ef4444; background: rgba(#ef4444, 0.1); }
+}
+
+// ── Loading ──
+.loading { text-align: center; padding: 80px 20px; color: $text-muted; }
+
+// ── Responsive ──
+@include mobile {
+  .header-main { flex-direction: column; }
+  .tab-bar { overflow-x: auto; }
+  .tab { font-size: 0.76rem; padding: 12px 10px; white-space: nowrap; }
+  .waveform-canvas { height: 60px; }
+  .chat-tab { height: 300px; }
+  .chat-msg { max-width: 90%; }
+}
