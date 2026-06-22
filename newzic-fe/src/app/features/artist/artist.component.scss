@@ -247,6 +247,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  &:disabled { opacity: 0.35; pointer-events: none; cursor: default; }
 }
 
 .btn-message {

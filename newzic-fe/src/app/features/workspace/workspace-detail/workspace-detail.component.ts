@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { WorkspaceService } from '../../../core/services/workspace.service';
 import { AuthService, DEFAULT_AVATAR } from '../../../core/services/auth.service';
+import { PlayerService } from '../../../core/services/player.service';
 import { ArtistService } from '../../../core/services/artist.service';
 import { Artist } from '../../../core/models';
 import {
@@ -53,6 +54,7 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   newVersionFileName = '';
   newVersionNotes = '';
   versionDragOver = signal(false);
+  versionUploading = signal(false);
 
   showFileModal = signal(false);
   newFileName = '';
@@ -108,6 +110,7 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
     private workspaceService: WorkspaceService,
     private authService: AuthService,
     private artistService: ArtistService,
+    private playerService: PlayerService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -211,6 +214,10 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
       this.isPlaying.set(false);
       if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     } else {
+      // Stop the global player if it's playing
+      if (this.playerService.isPlaying()) {
+        this.playerService.togglePlay();
+      }
       this.audio.play().then(() => {
         this.isPlaying.set(true);
         this.startProgressLoop();
@@ -329,17 +336,24 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
 
   uploadVersion(): void {
     const ws = this.workspace();
-    if (!ws || !this.newVersionAudioData) return;
+    if (!ws || !this.newVersionAudioData || this.versionUploading()) return;
 
+    this.versionUploading.set(true);
     this.workspaceService.uploadVersion(ws.id, {
       audioUrl: this.newVersionAudioData,
       notes: this.newVersionNotes || undefined
-    }).subscribe(() => {
-      this.showVersionModal.set(false);
-      this.newVersionAudioData = '';
-      this.newVersionFileName = '';
-      this.newVersionNotes = '';
-      this.loadVersions(ws.id);
+    }).subscribe({
+      next: () => {
+        this.showVersionModal.set(false);
+        this.newVersionAudioData = '';
+        this.newVersionFileName = '';
+        this.newVersionNotes = '';
+        this.versionUploading.set(false);
+        this.loadVersions(ws.id);
+      },
+      error: () => {
+        this.versionUploading.set(false);
+      }
     });
   }
 

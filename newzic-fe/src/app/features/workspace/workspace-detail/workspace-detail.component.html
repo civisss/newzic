@@ -341,8 +341,15 @@
         <textarea [(ngModel)]="newVersionNotes" rows="2" placeholder="What changed in this version?"></textarea>
       </div>
       <div class="modal-actions">
-        <button class="btn-ghost" (click)="showVersionModal.set(false)">Cancel</button>
-        <button class="btn-primary" (click)="uploadVersion()" [disabled]="!newVersionAudioData">Upload</button>
+        <button class="btn-ghost" (click)="showVersionModal.set(false)" [disabled]="versionUploading()">Cancel</button>
+        <button class="btn-primary" (click)="uploadVersion()" [disabled]="!newVersionAudioData || versionUploading()">
+          @if (versionUploading()) {
+            <span class="spinner"></span>
+            Uploading…
+          } @else {
+            Upload
+          }
+        </button>
       </div>
     </div>
   </div>

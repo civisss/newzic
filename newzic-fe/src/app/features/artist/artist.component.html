@@ -61,7 +61,7 @@
             <button class="btn-follow" [class.following]="following()" (click)="toggleFollow()">
               {{ following() ? ('artist.following' | translate) : ('artist.follow' | translate) }}
             </button>
-            <button class="btn-play-all" [class.playing]="isPlayingArtist()" (click)="playAll()">
+            <button class="btn-play-all" [class.playing]="isPlayingArtist()" (click)="playAll()" [disabled]="songs().length === 0">
               @if (isPlayingArtist()) {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
                 {{ 'artist.pause' | translate }}
