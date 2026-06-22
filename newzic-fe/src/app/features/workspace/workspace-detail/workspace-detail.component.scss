@@ -571,7 +571,7 @@
 }
 
 .file-drop-label {
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
   padding: 40px 24px; cursor: pointer; text-align: center;
   color: $text-tertiary; transition: all $transition-base;
 
@@ -580,8 +580,16 @@
     border-color: rgba($accent-violet, 0.4);
   }
 
-  .file-drop-title { font-size: 0.88rem; font-weight: 600; color: $text-secondary; margin-top: 4px; }
-  .file-drop-hint { font-size: 0.75rem; color: $text-muted; line-height: 1.5; }
+  .file-drop-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba($accent-violet, 0.08);
+    color: $accent-violet;
+    margin: 0 auto 4px;
+    svg { display: block; }
+  }
+  .file-drop-title { display: block; width: 100%; font-size: 0.88rem; font-weight: 600; color: $text-secondary; }
+  .file-drop-hint { display: block; width: 100%; font-size: 0.75rem; color: $text-muted; line-height: 1.5; }
 }
 
 .file-selected {
