@@ -164,12 +164,12 @@
   border: 1px solid transparent;
   border-radius: $radius-md;
   padding: 10px 16px;
-
-  @include mobile { padding: 6px 10px; }
   cursor: pointer;
   transition: all $transition-base;
   color: $text-primary;
   text-align: center;
+
+  @include mobile { padding: 6px 10px; }
 
   &:hover {
     background: rgba(255, 255, 255, 0.04);

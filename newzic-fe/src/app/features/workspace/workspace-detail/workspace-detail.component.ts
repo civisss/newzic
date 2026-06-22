@@ -6,7 +6,6 @@ import { WorkspaceService } from '../../../core/services/workspace.service';
 import { AuthService, DEFAULT_AVATAR } from '../../../core/services/auth.service';
 import { PlayerService } from '../../../core/services/player.service';
 import { ArtistService } from '../../../core/services/artist.service';
-import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { I18nService } from '../../../core/services/i18n.service';
 import { Artist } from '../../../core/models';
 import {
@@ -20,7 +19,7 @@ import {
 @Component({
   selector: 'app-workspace-detail',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe, TranslatePipe],
+  imports: [RouterLink, FormsModule, DatePipe],
   templateUrl: './workspace-detail.component.html',
   styleUrl: './workspace-detail.component.scss'
 })

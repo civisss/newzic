@@ -24,12 +24,16 @@
 
 .reg-marquee-top {
   padding-top: 20px;
-  padding-bottom: 0;
+  padding-bottom: 16px;
+
+  @include mobile { padding-bottom: 12px; }
 }
 
 .reg-marquee-bottom {
-  padding-top: 0;
+  padding-top: 16px;
   padding-bottom: 20px;
+
+  @include mobile { padding-top: 12px; }
 }
 
 .reg-marquee-inner {
