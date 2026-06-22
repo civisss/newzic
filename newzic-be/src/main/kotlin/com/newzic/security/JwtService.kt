@@ -15,13 +15,20 @@ class JwtService(private val jwtProperties: JwtProperties) {
         Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
     }
 
-    fun generateToken(userId: String, username: String): String {
+    fun generateToken(userId: String, username: String, roles: List<String> = emptyList(), email: String? = null): String {
         val now = Date()
         val expiry = Date(now.time + jwtProperties.expirationMs)
 
-        return Jwts.builder()
+        val builder = Jwts.builder()
             .subject(userId)
             .claim("username", username)
+            .claim("roles", roles)
+
+        if (email != null) {
+            builder.claim("email", email)
+        }
+
+        return builder
             .issuedAt(now)
             .expiration(expiry)
             .signWith(key)
@@ -30,6 +37,19 @@ class JwtService(private val jwtProperties: JwtProperties) {
 
     fun getUserIdFromToken(token: String): String {
         return getClaims(token).subject
+    }
+
+    fun getUsernameFromToken(token: String): String? {
+        return getClaims(token)["username"] as? String
+    }
+
+    fun getRolesFromToken(token: String): List<String> {
+        @Suppress("UNCHECKED_CAST")
+        return getClaims(token)["roles"] as? List<String> ?: emptyList()
+    }
+
+    fun getEmailFromToken(token: String): String? {
+        return getClaims(token)["email"] as? String
     }
 
     fun isTokenValid(token: String): Boolean {

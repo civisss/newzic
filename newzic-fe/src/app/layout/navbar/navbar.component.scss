@@ -118,6 +118,10 @@
   }
 
   @include mobile { display: none; }
+
+  &.notif-mobile-visible {
+    @include mobile { display: flex; }
+  }
 }
 
 .badge {
@@ -189,8 +193,9 @@
   @include scrollbar;
 
   @include mobile {
-    min-width: 300px;
-    right: -40px;
+    min-width: 280px;
+    right: -8px;
+    max-width: calc(100vw - 24px);
   }
 }
 
@@ -478,7 +483,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -18px;
+    margin-top: -12px;
     box-shadow: 0 4px 16px rgba($accent-violet, 0.4);
     transition: transform $transition-spring, box-shadow $transition-base;
 

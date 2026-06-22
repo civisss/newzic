@@ -35,34 +35,38 @@
 
   @if (activeTab() === 'overview' && stats()) {
     <!-- Stats Row -->
-    <div class="stats-row">
-      <button class="stat stat-clickable" (click)="openFollowersModal('followers')">
-        <strong>{{ stats()!.totalFollowers | formatNumber }}</strong>
-        <span>{{ 'profile.followers' | translate }}</span>
-      </button>
-      <button class="stat stat-clickable" (click)="openFollowersModal('following')">
-        <strong>{{ stats()!.totalFollowing | formatNumber }}</strong>
-        <span>{{ 'profile.following' | translate }}</span>
-      </button>
+    <div class="stats-wrap">
+      <div class="stats-follow-row">
+        <button class="stat stat-clickable" (click)="openFollowersModal('followers')">
+          <strong>{{ stats()!.totalFollowers | formatNumber }}</strong>
+          <span>{{ 'profile.followers' | translate }}</span>
+        </button>
+        <button class="stat stat-clickable" (click)="openFollowersModal('following')">
+          <strong>{{ stats()!.totalFollowing | formatNumber }}</strong>
+          <span>{{ 'profile.following' | translate }}</span>
+        </button>
+      </div>
       <span class="stat-divider"></span>
-      <div class="stat">
-        <strong>{{ stats()!.totalPlays | formatNumber }}</strong>
-        <span>{{ 'profile.total_plays' | translate }}</span>
-      </div>
-      <div class="stat">
-        <strong>{{ stats()!.totalReactions | formatNumber }}</strong>
-        <span>{{ 'profile.reactions' | translate }}</span>
-      </div>
-      <div class="stat">
-        <strong>{{ stats()!.totalSongs }}</strong>
-        <span>{{ 'profile.tracks' | translate }}</span>
-      </div>
-      @if (stats()!.growthPercent) {
-        <div class="stat growth-stat">
-          <strong>{{ getTrendIcon(stats()!.playsTrend) }} {{ stats()!.growthPercent }}%</strong>
-          <span>{{ 'profile.weekly_growth' | translate }}</span>
+      <div class="stats-detail-row">
+        <div class="stat">
+          <strong>{{ stats()!.totalPlays | formatNumber }}</strong>
+          <span>{{ 'profile.total_plays' | translate }}</span>
         </div>
-      }
+        <div class="stat">
+          <strong>{{ stats()!.totalReactions | formatNumber }}</strong>
+          <span>{{ 'profile.reactions' | translate }}</span>
+        </div>
+        <div class="stat">
+          <strong>{{ stats()!.totalSongs }}</strong>
+          <span>{{ 'profile.tracks' | translate }}</span>
+        </div>
+        @if (stats()!.growthPercent) {
+          <div class="stat growth-stat">
+            <strong>{{ getTrendIcon(stats()!.playsTrend) }} {{ stats()!.growthPercent }}%</strong>
+            <span>{{ 'profile.weekly_growth' | translate }}</span>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- My Tracks -->

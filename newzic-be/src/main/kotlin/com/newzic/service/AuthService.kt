@@ -52,7 +52,12 @@ class AuthService(
         )
 
         val saved = userRepository.save(user)
-        val token = jwtService.generateToken(saved.id.toString(), saved.username)
+        val token = jwtService.generateToken(
+            saved.id.toString(),
+            saved.username,
+            saved.roles.map { it.name },
+            saved.email
+        )
         return AuthResponse(token = token, user = userMapper.toResponse(saved))
     }
 
@@ -64,7 +69,12 @@ class AuthService(
             throw IllegalArgumentException("Invalid credentials")
         }
 
-        val token = jwtService.generateToken(user.id.toString(), user.username)
+        val token = jwtService.generateToken(
+            user.id.toString(),
+            user.username,
+            user.roles.map { it.name },
+            user.email
+        )
         return AuthResponse(token = token, user = userMapper.toResponse(user))
     }
 }

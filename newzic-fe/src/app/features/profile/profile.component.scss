@@ -119,8 +119,8 @@
   }
 }
 
-// Stats row (inline, matching artist page)
-.stats-row {
+// Stats wrap (matching artist page)
+.stats-wrap {
   display: flex;
   align-items: center;
   gap: 24px;
@@ -128,8 +128,22 @@
   flex-wrap: wrap;
 
   @include mobile {
-    gap: 16px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+  }
+}
+
+.stats-follow-row,
+.stats-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  @include mobile {
     justify-content: center;
+    gap: 12px;
   }
 }
 
@@ -138,6 +152,11 @@
   flex-direction: column;
   strong { font-size: 1.3rem; font-weight: 700; }
   span { font-size: 0.78rem; color: $text-tertiary; }
+
+  @include mobile {
+    strong { font-size: 1.1rem; }
+    span { font-size: 0.7rem; }
+  }
 }
 
 .stat-clickable {
@@ -145,6 +164,8 @@
   border: 1px solid transparent;
   border-radius: $radius-md;
   padding: 10px 16px;
+
+  @include mobile { padding: 6px 10px; }
   cursor: pointer;
   transition: all $transition-base;
   color: $text-primary;

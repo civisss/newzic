@@ -32,30 +32,34 @@
             </p>
           }
           <p class="artist-bio">{{ artist()!.bio }}</p>
-          <div class="artist-stats-row">
-            <button class="stat stat-clickable" (click)="openFollowersModal('followers')">
-              <strong>{{ artist()!.followers | formatNumber }}</strong>
-              <span>{{ 'artist.followers' | translate }}</span>
-            </button>
-            <button class="stat stat-clickable" (click)="openFollowersModal('following')">
-              <strong>{{ artist()!.following | formatNumber }}</strong>
-              <span>{{ 'artist.following_label' | translate }}</span>
-            </button>
+          <div class="artist-stats-wrap">
+            <div class="stats-follow-row">
+              <button class="stat stat-clickable" (click)="openFollowersModal('followers')">
+                <strong>{{ artist()!.followers | formatNumber }}</strong>
+                <span>{{ 'artist.followers' | translate }}</span>
+              </button>
+              <button class="stat stat-clickable" (click)="openFollowersModal('following')">
+                <strong>{{ artist()!.following | formatNumber }}</strong>
+                <span>{{ 'artist.following_label' | translate }}</span>
+              </button>
+            </div>
             <span class="stat-divider"></span>
-            <div class="stat">
-              <strong>{{ artist()!.totalPlays | formatNumber }}</strong>
-              <span>{{ 'artist.total_plays' | translate }}</span>
-            </div>
-            <div class="stat">
-              <strong>{{ songs().length }}</strong>
-              <span>{{ 'artist.tracks' | translate }}</span>
-            </div>
-            @if (artist()!.weeklyGrowth) {
-              <div class="stat growth-stat">
-                <strong>+{{ artist()!.weeklyGrowth }}%</strong>
-                <span>{{ 'artist.weekly_growth' | translate }}</span>
+            <div class="stats-detail-row">
+              <div class="stat">
+                <strong>{{ artist()!.totalPlays | formatNumber }}</strong>
+                <span>{{ 'artist.total_plays' | translate }}</span>
               </div>
-            }
+              <div class="stat">
+                <strong>{{ songs().length }}</strong>
+                <span>{{ 'artist.tracks' | translate }}</span>
+              </div>
+              @if (artist()!.weeklyGrowth) {
+                <div class="stat growth-stat">
+                  <strong>+{{ artist()!.weeklyGrowth }}%</strong>
+                  <span>{{ 'artist.weekly_growth' | translate }}</span>
+                </div>
+              }
+            </div>
           </div>
           <div class="header-actions">
             <button class="btn-follow" [class.following]="following()" (click)="toggleFollow()">
