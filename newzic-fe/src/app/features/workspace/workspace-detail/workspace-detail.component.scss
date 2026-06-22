@@ -71,19 +71,19 @@
 }
 
 .member-chip {
-  display: flex; align-items: center; gap: 8px;
-  padding: 4px 14px 4px 4px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 16px 6px 6px;
   border-radius: $radius-full;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid $border-subtle;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   text-decoration: none; color: inherit; cursor: pointer;
   transition: all $transition-fast;
   &:hover { background: rgba($accent-violet, 0.1); border-color: rgba($accent-violet, 0.3); }
 
-  img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+  img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
   .owner-badge {
-    font-size: 0.65rem; padding: 2px 8px;
+    font-size: 0.7rem; padding: 3px 10px;
     border-radius: $radius-full;
     background: rgba($accent-violet, 0.15); color: $accent-violet;
     font-weight: 600;
