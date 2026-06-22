@@ -29,11 +29,13 @@ class NotificationService(
     private val userRepository: UserRepository
 ) {
 
+    @Transactional(readOnly = true)
     fun getForUser(userId: UUID, pageable: Pageable): Page<NotificationResponse> {
         return notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId, pageable)
             .map { toResponse(it) }
     }
 
+    @Transactional(readOnly = true)
     fun getUnreadCount(userId: UUID): Long {
         return notificationRepository.countByRecipientIdAndIsReadFalse(userId)
     }
