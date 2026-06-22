@@ -18,14 +18,15 @@ interface MessageRepository : JpaRepository<MessageEntity, UUID> {
 
     @Query("""
         SELECT m FROM MessageEntity m
-        WHERE m.id IN (
-            SELECT MAX(m2.id) FROM MessageEntity m2
+        WHERE m.createdAt IN (
+            SELECT MAX(m2.createdAt) FROM MessageEntity m2
             WHERE m2.sender.id = :userId OR m2.recipient.id = :userId
             GROUP BY CASE
                 WHEN m2.sender.id = :userId THEN m2.recipient.id
                 ELSE m2.sender.id
             END
         )
+        AND (m.sender.id = :userId OR m.recipient.id = :userId)
         ORDER BY m.createdAt DESC
     """)
     fun findConversationPreviews(userId: UUID): List<MessageEntity>

@@ -71,9 +71,11 @@
       </div>
       <div class="cb-input">
         <textarea
+          #msgInput
           [(ngModel)]="newMessage"
           [placeholder]="'messages.type_message' | translate"
           (keydown)="onKeyDown($event)"
+          (input)="msgInput.style.height = 'auto'; msgInput.style.height = msgInput.scrollHeight + 'px'"
           rows="1"
         ></textarea>
         <button class="cb-send" (click)="sendMessage()" [disabled]="sending() || !newMessage.trim()">

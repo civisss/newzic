@@ -23,6 +23,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
   private shouldScroll = false;
 
   @ViewChild('chatMessagesEnd') chatMessagesEnd?: ElementRef;
+  @ViewChild('msgInput') msgInput?: ElementRef<HTMLTextAreaElement>;
 
   readonly currentUserId = computed(() => this.auth.user()?.id ?? '');
   readonly unreadCount = computed(() => this.messageService.unreadCount());
@@ -44,12 +45,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
       this.messageService.loadConversations();
       this.messageService.loadUnreadCount();
     }
-    // Poll for new messages every 30s
+    // Poll for new messages every 10s
     setInterval(() => {
       if (this.auth.isLoggedIn()) {
         this.messageService.loadUnreadCount();
       }
-    }, 30000);
+    }, 10000);
   }
 
   ngAfterViewChecked(): void {
@@ -108,6 +109,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
       next: (msg) => {
         this.messages.update(list => [...list, msg]);
         this.newMessage = '';
+        if (this.msgInput) this.msgInput.nativeElement.style.height = 'auto';
         this.sending.set(false);
         this.shouldScroll = true;
         this.conversations.update(list => {
