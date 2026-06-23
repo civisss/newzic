@@ -34,8 +34,14 @@ export class I18nService {
     this.loadTranslations(this._currentLang());
   }
 
-  t(key: string): string {
-    return this._translations[key] ?? key;
+  t(key: string, params?: Record<string, string | number>): string {
+    let value = this._translations[key] ?? key;
+    if (params) {
+      Object.keys(params).forEach(k => {
+        value = value.replace(new RegExp(`{{\\s*${k}\\s*}}`, 'g'), String(params[k]));
+      });
+    }
+    return value;
   }
 
   setLanguage(code: string, saveToServer = false): void {

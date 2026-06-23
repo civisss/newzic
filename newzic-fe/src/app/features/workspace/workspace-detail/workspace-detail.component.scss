@@ -982,8 +982,8 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 0.9rem;
   background: rgba($accent-violet, 0.1);
-  border: 2px solid $bg-card;
-  box-shadow: 0 0 0 3px $bg-main;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 2px $bg-primary;
 }
 
 .activity-avatar {
