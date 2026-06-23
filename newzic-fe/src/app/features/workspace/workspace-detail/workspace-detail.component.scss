@@ -783,6 +783,10 @@
   font-weight: 500;
 }
 
+.transport-hidden {
+  display: none !important;
+}
+
 // ── Loading ──
 .loading { text-align: center; padding: 80px 20px; color: $text-muted; }
 

@@ -103,8 +103,8 @@
         </div>
       }
 
-      <!-- Transport controls -->
-      <div class="transport">
+      <!-- Transport controls (hidden during loading) -->
+      <div class="transport" [class.transport-hidden]="audioLoading()">
         <button class="play-btn" (click)="togglePlay()">
           @if (isPlaying()) {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
