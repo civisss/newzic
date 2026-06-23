@@ -91,7 +91,12 @@ describe('NotificationService', () => {
 
     service.markAsRead('n1');
 
+    const markReq = httpMock.expectOne(`${environment.apiUrl}/notifications/n1/mark-read`);
+    expect(markReq.request.method).toBe('POST');
+    markReq.flush({});
+
     expect(service.notifications()[0].read).toBeTrue();
+    expect(service.unreadCount()).toBe(0);
   });
 
   it('should handle empty notification list', () => {
