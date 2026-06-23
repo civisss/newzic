@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, computed } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './layout/navbar/navbar.component';
 import { PlayerComponent } from './layout/player/player.component';
 import { ChatWidgetComponent } from './layout/chat-widget/chat-widget.component';
@@ -13,5 +13,9 @@ import { AuthService } from './core/services/auth.service';
   styleUrl: './app.scss'
 })
 export class App {
-  constructor(public auth: AuthService) {}
+  constructor(public auth: AuthService, private router: Router) {}
+
+  showChatWidget(): boolean {
+    return !this.router.url.startsWith('/messages');
+  }
 }

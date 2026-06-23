@@ -1,0 +1,238 @@
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.analytics-page {
+  padding: 32px 0 80px;
+  max-width: 960px; margin: 0 auto;
+
+  @include mobile { padding: 24px 16px 80px; }
+
+  h1 {
+    font-size: 1.6rem; font-weight: 800;
+    background: $gradient-violet-blue;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 24px;
+  }
+}
+
+.section-tabs {
+  display: flex; gap: 4px; margin-bottom: 28px;
+  border-bottom: 1px solid $border-subtle; padding-bottom: 0;
+}
+
+.sec-tab {
+  padding: 10px 18px; background: none; border: none;
+  color: $text-muted; font-size: 0.84rem; font-weight: 500;
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all $transition-fast;
+
+  &:hover { color: $text-secondary; }
+  &.active {
+    color: $accent-violet; border-bottom-color: $accent-violet;
+  }
+}
+
+.loading-state {
+  text-align: center; padding: 60px 0; color: $text-muted;
+}
+
+.analytics-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.analytics-card {
+  background: $bg-card; border: 1px solid $border-subtle;
+  border-radius: $radius-lg; padding: 24px;
+
+  h3 {
+    font-size: 0.88rem; font-weight: 600; color: $text-primary;
+    margin: 0 0 16px;
+  }
+}
+
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+
+.bar-row {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.bar-label {
+  font-size: 0.78rem; color: $text-secondary; width: 60px;
+  text-transform: capitalize; flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1; height: 8px; background: rgba(white, 0.04);
+  border-radius: 4px; overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%; border-radius: 4px;
+  background: $gradient-violet-blue;
+  transition: width 0.6s ease;
+
+  &.accent { background: linear-gradient(90deg, $accent-pink, $accent-violet); }
+}
+
+.bar-value {
+  font-size: 0.72rem; color: $text-muted; width: 40px; text-align: right;
+}
+
+// Song performance
+.song-perf-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.song-perf-card {
+  display: flex; align-items: center; gap: 16px;
+  background: $bg-card; border: 1px solid $border-subtle;
+  border-radius: $radius-md; padding: 16px;
+}
+
+.song-cover {
+  width: 52px; height: 52px; border-radius: $radius-sm;
+  object-fit: cover; flex-shrink: 0;
+}
+
+.song-perf-info {
+  flex: 1;
+  h4 { margin: 0 0 6px; font-size: 0.9rem; color: $text-primary; }
+}
+
+.song-metrics {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  span { font-size: 0.76rem; color: $text-muted; }
+}
+
+// Growth
+.growth-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.growth-card {
+  position: relative; overflow: hidden;
+  background: $bg-card; border: 1px solid $border-subtle;
+  border-radius: $radius-xl; padding: 28px;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba($accent-violet, 0.3);
+  }
+
+  &.featured {
+    border-color: rgba($accent-violet, 0.25);
+    .growth-card-glow { opacity: 1; }
+  }
+
+  &.trend-up {
+    .trend-badge { background: rgba(#22C55E, 0.12); color: #4ADE80; }
+    .growth-number { background: linear-gradient(135deg, #22C55E, #4ADE80); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  }
+  &.trend-down {
+    .trend-badge { background: rgba(#EF4444, 0.12); color: #F87171; }
+    .growth-number { background: linear-gradient(135deg, #EF4444, #F87171); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  }
+  &:not(.trend-up):not(.trend-down) {
+    .trend-badge { background: rgba($text-muted, 0.1); color: $text-muted; }
+    .growth-number { background: $gradient-violet-blue; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  }
+}
+
+.growth-card-glow {
+  position: absolute; top: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba($accent-violet, 0.08), transparent 70%);
+  pointer-events: none; opacity: 0;
+  transition: opacity $transition-base;
+  .growth-card:hover & { opacity: 1; }
+}
+
+.growth-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 0.82rem; font-weight: 600; color: $text-muted;
+    text-transform: uppercase; letter-spacing: 0.06em; margin: 0;
+  }
+}
+
+.trend-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 700;
+}
+
+.growth-metrics {
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.growth-metric-main {
+  display: flex; align-items: baseline; gap: 8px;
+}
+
+.growth-number {
+  font-size: 2.2rem; font-weight: 800; line-height: 1;
+}
+
+.growth-unit {
+  font-size: 0.82rem; font-weight: 500; color: $text-muted;
+}
+
+.growth-metric-sub {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.78rem; color: $text-secondary;
+
+  svg { color: $accent-violet; flex-shrink: 0; }
+}
+
+// Donations
+.donation-overview {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  margin-bottom: 24px;
+}
+
+.donation-stat-card {
+  background: $bg-card; border: 1px solid $border-subtle;
+  border-radius: $radius-lg; padding: 28px; text-align: center;
+
+  .stat-value {
+    display: block; font-size: 1.8rem; font-weight: 800;
+    background: $gradient-violet-blue;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label {
+    font-size: 0.78rem; color: $text-muted; margin-top: 4px; display: block;
+  }
+}
+
+.supporter-row, .donation-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba($border-subtle, 0.5);
+  &:last-child { border-bottom: none; }
+}
+
+.supporter-avatar {
+  width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+}
+
+.supporter-name {
+  flex: 1; font-size: 0.84rem; color: $text-primary;
+}
+
+.supporter-total, .donation-amount {
+  font-size: 0.84rem; font-weight: 600; color: $accent-green;
+}
+
+.donation-info {
+  flex: 1;
+  strong { font-size: 0.84rem; color: $text-primary; display: block; }
+  .donation-msg { font-size: 0.72rem; color: $text-muted; }
+}
+
+.empty { text-align: center; color: $text-muted; padding: 40px 0; }
+.empty-hint { color: $text-muted; font-size: 0.82rem; padding: 24px 0; text-align: center; }

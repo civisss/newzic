@@ -1,0 +1,259 @@
+<div class="analytics-page container">
+  <h1>{{ 'analytics.title' | translate }}</h1>
+
+  <!-- Section Tabs -->
+  <div class="section-tabs">
+    <button class="sec-tab" [class.active]="activeSection() === 'audience'" (click)="activeSection.set('audience')">
+      {{ 'analytics.audience' | translate }}
+    </button>
+    <button class="sec-tab" [class.active]="activeSection() === 'songs'" (click)="activeSection.set('songs')">
+      {{ 'analytics.songs' | translate }}
+    </button>
+    <button class="sec-tab" [class.active]="activeSection() === 'growth'" (click)="activeSection.set('growth')">
+      {{ 'analytics.growth' | translate }}
+    </button>
+    <button class="sec-tab" [class.active]="activeSection() === 'donations'" (click)="activeSection.set('donations')">
+      {{ 'analytics.donations' | translate }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p>{{ 'analytics.loading' | translate }}</p>
+    </div>
+  } @else if (analytics(); as a) {
+
+    <!-- Audience Section -->
+    @if (activeSection() === 'audience') {
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <h3>{{ 'analytics.by_country' | translate }}</h3>
+          <div class="bar-chart">
+            @for (item of a.audienceByCountry; track item.label) {
+              <div class="bar-row">
+                <span class="bar-label">{{ item.label }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="item.percent"></div>
+                </div>
+                <span class="bar-value">{{ item.percent }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>{{ 'analytics.by_gender' | translate }}</h3>
+          <div class="bar-chart">
+            @for (item of a.audienceByGender; track item.label) {
+              <div class="bar-row">
+                <span class="bar-label">{{ item.label }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="item.percent"></div>
+                </div>
+                <span class="bar-value">{{ item.percent }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>{{ 'analytics.by_age' | translate }}</h3>
+          <div class="bar-chart">
+            @for (item of a.audienceByAge; track item.label) {
+              <div class="bar-row">
+                <span class="bar-label">{{ item.label }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="item.percent"></div>
+                </div>
+                <span class="bar-value">{{ item.percent }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>{{ 'analytics.interests' | translate }}</h3>
+          <div class="bar-chart">
+            @if (a.audienceInterests.length === 0) {
+              <p class="empty-hint">{{ 'analytics.no_data' | translate }}</p>
+            }
+            @for (item of a.audienceInterests; track item.label) {
+              <div class="bar-row">
+                <span class="bar-label">{{ item.label }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill accent" [style.width.%]="item.percent"></div>
+                </div>
+                <span class="bar-value">{{ item.percent }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Songs Section -->
+    @if (activeSection() === 'songs') {
+      <div class="song-perf-list">
+        @for (s of a.songPerformance; track s.songId) {
+          <div class="song-perf-card">
+            <img [src]="s.cover || 'assets/default-cover.svg'" class="song-cover" />
+            <div class="song-perf-info">
+              <h4>{{ s.title }}</h4>
+              <div class="song-metrics">
+                <span>▶ {{ s.plays | formatNumber }}</span>
+                <span>❤️ {{ s.likes | formatNumber }}</span>
+                <span>🔗 {{ s.shares | formatNumber }}</span>
+                <span>💾 {{ s.saves | formatNumber }}</span>
+                <span>👥 +{{ s.newFollowers | formatNumber }}</span>
+              </div>
+            </div>
+          </div>
+        }
+        @if (a.songPerformance.length === 0) {
+          <p class="empty">{{ 'analytics.no_songs' | translate }}</p>
+        }
+      </div>
+    }
+
+    <!-- Growth Section -->
+    @if (activeSection() === 'growth') {
+      <div class="growth-grid">
+        <div class="growth-card" [class.trend-up]="a.growth.daily.trend === 'up'" [class.trend-down]="a.growth.daily.trend === 'down'">
+          <div class="growth-card-glow"></div>
+          <div class="growth-header">
+            <h3>{{ 'analytics.daily' | translate }}</h3>
+            <span class="trend-badge" [class]="'trend-' + a.growth.daily.trend">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                @if (a.growth.daily.trend === 'up') {
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                  <polyline points="17 6 23 6 23 12"/>
+                } @else if (a.growth.daily.trend === 'down') {
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                  <polyline points="17 18 23 18 23 12"/>
+                } @else {
+                  <line x1="1" y1="12" x2="23" y2="12"/>
+                }
+              </svg>
+              {{ a.growth.daily.trend === 'up' ? '+' : '' }}{{ a.growth.daily.trend === 'stable' ? '0' : '' }}
+            </span>
+          </div>
+          <div class="growth-metrics">
+            <div class="growth-metric-main">
+              <span class="growth-number">{{ a.growth.daily.plays | formatNumber }}</span>
+              <span class="growth-unit">plays</span>
+            </div>
+            <div class="growth-metric-sub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14" stroke="currentColor" stroke-width="2"/><line x1="22" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="2"/></svg>
+              <span>+{{ a.growth.daily.followers | formatNumber }} followers</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-card featured" [class.trend-up]="a.growth.weekly.trend === 'up'" [class.trend-down]="a.growth.weekly.trend === 'down'">
+          <div class="growth-card-glow"></div>
+          <div class="growth-header">
+            <h3>{{ 'analytics.weekly' | translate }}</h3>
+            <span class="trend-badge" [class]="'trend-' + a.growth.weekly.trend">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                @if (a.growth.weekly.trend === 'up') {
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                  <polyline points="17 6 23 6 23 12"/>
+                } @else if (a.growth.weekly.trend === 'down') {
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                  <polyline points="17 18 23 18 23 12"/>
+                } @else {
+                  <line x1="1" y1="12" x2="23" y2="12"/>
+                }
+              </svg>
+            </span>
+          </div>
+          <div class="growth-metrics">
+            <div class="growth-metric-main">
+              <span class="growth-number">{{ a.growth.weekly.plays | formatNumber }}</span>
+              <span class="growth-unit">plays</span>
+            </div>
+            <div class="growth-metric-sub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14" stroke="currentColor" stroke-width="2"/><line x1="22" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="2"/></svg>
+              <span>+{{ a.growth.weekly.followers | formatNumber }} followers</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-card" [class.trend-up]="a.growth.monthly.trend === 'up'" [class.trend-down]="a.growth.monthly.trend === 'down'">
+          <div class="growth-card-glow"></div>
+          <div class="growth-header">
+            <h3>{{ 'analytics.monthly' | translate }}</h3>
+            <span class="trend-badge" [class]="'trend-' + a.growth.monthly.trend">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                @if (a.growth.monthly.trend === 'up') {
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                  <polyline points="17 6 23 6 23 12"/>
+                } @else if (a.growth.monthly.trend === 'down') {
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                  <polyline points="17 18 23 18 23 12"/>
+                } @else {
+                  <line x1="1" y1="12" x2="23" y2="12"/>
+                }
+              </svg>
+            </span>
+          </div>
+          <div class="growth-metrics">
+            <div class="growth-metric-main">
+              <span class="growth-number">{{ a.growth.monthly.plays | formatNumber }}</span>
+              <span class="growth-unit">plays</span>
+            </div>
+            <div class="growth-metric-sub">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14" stroke="currentColor" stroke-width="2"/><line x1="22" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="2"/></svg>
+              <span>+{{ a.growth.monthly.followers | formatNumber }} followers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Donations Section -->
+    @if (activeSection() === 'donations') {
+      @if (donations(); as d) {
+        <div class="donation-overview">
+          <div class="donation-stat-card">
+            <span class="stat-value">€{{ formatCents(d.totalReceivedCents) }}</span>
+            <span class="stat-label">{{ 'analytics.total_received' | translate }}</span>
+          </div>
+          <div class="donation-stat-card">
+            <span class="stat-value">{{ d.totalSupporters }}</span>
+            <span class="stat-label">{{ 'analytics.supporters' | translate }}</span>
+          </div>
+        </div>
+
+        @if (d.topSupporters.length > 0) {
+          <div class="analytics-card">
+            <h3>{{ 'analytics.top_supporters' | translate }}</h3>
+            @for (s of d.topSupporters; track s.userId) {
+              <div class="supporter-row">
+                <img [src]="s.avatar || 'assets/default-avatar.svg'" class="supporter-avatar" />
+                <span class="supporter-name">{{ s.displayName }}</span>
+                <span class="supporter-total">€{{ formatCents(s.totalCents) }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (d.recentDonations.length > 0) {
+          <div class="analytics-card">
+            <h3>{{ 'analytics.recent_donations' | translate }}</h3>
+            @for (don of d.recentDonations; track don.id) {
+              <div class="donation-row">
+                <img [src]="don.fromUserAvatar || 'assets/default-avatar.svg'" class="supporter-avatar" />
+                <div class="donation-info">
+                  <strong>{{ don.fromUserName }}</strong>
+                  <span class="donation-msg">{{ don.message || '' }}</span>
+                </div>
+                <span class="donation-amount">€{{ formatCents(don.artistCents) }}</span>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  }
+</div>

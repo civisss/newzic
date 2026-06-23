@@ -96,6 +96,7 @@ cd newzic-be && ./gradlew test && cd ../newzic-fe && npx ng test --watch=false
 - **Reactions system** — fire 🔥, gem 💎, on point 🎯, star 🌟 (beyond simple likes)
 - **Song likes** — like/unlike songs from the player bar or song cards with animated heart icon
 - **Trending & Fresh Drops** — auto-generated charts and new release streams
+- **Premium Discovery boost** — premium artists get moderate visibility boost in recommendations (quality still matters)
 
 ### Social
 - **Follow/unfollow** with real-time follower/following counts
@@ -104,15 +105,50 @@ cd newzic-be && ./gradlew test && cd ../newzic-fe && npx ng test --watch=false
 - **Open Mic feed** — social feed for artist updates and previews
 - **Weekly Spotlight** — editorial curated picks
 
+### Workspace Collaboration
+- **Real-time workspaces** — create collaborative projects with other artists
+- **Version management** — upload and compare audio versions with timestamped comments
+- **Activity feed** — vertical timeline with colored icons, user avatars, and formatted messages
+- **Tasks & files** — organize production with tasks, shared files, and reference tracks
+- **Chat** — workspace-scoped messaging for project discussions
+
+### Newzic Premium (€9.99/month)
+- **Unlimited songs** — free plan limited to 10 published tracks
+- **Unlimited workspaces** — free plan limited to 1 workspace
+- **Unlimited collaborators** — free plan limited to 4 per workspace
+- **Unlimited comments** — free plan limited to 5 per version
+- **Premium badge** — animated gradient badge on profile and cards
+- **Verified profile** — checkmark badge next to artist name
+- **Custom URL** — personalized profile URL (e.g., newzic.com/your-name)
+- **Advanced analytics** — audience demographics, song performance, growth trends
+- **Discovery boost** — moderate ranking boost in recommendations
+- **Upgrade paywall** — beautiful modal shown when free limits are reached
+- **Logo branding** — "NEWZIC PREMIUM" shown in navbar for premium users
+
+### Supporta l'Artista (Donation System)
+- **Transparent donations** — 95% goes to the artist, 5% platform fee
+- **Preset & custom amounts** — quick-pick buttons (€1, €3, €5, €10, €25) or custom input
+- **Personal messages** — attach a message to your donation
+- **Donation dashboard** — total received, supporter count, top supporters, recent donations
+- **Fee breakdown** — real-time transparency showing artist vs. platform split
+
 ### Profiles
 - **Artist profiles** — music, about, photos tabs with social links, collaboration availability, and genre tags
+- **Premium & verified badges** — reusable components with gradient styling
 - **User profile dashboard** — stats (plays, followers, reactions, tracks, following), liked songs, settings
 - **Clickable follower/following stats** on both profile and artist pages
+
+### Advanced Analytics (Premium)
+- **Audience demographics** — country, gender, age distribution
+- **Audience interests** — genre affinities from play data
+- **Song performance** — plays, likes, shares, saves, new followers per track
+- **Growth metrics** — daily, weekly, monthly play/follower trends with direction indicators
+- **Donation overview** — integrated into analytics dashboard
 
 ### Internationalization
 - **4 languages**: English, Italian, German, Spanish
 - Language preference saved per-user (synced to backend)
-- All UI strings use translation keys via `TranslatePipe`
+- All UI strings use translation keys via `TranslatePipe` (supports parameter interpolation)
 - Translation files: `src/assets/i18n/{en,it,de,es}.json`
 
 ## Sub-projects

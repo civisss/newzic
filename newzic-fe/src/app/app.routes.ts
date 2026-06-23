@@ -62,6 +62,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/messages/messages.component').then(m => m.MessagesComponent)
   },
   {
+    path: 'analytics',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/analytics/analytics.component').then(m => m.AnalyticsComponent)
+  },
+  {
     path: 'workspaces',
     canActivate: [authGuard],
     loadComponent: () => import('./features/workspace/workspace-list/workspace-list.component').then(m => m.WorkspaceListComponent)

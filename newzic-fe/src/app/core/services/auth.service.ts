@@ -101,7 +101,10 @@ export class AuthService {
       following: u.following || 0,
       country: u.country,
       preferredGenres: u.preferredGenres,
-      preferredLanguage: u.preferredLanguage
+      preferredLanguage: u.preferredLanguage,
+      premium: u.premium || false,
+      verified: u.verified || false,
+      customUrl: u.customUrl
     };
   }
 }

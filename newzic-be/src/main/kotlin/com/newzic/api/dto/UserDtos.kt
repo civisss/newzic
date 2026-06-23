@@ -17,6 +17,8 @@ data class UserResponse(
     val tags: List<String>,
     val verified: Boolean,
     val premium: Boolean,
+    val premiumSince: String?,
+    val customUrl: String?,
     val country: String?,
     val location: String?,
     val preferredGenres: List<String>,

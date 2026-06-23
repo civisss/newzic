@@ -63,7 +63,9 @@ class UserRecommendationTest {
                 joinedDate = u.joinedDate.toString(),
                 socialLinks = com.newzic.api.dto.SocialLinksDto(),
                 photos = u.photos.toList(),
-                preferredLanguage = u.preferredLanguage
+                preferredLanguage = u.preferredLanguage,
+                premiumSince = u.premiumSince?.toString(),
+                customUrl = u.customUrl
             )
         }
     }

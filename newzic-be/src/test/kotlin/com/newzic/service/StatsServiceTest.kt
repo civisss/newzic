@@ -22,6 +22,7 @@ class StatsServiceTest {
     @Mock private lateinit var reactionRepository: ReactionRepository
     @Mock private lateinit var playEventRepository: PlayEventRepository
     @Mock private lateinit var followRepository: FollowRepository
+    @Mock private lateinit var songLikeRepository: SongLikeRepository
 
     @InjectMocks
     private lateinit var statsService: StatsService

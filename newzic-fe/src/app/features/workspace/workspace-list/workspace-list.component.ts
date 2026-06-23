@@ -7,11 +7,12 @@ import { Workspace, WorkspaceStatus } from '../../../core/models';
 import { AuthService, DEFAULT_AVATAR } from '../../../core/services/auth.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { I18nService } from '../../../core/services/i18n.service';
+import { UpgradeModalComponent } from '../../../shared/components/upgrade-modal/upgrade-modal.component';
 
 @Component({
   selector: 'app-workspace-list',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe, TranslatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, TranslatePipe, UpgradeModalComponent],
   templateUrl: './workspace-list.component.html',
   styleUrl: './workspace-list.component.scss'
 })
@@ -19,6 +20,7 @@ export class WorkspaceListComponent implements OnInit {
   workspaces = signal<Workspace[]>([]);
   activeFilter = signal<string>('all');
   showCreateModal = signal(false);
+  showUpgradeModal = signal(false);
 
   newTitle = '';
   newDescription = '';
@@ -63,11 +65,19 @@ export class WorkspaceListComponent implements OnInit {
     this.workspaceService.create({
       title: this.newTitle,
       description: this.newDescription || undefined
-    }).subscribe(ws => {
-      this.showCreateModal.set(false);
-      this.newTitle = '';
-      this.newDescription = '';
-      this.router.navigate(['/workspace', ws.id]);
+    }).subscribe({
+      next: ws => {
+        this.showCreateModal.set(false);
+        this.newTitle = '';
+        this.newDescription = '';
+        this.router.navigate(['/workspace', ws.id]);
+      },
+      error: err => {
+        if (err.status === 402) {
+          this.showCreateModal.set(false);
+          this.showUpgradeModal.set(true);
+        }
+      }
     });
   }
 

@@ -110,4 +110,8 @@
       </div>
     </div>
   }
+
+  @if (showUpgradeModal()) {
+    <app-upgrade-modal (close)="showUpgradeModal.set(false)" />
+  }
 </div>

@@ -128,6 +128,9 @@ class UserService(
             // ── VERIFIED ARTISTS get a small trust boost ──
             if (other.verified) score += 3.0
 
+            // ── PREMIUM DISCOVERY boost (moderate, quality first) ──
+            if (other.premium) score += 6.0
+
             ScoredUser(other, score)
         }
 

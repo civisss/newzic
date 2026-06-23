@@ -15,4 +15,7 @@ export interface User {
   country?: string;
   preferredGenres?: string[];
   preferredLanguage?: string;
+  premium?: boolean;
+  verified?: boolean;
+  customUrl?: string;
 }

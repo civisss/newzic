@@ -8,3 +8,4 @@ export * from './feed.model';
 export * from './stats.model';
 export * from './spotlight.model';
 export * from './workspace.model';
+export * from './premium.model';

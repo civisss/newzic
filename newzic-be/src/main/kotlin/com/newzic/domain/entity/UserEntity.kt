@@ -62,6 +62,11 @@ class UserEntity(
 
     var premium: Boolean = false,
 
+    var premiumSince: LocalDateTime? = null,
+
+    @Column(unique = true)
+    var customUrl: String? = null,
+
     var country: String? = null,
 
     var location: String? = null,

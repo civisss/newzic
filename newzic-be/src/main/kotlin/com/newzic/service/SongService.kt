@@ -26,7 +26,8 @@ class SongService(
     private val reactionRepository: ReactionRepository,
     private val songMapper: SongMapper,
     private val notificationService: NotificationService,
-    private val recommendationService: RecommendationService
+    private val recommendationService: RecommendationService,
+    private val premiumService: PremiumService
 ) {
 
     @Transactional(readOnly = true)
@@ -118,6 +119,9 @@ class SongService(
             if (daysSinceRelease < 30) score += 8.0
             else if (daysSinceRelease < 90) score += 4.0
 
+            // Premium Discovery boost (moderate, quality still matters)
+            if (song.artist.premium) score += 6.0
+
             ScoredSong(song, score)
         }
 
@@ -130,6 +134,8 @@ class SongService(
 
     @Transactional
     fun create(userId: UUID, request: CreateSongRequest): SongResponse {
+        premiumService.requireCanPublishSong(userId)
+
         val artist = userRepository.findById(userId)
             .orElseThrow { NoSuchElementException("User not found") }
 

@@ -26,6 +26,8 @@ class UserMapper {
             tags = user.tags.toList(),
             verified = user.verified,
             premium = user.premium,
+            premiumSince = user.premiumSince?.toString()?.plus("Z"),
+            customUrl = user.customUrl,
             country = user.country,
             location = user.location,
             preferredGenres = user.preferredGenres.toList(),

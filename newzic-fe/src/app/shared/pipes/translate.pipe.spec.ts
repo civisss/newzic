@@ -32,6 +32,6 @@ describe('TranslatePipe', () => {
   it('should delegate to I18nService.t()', () => {
     spyOn(i18nService, 't').and.returnValue('Translated');
     expect(pipe.transform('some.key')).toBe('Translated');
-    expect(i18nService.t).toHaveBeenCalledWith('some.key');
+    expect(i18nService.t).toHaveBeenCalledWith('some.key', undefined);
   });
 });

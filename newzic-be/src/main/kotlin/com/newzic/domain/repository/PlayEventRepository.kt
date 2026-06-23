@@ -25,6 +25,13 @@ interface PlayEventRepository : JpaRepository<PlayEventEntity, UUID> {
 
     @Query("""
         SELECT p.song.genre, COUNT(p) FROM PlayEventEntity p 
+        WHERE p.song.artist.id = :artistId AND p.song.genre IS NOT NULL
+        GROUP BY p.song.genre ORDER BY COUNT(p) DESC
+    """)
+    fun findTopGenresByArtist(artistId: UUID): List<Array<Any>>
+
+    @Query("""
+        SELECT p.song.genre, COUNT(p) FROM PlayEventEntity p 
         WHERE p.user.id = :userId AND p.song.genre IS NOT NULL
         GROUP BY p.song.genre ORDER BY COUNT(p) DESC
     """)

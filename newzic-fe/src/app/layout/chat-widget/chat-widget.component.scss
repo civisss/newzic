@@ -6,7 +6,7 @@
   position: fixed;
   bottom: calc($player-height + 24px);
   right: 48px;
-  z-index: $z-modal + 1;
+  z-index: $z-modal - 1;
   width: 62px;
   height: 62px;
   border-radius: 50%;
@@ -81,7 +81,7 @@
   position: fixed;
   bottom: calc($player-height + 90px);
   right: 24px;
-  z-index: $z-modal;
+  z-index: $z-modal - 1;
   width: 380px;
   height: 500px;
   background: rgba(15, 15, 26, 0.92);

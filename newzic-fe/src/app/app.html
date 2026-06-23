@@ -8,5 +8,7 @@
 
 @if (auth.isLoggedIn()) {
   <app-player />
-  <app-chat-widget />
+  @if (showChatWidget()) {
+    <app-chat-widget />
+  }
 }

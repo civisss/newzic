@@ -12,11 +12,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { MessageService } from '../../core/services/message.service';
 import { Artist, Song, Album } from '../../core/models';
 import { FollowersModalComponent } from '../../shared/components/followers-modal/followers-modal.component';
+import { PremiumBadgeComponent } from '../../shared/components/premium-badge/premium-badge.component';
+import { VerifiedBadgeComponent } from '../../shared/components/verified-badge/verified-badge.component';
+import { DonateModalComponent } from '../../shared/components/donate-modal/donate-modal.component';
 
 @Component({
   selector: 'app-artist',
   standalone: true,
-  imports: [UpperCasePipe, SlicePipe, FormatNumberPipe, DurationPipe, TranslatePipe, FollowersModalComponent],
+  imports: [UpperCasePipe, SlicePipe, FormatNumberPipe, DurationPipe, TranslatePipe, FollowersModalComponent, PremiumBadgeComponent, VerifiedBadgeComponent, DonateModalComponent],
   templateUrl: './artist.component.html',
   styleUrl: './artist.component.scss'
 })
@@ -30,6 +33,7 @@ export class ArtistComponent implements OnInit {
   likedSongIds = signal<Set<string>>(new Set());
   showFollowModal = signal(false);
   followModalMode = signal<'followers' | 'following'>('followers');
+  showDonateModal = signal(false);
 
   constructor(
     private route: ActivatedRoute,

@@ -71,7 +71,7 @@
 
 .profile-username {
   color: $text-tertiary; font-size: 0.9rem;
-  margin-right: 12px;
+  display: block; margin-bottom: 6px;
 }
 
 .profile-role {
@@ -94,6 +94,36 @@
 
 .btn-upload-profile { @include button-primary; padding: 10px 24px; font-size: 0.85rem; }
 .btn-edit-profile { @include button-ghost; padding: 10px 24px; font-size: 0.85rem; }
+
+.profile-badges {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 4px;
+  @include mobile { justify-content: center; }
+}
+
+.btn-become-premium {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 24px; font-size: 0.85rem; font-weight: 700;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(168,85,247,0.15), rgba(236,72,153,0.12));
+  border: 1.5px solid rgba(251,191,36,0.35);
+  border-radius: $radius-full; cursor: pointer;
+  color: #FBBF24;
+  transition: all $transition-base;
+  animation: premBtnGlow 3s ease-in-out infinite;
+
+  &:hover {
+    background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(168,85,247,0.22), rgba(236,72,153,0.18));
+    border-color: rgba(251,191,36,0.5);
+    box-shadow: 0 0 16px rgba(251,191,36,0.2), 0 0 32px rgba(168,85,247,0.15);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes premBtnGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(251,191,36,0.1); }
+  50% { box-shadow: 0 0 16px rgba(251,191,36,0.18), 0 0 24px rgba(168,85,247,0.1); }
+}
 
 // Tabs
 .profile-tabs {

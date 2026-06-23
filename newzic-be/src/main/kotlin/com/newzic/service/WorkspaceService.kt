@@ -22,7 +22,8 @@ class WorkspaceService(
     private val referenceRepository: WorkspaceReferenceRepository,
     private val userRepository: UserRepository,
     private val collaborationRepository: CollaborationRepository,
-    private val notificationService: NotificationService
+    private val notificationService: NotificationService,
+    private val premiumService: PremiumService
 ) {
 
     // ═══════════════════════════════════════════
@@ -31,6 +32,8 @@ class WorkspaceService(
 
     @Transactional
     fun create(userId: UUID, request: CreateWorkspaceRequest): WorkspaceResponse {
+        premiumService.requireCanCreateWorkspace(userId)
+
         val owner = userRepository.findById(userId)
             .orElseThrow { NoSuchElementException("User not found") }
 
@@ -119,6 +122,15 @@ class WorkspaceService(
         val workspace = workspaceRepository.findById(workspaceId)
             .orElseThrow { NoSuchElementException("Workspace not found") }
         requireMember(workspaceId, inviterId)
+
+        // Check collaborator limit for free users
+        val inviter = userRepository.findById(inviterId).orElseThrow()
+        if (!inviter.premium) {
+            val currentCount = memberRepository.countByWorkspaceId(workspaceId)
+            if (currentCount >= PremiumService.FREE_MAX_COLLABORATORS) {
+                throw PremiumRequiredException("collaborator_limit", "Upgrade to Premium for unlimited collaborators.")
+            }
+        }
 
         if (memberRepository.existsByWorkspaceIdAndUserId(workspaceId, inviteeId)) {
             throw IllegalStateException("User is already a member")
@@ -225,6 +237,15 @@ class WorkspaceService(
     @Transactional
     fun addComment(workspaceId: UUID, versionId: UUID, userId: UUID, request: AddCommentRequest): WorkspaceCommentResponse {
         requireMember(workspaceId, userId)
+
+        // Check comment limit for free users
+        val commenter = userRepository.findById(userId).orElseThrow()
+        if (!commenter.premium) {
+            val commentCount = commentRepository.countByVersionId(versionId)
+            if (commentCount >= PremiumService.FREE_MAX_COMMENTS_PER_SONG) {
+                throw PremiumRequiredException("comment_limit", "Upgrade to Premium for unlimited comments.")
+            }
+        }
 
         val version = versionRepository.findById(versionId)
             .orElseThrow { NoSuchElementException("Version not found") }

@@ -12,11 +12,13 @@ import { PlayerService } from '../../core/services/player.service';
 import { ArtistStats, Song } from '../../core/models';
 import { environment } from '../../../environments/environment';
 import { FollowersModalComponent } from '../../shared/components/followers-modal/followers-modal.component';
+import { UpgradeModalComponent } from '../../shared/components/upgrade-modal/upgrade-modal.component';
+import { PremiumBadgeComponent } from '../../shared/components/premium-badge/premium-badge.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterLink, FormatNumberPipe, FormsModule, TranslatePipe, FollowersModalComponent],
+  imports: [RouterLink, FormatNumberPipe, FormsModule, TranslatePipe, FollowersModalComponent, UpgradeModalComponent, PremiumBadgeComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -30,6 +32,7 @@ export class ProfileComponent implements OnInit {
   savingAvatar = signal(false);
   avatarPreview = signal('');
   showFollowModal = signal(false);
+  showUpgradeModal = signal(false);
   followModalMode = signal<'followers' | 'following'>('followers');
   editCountry = '';
   editPreferredGenres: string[] = [];

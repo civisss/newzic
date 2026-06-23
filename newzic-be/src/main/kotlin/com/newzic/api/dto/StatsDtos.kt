@@ -24,3 +24,42 @@ data class CityPlaysDto(
     val city: String,
     val plays: Long
 )
+
+// ── Premium Advanced Analytics ──
+
+data class AdvancedAnalyticsResponse(
+    val audienceByCountry: List<PercentageItem>,
+    val audienceByGender: List<PercentageItem>,
+    val audienceByAge: List<PercentageItem>,
+    val audienceInterests: List<PercentageItem>,
+    val songPerformance: List<SongPerformanceDto>,
+    val growth: GrowthDto
+)
+
+data class PercentageItem(
+    val label: String,
+    val percent: Double
+)
+
+data class SongPerformanceDto(
+    val songId: String,
+    val title: String,
+    val cover: String?,
+    val plays: Long,
+    val likes: Long,
+    val shares: Long,
+    val saves: Long,
+    val newFollowers: Long
+)
+
+data class GrowthDto(
+    val daily: GrowthPoint,
+    val weekly: GrowthPoint,
+    val monthly: GrowthPoint
+)
+
+data class GrowthPoint(
+    val plays: Long,
+    val followers: Long,
+    val trend: String    // "up" | "down" | "stable"
+)

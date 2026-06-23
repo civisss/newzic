@@ -10,18 +10,14 @@
           <div class="artist-name-row">
             <h1>{{ artist()!.name }}
               @if (artist()!.verified) {
-                <span class="verified-check" title="Verified artist">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                </span>
+                <app-verified-badge />
               }
             </h1>
+            <span class="artist-username">&#64;{{ artist()!.username }}</span>
             <div class="header-badges">
               <span class="role-badge">{{ getRoleLabel(artist()!.role) }}</span>
               @if (artist()!.premium) {
-                <span class="premium-badge">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                  Premium
-                </span>
+                <app-premium-badge />
               }
             </div>
           </div>
@@ -78,6 +74,9 @@
               <button class="btn-message" (click)="openChat(artist()!.id)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 {{ 'artist.send_message' | translate }}
+              </button>
+              <button class="btn-donate" (click)="showDonateModal.set(true)">
+                💜&nbsp; {{ 'artist.support_artist' | translate }}
               </button>
             }
           </div>
@@ -260,6 +259,14 @@
       [userId]="artist()!.id"
       [mode]="followModalMode()"
       (closed)="closeFollowModal()"
+    />
+  }
+
+  @if (showDonateModal()) {
+    <app-donate-modal
+      [artistId]="artist()!.id"
+      [artistName]="artist()!.name"
+      (close)="showDonateModal.set(false)"
     />
   }
 }

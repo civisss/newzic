@@ -1,0 +1,93 @@
+@use 'app/shared/styles/variables' as *;
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: $z-modal;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 20px;
+  backdrop-filter: blur(4px);
+}
+
+.upgrade-modal {
+  position: relative; overflow: hidden;
+  background: $bg-surface; border: 1px solid $border-light;
+  border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 440px;
+  text-align: center;
+}
+
+.upgrade-glow {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  width: 160px; height: 160px; border-radius: 50%;
+  background: radial-gradient(circle, rgba($accent-violet, 0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.upgrade-header {
+  position: relative; z-index: 1;
+  margin-bottom: 28px;
+
+  h2 {
+    font-size: 1.4rem; font-weight: 800; letter-spacing: 0.12em;
+    background: $gradient-violet-blue;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 12px 0 8px;
+  }
+}
+
+.upgrade-icon {
+  svg { filter: drop-shadow(0 0 8px rgba($accent-violet, 0.25)); }
+}
+
+.limit-msg {
+  font-size: 0.85rem; color: $text-secondary; margin: 0;
+  line-height: 1.5;
+}
+
+.upgrade-features {
+  text-align: left; margin-bottom: 28px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.feature-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.84rem; color: $text-secondary;
+
+  .check {
+    color: $accent-green; font-weight: 700; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+}
+
+.upgrade-price {
+  margin-bottom: 24px;
+
+  .price {
+    font-size: 2rem; font-weight: 800;
+    background: $gradient-violet-blue;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .period {
+    font-size: 0.9rem; color: $text-muted;
+  }
+}
+
+.upgrade-actions {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.upgrade-btn {
+  width: 100%; padding: 14px;
+  background: $gradient-violet-blue;
+  color: white; border: none; border-radius: $radius-lg;
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  transition: opacity $transition-fast, transform $transition-fast;
+  &:hover { opacity: 0.9; transform: translateY(-1px); }
+}
+
+.skip-btn {
+  background: none; border: none;
+  color: $text-muted; font-size: 0.82rem; cursor: pointer;
+  padding: 8px;
+  &:hover { color: $text-secondary; }
+}

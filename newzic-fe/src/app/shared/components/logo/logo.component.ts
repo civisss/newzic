@@ -26,6 +26,9 @@ import { RouterLink } from '@angular/router';
       </svg>
       @if (showText) {
         <span class="logo-text" [style.font-size.px]="textSize">NEWZIC</span>
+        @if (isPremium) {
+          <span class="logo-premium" [style.font-size.px]="textSize * 0.5">PREMIUM</span>
+        }
       }
     </a>
   `,
@@ -62,6 +65,16 @@ import { RouterLink } from '@angular/router';
       0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
     }
+    .logo-premium {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #A855F7, #3B82F6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-left: 4px;
+      opacity: 0.85;
+    }
   `],
   imports: [RouterLink]
 })
@@ -71,4 +84,5 @@ export class LogoComponent {
   @Input() gap = 10;
   @Input() showText = true;
   @Input() clickable = true;
+  @Input() isPremium = false;
 }

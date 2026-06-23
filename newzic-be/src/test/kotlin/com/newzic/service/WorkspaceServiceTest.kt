@@ -31,6 +31,7 @@ class WorkspaceServiceTest {
     @Mock private lateinit var userRepository: UserRepository
     @Mock private lateinit var collaborationRepository: CollaborationRepository
     @Mock private lateinit var notificationService: NotificationService
+    @Mock private lateinit var premiumService: PremiumService
 
     @InjectMocks
     private lateinit var workspaceService: WorkspaceService
@@ -200,6 +201,8 @@ class WorkspaceServiceTest {
             whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, collaborator.id)).thenReturn(false)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(memberRepository.countByWorkspaceId(ws.id)).thenReturn(1)
             whenever(userRepository.findById(collaborator.id)).thenReturn(Optional.of(collaborator))
             whenever(memberRepository.save(any<WorkspaceMemberEntity>())).thenAnswer { it.arguments[0] }
             whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
@@ -215,6 +218,8 @@ class WorkspaceServiceTest {
             val ws = createWorkspace(owner)
             whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(memberRepository.countByWorkspaceId(ws.id)).thenReturn(1)
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, collaborator.id)).thenReturn(true)
 
             assertThrows(IllegalStateException::class.java) {
@@ -227,6 +232,8 @@ class WorkspaceServiceTest {
             val ws = createWorkspace(owner)
             whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(memberRepository.countByWorkspaceId(ws.id)).thenReturn(1)
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, collaborator.id)).thenReturn(false)
             whenever(userRepository.findById(collaborator.id)).thenReturn(Optional.of(collaborator))
             whenever(memberRepository.save(any<WorkspaceMemberEntity>())).thenAnswer { it.arguments[0] }
@@ -364,6 +371,8 @@ class WorkspaceServiceTest {
             val versionOnWs2 = createVersion(ws2, owner, 1)
 
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws1.id, owner.id)).thenReturn(true)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(commentRepository.countByVersionId(versionOnWs2.id)).thenReturn(0)
             whenever(versionRepository.findById(versionOnWs2.id)).thenReturn(Optional.of(versionOnWs2))
 
             assertThrows(IllegalArgumentException::class.java) {

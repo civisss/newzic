@@ -93,8 +93,14 @@
   }
 
   @include mobile {
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
+}
+
+.artist-username {
+  color: rgba(255,255,255,0.5); font-size: 0.9rem;
 }
 
 .header-badges {
@@ -309,6 +315,22 @@
 
   &:hover { color: $accent-violet; border-color: $accent-violet; }
 
+  @include mobile { padding: 8px 14px; font-size: 0.82rem; }
+}
+
+.btn-donate {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(124,58,237,0.12));
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: $radius-lg; color: #c084fc;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(124,58,237,0.2));
+    border-color: $accent-violet;
+  }
   @include mobile { padding: 8px 14px; font-size: 0.82rem; }
 }
 
