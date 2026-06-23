@@ -12,7 +12,24 @@
   border-top: 1px solid $border-subtle;
 
   @include mobile {
-    bottom: 60px;
+    bottom: 80px;
+    left: 16px;
+    right: 16px;
+    height: 56px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(14, 14, 24, 0.55);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  // Hide player when notification panel is open on mobile
+  :host-context(body.notif-panel-open) & {
+    @include mobile {
+      display: none;
+    }
   }
 }
 
@@ -27,8 +44,9 @@
   gap: 16px;
 
   @include mobile {
-    grid-template-columns: 1fr 1fr;
-    padding: 0 12px;
+    grid-template-columns: 1fr auto;
+    padding: 0 10px;
+    gap: 8px;
   }
 }
 
@@ -52,6 +70,11 @@
   &:hover {
     transform: scale(1.06);
     box-shadow: 0 4px 20px rgba($accent-violet, 0.2);
+  }
+
+  @include mobile {
+    width: 38px;
+    height: 38px;
   }
 }
 
@@ -185,6 +208,12 @@
 
   &:active {
     transform: scale(0.95);
+  }
+
+  @include mobile {
+    width: 36px;
+    height: 36px;
+    svg { width: 20px; height: 20px; }
   }
 }
 

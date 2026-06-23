@@ -24,6 +24,7 @@ export class ProfileComponent implements OnInit {
   stats = signal<ArtistStats | null>(null);
   mySongs = signal<Song[]>([]);
   likedSongs = signal<Song[]>([]);
+  songsLoading = signal(true);
   activeTab = signal<'overview' | 'liked' | 'settings'>('overview');
   savingPrefs = signal(false);
   savingAvatar = signal(false);
@@ -78,7 +79,10 @@ export class ProfileComponent implements OnInit {
     this.statsService.getMyStats().subscribe(s => this.stats.set(s));
     const user = this.auth.user();
     if (user) {
-      this.songService.getByArtist(user.id).subscribe(songs => this.mySongs.set(songs));
+      this.songService.getByArtist(user.id).subscribe(songs => {
+        this.mySongs.set(songs);
+        this.songsLoading.set(false);
+      });
       this.songService.getLikedSongs().subscribe(songs => this.likedSongs.set(songs));
       this.editCountry = user.country || '';
       this.editPreferredGenres = [...(user.preferredGenres || [])];

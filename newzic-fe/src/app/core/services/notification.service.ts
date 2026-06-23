@@ -23,9 +23,14 @@ export class NotificationService {
   }
 
   markAsRead(id: string): void {
-    this._notifications.update(list =>
-      list.map(n => (n.id === id ? { ...n, read: true } : n))
-    );
+    const notif = this._notifications().find(n => n.id === id);
+    if (notif && !notif.read) {
+      this._notifications.update(list =>
+        list.map(n => (n.id === id ? { ...n, read: true } : n))
+      );
+      this._unreadCount.update(c => Math.max(0, c - 1));
+      this.http.post(`${environment.apiUrl}/notifications/${id}/mark-read`, {}).subscribe();
+    }
   }
 
   markAllAsRead(): void {

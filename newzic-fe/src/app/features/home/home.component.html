@@ -152,7 +152,9 @@
       @if (recommendedSongs().length > 0) {
         <div class="marquee-section rec-marquee-wrap">
           <div class="marquee-track">
-            <div class="marquee-inner rec-songs-marquee">
+            <div class="marquee-inner rec-songs-marquee" #recMarquee
+                 (touchstart)="recMarquee.classList.add('touch-paused')"
+                 (touchend)="recMarquee.classList.remove('touch-paused')">
               @for (song of recommendedSongs(); track song.id + 'a') {
                 <div class="rec-song-card" (click)="playRecommendedSong(song)">
                   <div class="rec-song-cover-wrap">
@@ -245,7 +247,9 @@
     </div>
     <div class="marquee-section">
       <div class="marquee-track">
-        <div class="marquee-inner artists-marquee">
+        <div class="marquee-inner artists-marquee" #artistsMarquee
+             (touchstart)="artistsMarquee.classList.add('touch-paused')"
+             (touchend)="artistsMarquee.classList.remove('touch-paused')">
           @for (artist of trendingArtists(); track artist.id + 'a') {
             <a [routerLink]="'/artist/' + artist.id" class="artist-card">
               <div class="artist-card-img">
@@ -374,7 +378,9 @@
     </div>
     <div class="marquee-section">
       <div class="marquee-track">
-        <div class="marquee-inner">
+        <div class="marquee-inner" #dropsMarquee
+             (touchstart)="dropsMarquee.classList.add('touch-paused')"
+             (touchend)="dropsMarquee.classList.remove('touch-paused')">
           @for (song of newReleases(); track song.id + 'a') {
             <div class="release-marquee-item" (click)="toggleSong(song)">
               <div class="release-cover-wrap" [class.playing]="isPlayingSong(song)">

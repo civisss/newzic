@@ -70,7 +70,17 @@
     </div>
 
     <!-- My Tracks -->
-    @if (mySongs().length > 0) {
+    @if (songsLoading()) {
+      <div class="my-tracks-section">
+        <h3>{{ 'profile.my_tracks' | translate }}</h3>
+        <div class="tracks-loader">
+          <div class="loader-bars">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p class="loader-text">Loading tracks...</p>
+        </div>
+      </div>
+    } @else if (mySongs().length > 0) {
       <div class="my-tracks-section">
         <h3>{{ 'profile.my_tracks' | translate }}</h3>
         <div class="my-tracks-list">

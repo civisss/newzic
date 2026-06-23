@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ViewChild, ElementRef, AfterViewChecked, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, ViewChild, ElementRef, AfterViewChecked, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -13,7 +13,8 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   templateUrl: './chat-widget.component.html',
   styleUrl: './chat-widget.component.scss'
 })
-export class ChatWidgetComponent implements OnInit, AfterViewChecked {
+export class ChatWidgetComponent implements OnInit, AfterViewChecked, OnDestroy {
+  private pollInterval: any;
   isOpen = signal(false);
   conversations = signal<ConversationPreview[]>([]);
   activeConversation = signal<string | null>(null);
@@ -45,12 +46,31 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
       this.messageService.loadConversations();
       this.messageService.loadUnreadCount();
     }
-    // Poll for new messages every 10s
-    setInterval(() => {
-      if (this.auth.isLoggedIn()) {
-        this.messageService.loadUnreadCount();
+    // Poll every 5s: refresh unread count + active conversation messages
+    this.pollInterval = setInterval(() => {
+      if (!this.auth.isLoggedIn()) return;
+      this.messageService.loadUnreadCount();
+
+      // Refresh active conversation messages
+      const activeId = this.activeConversation();
+      if (activeId && this.isOpen()) {
+        this.messageService.getConversation(activeId).subscribe(msgs => {
+          const current = this.messages();
+          if (msgs.length !== current.length) {
+            this.messages.set(msgs);
+            this.shouldScroll = true;
+          }
+        });
+        // Also refresh conversation list for latest previews
+        this.messageService.loadConversations();
+        setTimeout(() => this.conversations.set([...this.messageService.conversations()]), 200);
       }
-    }, 10000);
+    }, 5000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.pollInterval) clearInterval(this.pollInterval);
+    document.body.style.overflow = '';
   }
 
   ngAfterViewChecked(): void {
@@ -65,9 +85,11 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
     if (this.isOpen()) {
       this.messageService.loadConversations();
       setTimeout(() => this.conversations.set([...this.messageService.conversations()]), 300);
+      if (window.innerWidth <= 768) document.body.style.overflow = 'hidden';
     } else {
       this.activeConversation.set(null);
       this.messages.set([]);
+      document.body.style.overflow = '';
     }
   }
 
@@ -76,6 +98,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
     this.messageService.getConversation(userId).subscribe(msgs => {
       this.messages.set(msgs);
       this.shouldScroll = true;
+      setTimeout(() => this.msgInput?.nativeElement?.focus(), 100);
     });
     this.messageService.markAsRead(userId).subscribe(() => {
       this.conversations.update(list =>
