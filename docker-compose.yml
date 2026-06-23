@@ -31,7 +31,7 @@ services:
       DB_USERNAME: newzic
       DB_PASSWORD: newzic
       JWT_SECRET: newzic-dev-secret-key-change-in-production-minimum-256-bits-long
-      CORS_ORIGINS: http://localhost:4200
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200}
     ports:
       - "8080:8080"
 
