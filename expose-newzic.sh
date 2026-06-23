@@ -3,16 +3,16 @@ set -e
 
 # ╔══════════════════════════════════════════════════════════╗
 # ║  expose-newzic.sh                                        ║
-# ║  Uguale a start.sh ma espone l'app via ngrok             ║
+# ║  Uguale a start.sh ma espone l'app via Cloudflare Tunnel ║
 # ╚══════════════════════════════════════════════════════════╝
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# ── Dominio ngrok gratuito ──
-NGROK_DOMAIN="${NGROK_DOMAIN:-autopilot-regalia-phonebook.ngrok-free.dev}"
-
-# ── Configura CORS per accettare il dominio ngrok ──
-export CORS_ORIGINS="http://localhost:4200,https://$NGROK_DOMAIN"
+# ── Tunnel tool: cloudflared (Cloudflare Tunnel, no bandwidth limits) ──
+if ! command -v cloudflared &> /dev/null; then
+    echo "❌ cloudflared non trovato. Installalo con: brew install cloudflared"
+    exit 1
+fi
 
 echo ""
 echo "🎵 NEWZIC — Local Expose"
@@ -33,10 +33,60 @@ npm install
 npx ng build --configuration=development
 
 # ─────────────────────────────────────────────
-# 2. START CONTAINERS (podman compose in background)
+# 2. CLOUDFLARE TUNNEL (prima dei container per ottenere l'URL)
 # ─────────────────────────────────────────────
 
+echo ""
+echo "🌐 Avvio Cloudflare Tunnel..."
+echo ""
+
+# Cleanup: quando premi Ctrl+C, ferma tunnel e container
+CF_PID=""
+cleanup() {
+    echo ""
+    echo "⏹  Arresto tunnel e container..."
+    [ -n "$CF_PID" ] && kill "$CF_PID" 2>/dev/null
+    cd "$SCRIPT_DIR" && podman compose down
+    echo "✅ Tutto spento."
+}
+trap cleanup SIGINT SIGTERM EXIT
+
+# Avvia cloudflared in background e cattura l'URL
+CF_LOG=$(mktemp)
+cloudflared tunnel --url http://localhost:4200 2>"$CF_LOG" &
+CF_PID=$!
+
+# Attendi che cloudflared generi l'URL pubblico
+echo -n "⏳ Attendo URL del tunnel..."
+TUNNEL_URL=""
+for i in $(seq 1 30); do
+    TUNNEL_URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$CF_LOG" 2>/dev/null | head -1)
+    if [ -n "$TUNNEL_URL" ]; then
+        break
+    fi
+    sleep 1
+    echo -n "."
+done
+echo ""
+
+if [ -z "$TUNNEL_URL" ]; then
+    echo "❌ Timeout in attesa dell'URL del tunnel. Log:"
+    cat "$CF_LOG"
+    exit 1
+fi
+
+echo "✅ Tunnel pronto: $TUNNEL_URL"
+
+# ─────────────────────────────────────────────
+# 3. START CONTAINERS con CORS aggiornato
+# ─────────────────────────────────────────────
+
+# Setta CORS prima di avviare i container così il backend lo riceve
+export CORS_ORIGINS="http://localhost:4200,$TUNNEL_URL"
+
+echo ""
 echo "🚀 Starting containers (db + backend + frontend)..."
+echo "   CORS_ORIGINS=$CORS_ORIGINS"
 cd "$SCRIPT_DIR"
 podman compose up --build -d
 
@@ -56,32 +106,17 @@ done
 echo ""
 echo "✅ Servizi pronti!"
 
-# ─────────────────────────────────────────────
-# 3. NGROK TUNNEL
-# ─────────────────────────────────────────────
-
-echo ""
-echo "🌐 Avvio ngrok tunnel..."
-echo "   Dominio: https://$NGROK_DOMAIN"
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
 echo "║  🚀  NEWZIC È ONLINE!                                    ║"
 echo "║                                                          ║"
-echo "║  🌐  https://$NGROK_DOMAIN"
+echo "║  🌐  $TUNNEL_URL"
 echo "║  📍  http://localhost:4200 (locale)                      ║"
 echo "║                                                          ║"
+echo "║  ☁️  Cloudflare Tunnel — nessun limite di banda          ║"
 echo "║  Premi Ctrl+C per spegnere tutto                         ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
-# Cleanup: quando premi Ctrl+C, ferma anche i container
-cleanup() {
-    echo ""
-    echo "⏹  Arresto ngrok e container..."
-    podman compose down
-    echo "✅ Tutto spento."
-}
-trap cleanup SIGINT SIGTERM EXIT
-
-# ngrok in foreground (Ctrl+C lo ferma)
-ngrok http --url="$NGROK_DOMAIN" 4200
+# Resta in attesa (il tunnel gira in background)
+wait $CF_PID

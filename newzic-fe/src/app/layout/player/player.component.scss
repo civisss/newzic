@@ -340,7 +340,7 @@
 .fs-player {
   position: fixed;
   inset: 0;
-  z-index: $z-player + 10;
+  z-index: $z-dropdown + 100;
   display: none;
   flex-direction: column;
   align-items: center;
