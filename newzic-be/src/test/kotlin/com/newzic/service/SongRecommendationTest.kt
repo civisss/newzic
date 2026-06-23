@@ -47,7 +47,7 @@ class SongRecommendationTest {
     }
 
     private fun stubSongMapper() {
-        whenever(songMapper.toResponse(any())).thenAnswer { invocation ->
+        whenever(songMapper.toListResponse(any())).thenAnswer { invocation ->
             val song = invocation.arguments[0] as SongEntity
             SongResponse(
                 id = song.id.toString(),
@@ -70,7 +70,7 @@ class SongRecommendationTest {
                     onpoint = song.reactionsOnpoint,
                     star = song.reactionsStar
                 ),
-                audioUrl = song.audioUrl,
+                audioUrl = null,
                 isExplicit = song.isExplicit
             )
         }

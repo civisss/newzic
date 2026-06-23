@@ -36,19 +36,19 @@ class SongService(
     }
 
     fun getByArtist(artistId: UUID, pageable: Pageable): Page<SongResponse> {
-        return songRepository.findByArtistId(artistId, pageable).map { songMapper.toResponse(it) }
+        return songRepository.findByArtistId(artistId, pageable).map { songMapper.toListResponse(it) }
     }
 
     fun getTrending(pageable: Pageable): Page<SongResponse> {
-        return songRepository.findTrending(pageable).map { songMapper.toResponse(it) }
+        return songRepository.findTrending(pageable).map { songMapper.toListResponse(it) }
     }
 
     fun getNewReleases(pageable: Pageable): Page<SongResponse> {
-        return songRepository.findNewReleases(pageable).map { songMapper.toResponse(it) }
+        return songRepository.findNewReleases(pageable).map { songMapper.toListResponse(it) }
     }
 
     fun search(query: String, pageable: Pageable): Page<SongResponse> {
-        return songRepository.search(query, pageable).map { songMapper.toResponse(it) }
+        return songRepository.search(query, pageable).map { songMapper.toListResponse(it) }
     }
 
     @Transactional(readOnly = true)
@@ -124,7 +124,7 @@ class SongService(
             .filter { it.score > 0 }
             .sortedByDescending { it.score }
             .take(limit)
-            .map { songMapper.toResponse(it.entity) }
+            .map { songMapper.toListResponse(it.entity) }
     }
 
     @Transactional

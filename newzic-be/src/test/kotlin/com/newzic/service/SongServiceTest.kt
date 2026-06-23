@@ -143,4 +143,141 @@ class SongServiceTest {
             clearInvocations(notificationService, reactionRepository, songRepository, userRepository)
         }
     }
+
+    // ── Lazy audio loading: getById returns audioUrl, list methods do not ──
+
+    @Test
+    fun `getById should return song with audioUrl`() {
+        song.audioUrl = "data:audio/mp3;base64,AAAA"
+        whenever(songRepository.findById(song.id)).thenReturn(Optional.of(song))
+        whenever(songMapper.toResponse(song)).thenCallRealMethod()
+
+        val result = songService.getById(song.id)
+
+        assertNotNull(result.audioUrl)
+        assertEquals("data:audio/mp3;base64,AAAA", result.audioUrl)
+        verify(songMapper).toResponse(song)
+        verify(songMapper, never()).toListResponse(any())
+    }
+
+    @Test
+    fun `getByArtist should return songs without audioUrl`() {
+        song.audioUrl = "data:audio/mp3;base64,AAAA"
+        val page = org.springframework.data.domain.PageImpl(listOf(song))
+        val pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+        whenever(songRepository.findByArtistId(artist.id, pageable)).thenReturn(page)
+        whenever(songMapper.toListResponse(song)).thenCallRealMethod()
+
+        val result = songService.getByArtist(artist.id, pageable)
+
+        assertNull(result.content[0].audioUrl)
+        verify(songMapper).toListResponse(song)
+        verify(songMapper, never()).toResponse(any())
+    }
+
+    @Test
+    fun `getTrending should return songs without audioUrl`() {
+        song.audioUrl = "data:audio/mp3;base64,AAAA"
+        val page = org.springframework.data.domain.PageImpl(listOf(song))
+        val pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+        whenever(songRepository.findTrending(pageable)).thenReturn(page)
+        whenever(songMapper.toListResponse(song)).thenCallRealMethod()
+
+        val result = songService.getTrending(pageable)
+
+        assertNull(result.content[0].audioUrl)
+        verify(songMapper).toListResponse(song)
+        verify(songMapper, never()).toResponse(any())
+    }
+
+    @Test
+    fun `getNewReleases should return songs without audioUrl`() {
+        song.audioUrl = "data:audio/mp3;base64,AAAA"
+        val page = org.springframework.data.domain.PageImpl(listOf(song))
+        val pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+        whenever(songRepository.findNewReleases(pageable)).thenReturn(page)
+        whenever(songMapper.toListResponse(song)).thenCallRealMethod()
+
+        val result = songService.getNewReleases(pageable)
+
+        assertNull(result.content[0].audioUrl)
+        verify(songMapper).toListResponse(song)
+        verify(songMapper, never()).toResponse(any())
+    }
+
+    @Test
+    fun `search should return songs without audioUrl`() {
+        song.audioUrl = "data:audio/mp3;base64,AAAA"
+        val page = org.springframework.data.domain.PageImpl(listOf(song))
+        val pageable = org.springframework.data.domain.PageRequest.of(0, 10)
+        whenever(songRepository.search("test", pageable)).thenReturn(page)
+        whenever(songMapper.toListResponse(song)).thenCallRealMethod()
+
+        val result = songService.search("test", pageable)
+
+        assertNull(result.content[0].audioUrl)
+        verify(songMapper).toListResponse(song)
+        verify(songMapper, never()).toResponse(any())
+    }
+}
+
+// ── SongMapper unit tests ──
+@ExtendWith(MockitoExtension::class)
+class SongMapperTest {
+
+    private val mapper = SongMapper()
+
+    private lateinit var artist: UserEntity
+    private lateinit var song: SongEntity
+
+    @BeforeEach
+    fun setUp() {
+        artist = UserEntity(
+            id = UUID.randomUUID(), displayName = "TestArtist", username = "testartist",
+            email = "test@test.com", passwordHash = "h", roles = mutableSetOf(ArtistRole.SINGER)
+        )
+        song = SongEntity(
+            id = UUID.randomUUID(), title = "Mapper Song", artist = artist,
+            duration = 180, audioUrl = "data:audio/mp3;base64,AAAA"
+        )
+    }
+
+    @Test
+    fun `toResponse should include audioUrl`() {
+        val result = mapper.toResponse(song)
+
+        assertEquals(song.id.toString(), result.id)
+        assertEquals("Mapper Song", result.title)
+        assertEquals("data:audio/mp3;base64,AAAA", result.audioUrl)
+    }
+
+    @Test
+    fun `toListResponse should exclude audioUrl`() {
+        val result = mapper.toListResponse(song)
+
+        assertEquals(song.id.toString(), result.id)
+        assertEquals("Mapper Song", result.title)
+        assertNull(result.audioUrl)
+    }
+
+    @Test
+    fun `toResponse and toListResponse should have same metadata`() {
+        val full = mapper.toResponse(song)
+        val list = mapper.toListResponse(song)
+
+        assertEquals(full.id, list.id)
+        assertEquals(full.title, list.title)
+        assertEquals(full.artistId, list.artistId)
+        assertEquals(full.artistName, list.artistName)
+        assertEquals(full.cover, list.cover)
+        assertEquals(full.duration, list.duration)
+        assertEquals(full.genre, list.genre)
+        assertEquals(full.plays, list.plays)
+        assertEquals(full.likes, list.likes)
+        assertEquals(full.reactions, list.reactions)
+        assertEquals(full.isExplicit, list.isExplicit)
+        // Only audioUrl differs
+        assertNotNull(full.audioUrl)
+        assertNull(list.audioUrl)
+    }
 }

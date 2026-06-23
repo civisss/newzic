@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Song } from '../models';
 import { SongService } from './song.service';
+import { Subscription } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PlayerService {
@@ -17,6 +18,10 @@ export class PlayerService {
   private audio = new Audio();
   private rafId: number | null = null;
   private songService = inject(SongService);
+  private loadSub: Subscription | null = null;
+
+  private _loading = signal(false);
+  readonly loading = this._loading.asReadonly();
 
   readonly currentSong = this._currentSong.asReadonly();
   readonly isPlaying = this._isPlaying.asReadonly();
@@ -56,6 +61,10 @@ export class PlayerService {
   }
 
   play(song: Song, queue?: Song[]): void {
+    // Cancel any pending audio fetch
+    this.loadSub?.unsubscribe();
+    this.loadSub = null;
+
     this._currentSong.set(song);
     this._progress.set(0);
 
@@ -67,6 +76,33 @@ export class PlayerService {
       this._currentIndex.set(queue.findIndex(s => s.id === song.id));
     }
 
+    if (song.audioUrl) {
+      // Audio already available (e.g. from getById)
+      this._loading.set(false);
+      this.startPlayback(song);
+    } else {
+      // Lazy-load: fetch full song detail with audioUrl
+      this._loading.set(true);
+      this._isPlaying.set(false);
+      this.loadSub = this.songService.getById(song.id).subscribe(full => {
+        this._loading.set(false);
+        if (full?.audioUrl) {
+          const enriched = { ...song, audioUrl: full.audioUrl };
+          this._currentSong.set(enriched);
+          // Update in queue too
+          this._queue.update(q => q.map(s => s.id === enriched.id ? enriched : s));
+          this.startPlayback(enriched);
+        } else {
+          // No audio data at all — use fallback
+          this._isPlaying.set(true);
+          this._duration.set(song.duration || 210);
+          this.startFallbackProgress(song);
+        }
+      });
+    }
+  }
+
+  private startPlayback(song: Song): void {
     if (song.audioUrl) {
       this.audio.src = song.audioUrl;
       this.audio.load();

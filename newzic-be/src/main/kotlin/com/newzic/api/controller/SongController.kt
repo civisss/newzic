@@ -142,7 +142,7 @@ class SongController(
     fun getLikedSongs(auth: Authentication): ResponseEntity<List<SongResponse>> {
         val userId = auth.principal as UUID
         val likes = songLikeRepository.findByUserIdOrderByCreatedAtDesc(userId)
-        val songs = likes.map { songMapper.toResponse(it.song) }
+        val songs = likes.map { songMapper.toListResponse(it.song) }
         return ResponseEntity.ok(songs)
     }
 }

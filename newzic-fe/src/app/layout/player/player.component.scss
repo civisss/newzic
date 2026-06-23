@@ -587,3 +587,26 @@
     background: rgba($accent-pink, 0.1);
   }
 }
+
+// ── Loading spinners ──
+.play-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: playerSpin 0.7s linear infinite;
+}
+
+.fs-play-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: playerSpin 0.7s linear infinite;
+}
+
+@keyframes playerSpin {
+  to { transform: rotate(360deg); }
+}
