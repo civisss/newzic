@@ -7,6 +7,7 @@ import { AuthService, DEFAULT_AVATAR } from '../../../core/services/auth.service
 import { PlayerService } from '../../../core/services/player.service';
 import { ArtistService } from '../../../core/services/artist.service';
 import { I18nService } from '../../../core/services/i18n.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { Artist } from '../../../core/models';
 import {
   Workspace,
@@ -19,7 +20,7 @@ import {
 @Component({
   selector: 'app-workspace-detail',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, TranslatePipe],
   templateUrl: './workspace-detail.component.html',
   styleUrl: './workspace-detail.component.scss'
 })
@@ -39,6 +40,7 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   currentTime = signal(0);
   duration = signal(0);
   waveformData = signal<number[]>([]);
+  audioLoading = signal(true);
 
   // UI state
   activeTab = signal<'comments' | 'files' | 'chat' | 'versions'>('comments');
@@ -156,6 +158,7 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
 
   selectVersion(version: WorkspaceVersion): void {
     this.stopAudio();
+    this.audioLoading.set(true);
     this.activeVersion.set(version);
     this.currentTime.set(0);
     this.duration.set(version.duration || 0);
@@ -182,6 +185,7 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
 
         this.onMetadataLoaded = () => {
           this.duration.set(this.audio!.duration);
+          this.audioLoading.set(false);
           this.drawWaveform();
         };
         this.onAudioEnded = () => {

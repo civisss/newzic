@@ -63,32 +63,45 @@
 
       <audio #audioElement [src]="ver.audioUrl" preload="metadata"></audio>
 
-      <div class="waveform-container">
-        <!-- Comment pins above waveform -->
-        <div class="comment-pins-layer">
-          @for (pin of commentPins(); track pin.id) {
-            <button class="comment-pin"
-                    [style.left.%]="pin.leftPercent"
-                    [title]="pin.authorName + ' @' + formatTimestamp(pin.timestampSeconds) + ': ' + pin.content"
-                    (click)="jumpToTimestamp(pin.timestampSeconds); $event.stopPropagation()">
-              <span class="pin-dot"></span>
-              <span class="pin-tooltip">
-                <strong>{{ pin.authorName }}</strong> @{{ formatTimestamp(pin.timestampSeconds) }}
-                <br/>{{ pin.content }}
-              </span>
-            </button>
-          }
+      @if (audioLoading()) {
+        <div class="ws-audio-loader">
+          <div class="ws-equalizer">
+            <div class="ws-eq-bar"></div>
+            <div class="ws-eq-bar"></div>
+            <div class="ws-eq-bar"></div>
+            <div class="ws-eq-bar"></div>
+            <div class="ws-eq-bar"></div>
+          </div>
+          <span class="ws-loader-text">{{ 'workspace.loading_track' | translate }}</span>
         </div>
+      } @else {
+        <div class="waveform-container">
+          <!-- Comment pins above waveform -->
+          <div class="comment-pins-layer">
+            @for (pin of commentPins(); track pin.id) {
+              <button class="comment-pin"
+                      [style.left.%]="pin.leftPercent"
+                      [title]="pin.authorName + ' @' + formatTimestamp(pin.timestampSeconds) + ': ' + pin.content"
+                      (click)="jumpToTimestamp(pin.timestampSeconds); $event.stopPropagation()">
+                <span class="pin-dot"></span>
+                <span class="pin-tooltip">
+                  <strong>{{ pin.authorName }}</strong> @{{ formatTimestamp(pin.timestampSeconds) }}
+                  <br/>{{ pin.content }}
+                </span>
+              </button>
+            }
+          </div>
 
-        <!-- Waveform Canvas -->
-        <canvas #waveformCanvas
-                class="waveform-canvas"
-                (click)="onWaveformClick($event)">
-        </canvas>
+          <!-- Waveform Canvas -->
+          <canvas #waveformCanvas
+                  class="waveform-canvas"
+                  (click)="onWaveformClick($event)">
+          </canvas>
 
-        <!-- Click hint -->
-        <div class="waveform-hint">Click on the waveform to add a comment at that moment</div>
-      </div>
+          <!-- Click hint -->
+          <div class="waveform-hint">Click on the waveform to add a comment at that moment</div>
+        </div>
+      }
 
       <!-- Transport controls -->
       <div class="transport">

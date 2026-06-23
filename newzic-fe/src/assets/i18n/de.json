@@ -265,5 +265,7 @@
   "workspace.status.draft": "Entwurf",
   "workspace.status.in_progress": "In Bearbeitung",
   "workspace.status.review": "Überprüfung",
-  "workspace.status.done": "Fertig"
+  "workspace.status.done": "Fertig",
+
+  "workspace.loading_track": "Track wird geladen..."
 }

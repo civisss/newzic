@@ -265,5 +265,7 @@
   "workspace.status.draft": "Borrador",
   "workspace.status.in_progress": "En Progreso",
   "workspace.status.review": "Revisión",
-  "workspace.status.done": "Completado"
+  "workspace.status.done": "Completado",
+
+  "workspace.loading_track": "Cargando pista..."
 }
