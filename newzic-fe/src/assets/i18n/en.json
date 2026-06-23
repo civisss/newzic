@@ -267,5 +267,104 @@
   "workspace.status.review": "Review",
   "workspace.status.done": "Done",
 
-  "workspace.loading_track": "Loading track..."
+  "workspace.loading_track": "Loading track...",
+
+  "workspace.tab.comments": "Comments",
+  "workspace.tab.tasks": "Tasks",
+  "workspace.tab.versions": "Versions",
+  "workspace.tab.references": "References",
+  "workspace.tab.files": "Files",
+  "workspace.tab.activity": "Activity",
+  "workspace.tab.chat": "Chat",
+
+  "workspace.comments.empty": "No comments yet. Click on the waveform to leave a timestamped comment.",
+  "workspace.comments.reply": "Reply",
+  "workspace.comments.resolve": "Resolve",
+  "workspace.comments.reopen": "Reopen",
+  "workspace.comments.resolved": "Resolved",
+  "workspace.comments.resolved_in": "in v{{version}}",
+  "workspace.comments.type_comment": "Type your comment...",
+
+  "workspace.tasks.add": "Add Task",
+  "workspace.tasks.complete_pct": "{{pct}}% complete",
+  "workspace.tasks.todo": "To Do",
+  "workspace.tasks.in_progress": "In Progress",
+  "workspace.tasks.done": "Done",
+  "workspace.tasks.start": "Start",
+  "workspace.tasks.complete": "Complete",
+  "workspace.tasks.back": "Back",
+  "workspace.tasks.reopen": "Reopen",
+  "workspace.tasks.empty": "No tasks yet. Add tasks to track what needs to be done.",
+
+  "workspace.versions.upload": "Upload Version",
+  "workspace.versions.comments_count": "{{count}} comments",
+
+  "workspace.references.add": "Add Reference",
+  "workspace.references.added_by": "Added by {{name}}",
+  "workspace.references.empty": "No reference tracks yet. Add tracks to define the mood and direction.",
+  "workspace.references.open_link": "Open link",
+  "workspace.references.remove": "Remove",
+
+  "workspace.files.upload": "Upload File",
+  "workspace.files.delete": "Delete file",
+  "workspace.files.empty": "No files shared yet. Upload stems, samples, or references.",
+
+  "workspace.activity.empty": "No activity yet. Actions in this workspace will be logged here.",
+
+  "workspace.chat.empty": "Start the conversation about this project.",
+  "workspace.chat.placeholder": "Type a message...",
+
+  "workspace.no_audio.title": "No audio yet",
+  "workspace.no_audio.subtitle": "Upload the first version to start collaborating",
+  "workspace.no_audio.upload_btn": "Upload Audio",
+
+  "workspace.waveform.hint": "Click to comment • Drag to select a range",
+  "workspace.file_ready": "Ready to upload",
+
+  "workspace.modal.upload_version": "Upload New Version",
+  "workspace.modal.audio_file": "Audio File",
+  "workspace.modal.notes": "Notes (optional)",
+  "workspace.modal.notes_placeholder": "What changed in this version?",
+  "workspace.modal.changelog": "Changelog",
+  "workspace.modal.changelog_placeholder": "e.g. Fixed bass mix",
+  "workspace.modal.changelog_add": "+ Add to changelog",
+  "workspace.modal.cancel": "Cancel",
+  "workspace.modal.upload": "Upload",
+  "workspace.modal.uploading": "Uploading…",
+  "workspace.modal.drag_drop": "Drag & drop your audio file",
+  "workspace.modal.drag_sub": "or click to browse — MP3, WAV, FLAC up to 50MB",
+  "workspace.modal.choose_file": "Choose File",
+
+  "workspace.modal.share_file": "Share File",
+  "workspace.modal.file_name": "File Name",
+  "workspace.modal.file_url": "File URL",
+  "workspace.modal.file_type": "Type",
+  "workspace.modal.share": "Share",
+
+  "workspace.modal.invite": "Invite Collaborator",
+  "workspace.modal.search_user": "Search by name or username",
+  "workspace.modal.search_placeholder": "Type a name or @username...",
+  "workspace.modal.no_users": "No users found",
+  "workspace.modal.invite_btn": "Invite",
+
+  "workspace.modal.add_task": "Add Task",
+  "workspace.modal.task_title": "Title",
+  "workspace.modal.task_title_placeholder": "e.g. Record verse 2",
+  "workspace.modal.task_desc": "Description (optional)",
+  "workspace.modal.task_desc_placeholder": "Details about this task...",
+  "workspace.modal.task_assign": "Assign to (optional)",
+  "workspace.modal.task_unassigned": "Unassigned",
+  "workspace.modal.task_add_btn": "Add Task",
+
+  "workspace.modal.add_reference": "Add Reference Track",
+  "workspace.modal.ref_title": "Title",
+  "workspace.modal.ref_artist": "Artist (optional)",
+  "workspace.modal.ref_link": "Link (optional)",
+  "workspace.modal.ref_why": "Why this reference?",
+  "workspace.modal.ref_why_placeholder": "e.g. I want this kind of mood...",
+  "workspace.modal.ref_platform": "Platform",
+  "workspace.modal.ref_add_btn": "Add Reference",
+  "workspace.modal.ref_other": "Other",
+
+  "workspace.loading": "Loading workspace..."
 }

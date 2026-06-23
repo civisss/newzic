@@ -14,7 +14,10 @@ import {
   WorkspaceVersion,
   WorkspaceComment,
   WorkspaceFile,
-  WorkspaceChatMessage
+  WorkspaceChatMessage,
+  WorkspaceTask,
+  WorkspaceActivity,
+  WorkspaceReference
 } from '../../../core/models';
 
 @Component({
@@ -35,6 +38,9 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   comments = signal<WorkspaceComment[]>([]);
   files = signal<WorkspaceFile[]>([]);
   chatMessages = signal<WorkspaceChatMessage[]>([]);
+  tasks = signal<WorkspaceTask[]>([]);
+  activities = signal<WorkspaceActivity[]>([]);
+  references = signal<WorkspaceReference[]>([]);
 
   // Audio state
   isPlaying = signal(false);
@@ -44,7 +50,8 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   audioLoading = signal(true);
 
   // UI state
-  activeTab = signal<'comments' | 'files' | 'chat' | 'versions'>('comments');
+  activeTab = signal<'comments' | 'files' | 'chat' | 'versions' | 'tasks' | 'activity' | 'references'>('comments');
+  showResolvedComments = signal(false);
   showCommentInput = signal(false);
   commentTimestamp = signal(0);
   newComment = '';
@@ -57,8 +64,29 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   newVersionAudioData = '';
   newVersionFileName = '';
   newVersionNotes = '';
+  newVersionChangelog: string[] = [];
+  newChangelogEntry = '';
   versionDragOver = signal(false);
   versionUploading = signal(false);
+
+  // Task modals
+  showTaskModal = signal(false);
+  newTaskTitle = '';
+  newTaskDescription = '';
+  newTaskAssigneeId = '';
+
+  // Reference modals
+  showReferenceModal = signal(false);
+  newRefTitle = '';
+  newRefArtist = '';
+  newRefUrl = '';
+  newRefNotes = '';
+  newRefPlatform = 'OTHER';
+
+  // Range comment state
+  isSelectingRange = signal(false);
+  rangeStart = signal<number | null>(null);
+  rangeEnd = signal<number | null>(null);
 
   showFileModal = signal(false);
   newFileName = '';
@@ -90,10 +118,32 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   readonly commentPins = computed(() => {
     const d = this.duration();
     if (d <= 0) return [];
-    return this.comments().map(c => ({
-      ...c,
-      leftPercent: (c.timestampSeconds / d) * 100
-    }));
+    return this.comments()
+      .filter(c => this.showResolvedComments() || !c.resolved)
+      .map(c => ({
+        ...c,
+        leftPercent: (c.timestampSeconds / d) * 100,
+        widthPercent: c.endTimestampSeconds ? ((c.endTimestampSeconds - c.timestampSeconds) / d) * 100 : 0
+      }));
+  });
+
+  readonly tasksByStatus = computed(() => {
+    const all = this.tasks();
+    return {
+      todo: all.filter(t => t.status === 'todo'),
+      in_progress: all.filter(t => t.status === 'in_progress'),
+      done: all.filter(t => t.status === 'done')
+    };
+  });
+
+  readonly unresolvedCommentCount = computed(() =>
+    this.comments().filter(c => !c.resolved && !c.parentId).length
+  );
+
+  readonly taskProgress = computed(() => {
+    const all = this.tasks();
+    if (all.length === 0) return 0;
+    return Math.round((all.filter(t => t.status === 'done').length / all.length) * 100);
   });
 
   fileTypes = [
@@ -145,6 +195,9 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
       this.loadVersions(id);
       this.loadFiles(id);
       this.loadChat(id);
+      this.loadTasks(id);
+      this.loadActivities(id);
+      this.loadReferences(id);
     });
   }
 
@@ -279,16 +332,29 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
     const v = this.activeVersion();
     if (!ws || !v || !this.newComment.trim()) return;
 
+    const endTs = this.rangeEnd();
     this.workspaceService.addComment(ws.id, v.id, {
       content: this.newComment,
       timestampSeconds: this.commentTimestamp(),
+      endTimestampSeconds: endTs && endTs > this.commentTimestamp() ? endTs : undefined,
       parentId: this.replyToId || undefined
     }).subscribe(() => {
       this.newComment = '';
       this.showCommentInput.set(false);
       this.replyToId = null;
+      this.rangeStart.set(null);
+      this.rangeEnd.set(null);
+      this.isSelectingRange.set(false);
       this.loadComments();
     });
+  }
+
+  resolveComment(comment: WorkspaceComment): void {
+    const ws = this.workspace();
+    const v = this.activeVersion();
+    if (!ws || !v) return;
+    this.workspaceService.resolveComment(ws.id, v.id, comment.id, !comment.resolved)
+      .subscribe(() => this.loadComments());
   }
 
   jumpToTimestamp(seconds: number): void {
@@ -348,6 +414,17 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
     reader.readAsDataURL(file);
   }
 
+  addChangelogEntry(): void {
+    if (this.newChangelogEntry.trim()) {
+      this.newVersionChangelog.push(this.newChangelogEntry.trim());
+      this.newChangelogEntry = '';
+    }
+  }
+
+  removeChangelogEntry(index: number): void {
+    this.newVersionChangelog.splice(index, 1);
+  }
+
   uploadVersion(): void {
     const ws = this.workspace();
     if (!ws || !this.newVersionAudioData || this.versionUploading()) return;
@@ -355,15 +432,19 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
     this.versionUploading.set(true);
     this.workspaceService.uploadVersion(ws.id, {
       audioUrl: this.newVersionAudioData,
-      notes: this.newVersionNotes || undefined
+      notes: this.newVersionNotes || undefined,
+      changelog: this.newVersionChangelog.length > 0 ? this.newVersionChangelog : undefined
     }).subscribe({
       next: () => {
         this.showVersionModal.set(false);
         this.newVersionAudioData = '';
         this.newVersionFileName = '';
         this.newVersionNotes = '';
+        this.newVersionChangelog = [];
+        this.newChangelogEntry = '';
         this.versionUploading.set(false);
         this.loadVersions(ws.id);
+        this.loadActivities(ws.id);
       },
       error: () => {
         this.versionUploading.set(false);
@@ -532,26 +613,48 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
       ctx.fill();
     }
 
-    // Draw comment pin markers
-    const comments = this.comments();
+    // Draw range comment highlights
+    const comments = this.comments().filter(c => this.showResolvedComments() || !c.resolved);
     const dur = this.duration();
     if (dur > 0) {
       comments.forEach(c => {
+        if (c.endTimestampSeconds && c.endTimestampSeconds > c.timestampSeconds) {
+          const startX = (c.timestampSeconds / dur) * rect.width;
+          const endX = (c.endTimestampSeconds / dur) * rect.width;
+          ctx.fillStyle = c.resolved ? 'rgba(74, 222, 128, 0.08)' : 'rgba(244, 114, 182, 0.1)';
+          ctx.fillRect(startX, 0, endX - startX, maxHeight);
+        }
+      });
+
+      // Draw comment pin markers
+      comments.forEach(c => {
         const pinX = (c.timestampSeconds / dur) * rect.width;
-        // Pin line
-        ctx.strokeStyle = '#F472B6';
+        const color = c.resolved ? '#4ADE80' : '#F472B6';
+        ctx.strokeStyle = color;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(pinX, 0);
         ctx.lineTo(pinX, maxHeight);
         ctx.stroke();
 
-        // Pin dot
-        ctx.fillStyle = '#F472B6';
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(pinX, 6, 4, 0, Math.PI * 2);
         ctx.fill();
       });
+    }
+
+    // Draw range selection overlay
+    const rangeS = this.rangeStart();
+    const rangeE = this.rangeEnd();
+    if (rangeS !== null && rangeE !== null && dur > 0) {
+      const sx = (Math.min(rangeS, rangeE) / dur) * rect.width;
+      const ex = (Math.max(rangeS, rangeE) / dur) * rect.width;
+      ctx.fillStyle = 'rgba(168, 85, 247, 0.2)';
+      ctx.fillRect(sx, 0, ex - sx, maxHeight);
+      ctx.strokeStyle = '#A855F7';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(sx, 0, ex - sx, maxHeight);
     }
   }
 
@@ -575,6 +678,150 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
+    }
+  }
+
+  // ── Tasks ──
+
+  loadTasks(wsId: string): void {
+    this.workspaceService.getTasks(wsId).subscribe(t => this.tasks.set(t));
+  }
+
+  createTask(): void {
+    const ws = this.workspace();
+    if (!ws || !this.newTaskTitle.trim()) return;
+    this.workspaceService.createTask(ws.id, {
+      title: this.newTaskTitle,
+      description: this.newTaskDescription || undefined,
+      assignedToId: this.newTaskAssigneeId || undefined
+    }).subscribe(() => {
+      this.showTaskModal.set(false);
+      this.newTaskTitle = '';
+      this.newTaskDescription = '';
+      this.newTaskAssigneeId = '';
+      this.loadTasks(ws.id);
+      this.loadActivities(ws.id);
+    });
+  }
+
+  updateTaskStatus(task: WorkspaceTask, status: string): void {
+    const ws = this.workspace();
+    if (!ws) return;
+    this.workspaceService.updateTask(ws.id, task.id, { status }).subscribe(() => {
+      this.loadTasks(ws.id);
+      this.loadActivities(ws.id);
+    });
+  }
+
+  deleteTask(taskId: string): void {
+    const ws = this.workspace();
+    if (!ws) return;
+    this.workspaceService.deleteTask(ws.id, taskId).subscribe(() => this.loadTasks(ws.id));
+  }
+
+  // ── Activities ──
+
+  loadActivities(wsId: string): void {
+    this.workspaceService.getActivities(wsId).subscribe(a => this.activities.set(a));
+  }
+
+  // ── References ──
+
+  loadReferences(wsId: string): void {
+    this.workspaceService.getReferences(wsId).subscribe(r => this.references.set(r));
+  }
+
+  addReference(): void {
+    const ws = this.workspace();
+    if (!ws || !this.newRefTitle.trim()) return;
+    this.workspaceService.addReference(ws.id, {
+      title: this.newRefTitle,
+      artist: this.newRefArtist || undefined,
+      url: this.newRefUrl || undefined,
+      notes: this.newRefNotes || undefined,
+      platform: this.newRefPlatform
+    }).subscribe(() => {
+      this.showReferenceModal.set(false);
+      this.newRefTitle = '';
+      this.newRefArtist = '';
+      this.newRefUrl = '';
+      this.newRefNotes = '';
+      this.newRefPlatform = 'OTHER';
+      this.loadReferences(ws.id);
+      this.loadActivities(ws.id);
+    });
+  }
+
+  deleteReference(refId: string): void {
+    const ws = this.workspace();
+    if (!ws) return;
+    this.workspaceService.deleteReference(ws.id, refId).subscribe(() => this.loadReferences(ws.id));
+  }
+
+  getPlatformIcon(platform: string): string {
+    const map: Record<string, string> = {
+      spotify: '🟢', youtube: '🟥', soundcloud: '🎧',
+      apple_music: '🍎', other: '🎥'
+    };
+    return map[platform] || '🎥';
+  }
+
+  getActivityIcon(type: string): string {
+    const map: Record<string, string> = {
+      version_uploaded: '📤', comment_added: '💬', comment_resolved: '✅',
+      task_created: '📝', task_completed: '✅', task_assigned: '👤',
+      member_joined: '👥', status_changed: '📊', reference_added: '🎥'
+    };
+    return map[type] || '⚡';
+  }
+
+  // ── Range comment helpers ──
+
+  onWaveformMouseDown(event: MouseEvent): void {
+    const canvas = this.waveformCanvas?.nativeElement;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    const time = percent * this.duration();
+    this.isSelectingRange.set(true);
+    this.rangeStart.set(time);
+    this.rangeEnd.set(null);
+  }
+
+  onWaveformMouseMove(event: MouseEvent): void {
+    if (!this.isSelectingRange()) return;
+    const canvas = this.waveformCanvas?.nativeElement;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    const time = percent * this.duration();
+    this.rangeEnd.set(time);
+    this.drawWaveform();
+  }
+
+  onWaveformMouseUp(event: MouseEvent): void {
+    if (!this.isSelectingRange()) return;
+    this.isSelectingRange.set(false);
+    const start = this.rangeStart();
+    const end = this.rangeEnd();
+
+    if (start !== null && end !== null && Math.abs(end - start) > 0.5) {
+      const actualStart = Math.min(start, end);
+      const actualEnd = Math.max(start, end);
+      this.rangeStart.set(actualStart);
+      this.rangeEnd.set(actualEnd);
+      this.commentTimestamp.set(actualStart);
+      if (this.audio) {
+        this.audio.currentTime = actualStart;
+        this.currentTime.set(actualStart);
+      }
+      this.showCommentInput.set(true);
+      this.replyToId = null;
+      this.newComment = '';
+    } else {
+      this.rangeStart.set(null);
+      this.rangeEnd.set(null);
+      this.onWaveformClick(event);
     }
   }
 

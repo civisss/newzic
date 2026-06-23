@@ -33,6 +33,7 @@ export interface WorkspaceVersion {
   versionNumber: number;
   audioUrl: string;
   notes: string | null;
+  changelog: string[];
   uploadedById: string;
   uploadedByName: string;
   uploadedByAvatar: string | null;
@@ -48,6 +49,9 @@ export interface WorkspaceComment {
   authorAvatar: string | null;
   content: string;
   timestampSeconds: number;
+  endTimestampSeconds: number | null;
+  resolved: boolean;
+  resolvedByVersionNumber: number | null;
   parentId: string | null;
   replies: WorkspaceComment[];
   createdAt: string;
@@ -70,5 +74,47 @@ export interface WorkspaceChatMessage {
   senderName: string;
   senderAvatar: string | null;
   content: string;
+  createdAt: string;
+}
+
+export type TaskStatus = 'todo' | 'in_progress' | 'done';
+
+export interface WorkspaceTask {
+  id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  assignedToId: string | null;
+  assignedToName: string | null;
+  assignedToAvatar: string | null;
+  createdById: string;
+  createdByName: string;
+  timestampSeconds: number | null;
+  resolvedByVersionNumber: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkspaceActivity {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar: string | null;
+  type: string;
+  message: string;
+  createdAt: string;
+}
+
+export type ReferencePlatform = 'spotify' | 'youtube' | 'soundcloud' | 'apple_music' | 'other';
+
+export interface WorkspaceReference {
+  id: string;
+  title: string;
+  artist: string | null;
+  url: string | null;
+  notes: string | null;
+  platform: ReferencePlatform;
+  addedById: string;
+  addedByName: string;
   createdAt: string;
 }

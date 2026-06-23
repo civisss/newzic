@@ -8,7 +8,10 @@ import {
   WorkspaceVersion,
   WorkspaceComment,
   WorkspaceFile,
-  WorkspaceChatMessage
+  WorkspaceChatMessage,
+  WorkspaceTask,
+  WorkspaceActivity,
+  WorkspaceReference
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -52,7 +55,10 @@ export class WorkspaceService {
     return this.http.get<WorkspaceVersion[]>(`${this.base}/${workspaceId}/versions`);
   }
 
-  uploadVersion(workspaceId: string, data: { audioUrl: string; notes?: string; duration?: number }): Observable<WorkspaceVersion> {
+  uploadVersion(workspaceId: string, data: {
+    audioUrl: string; notes?: string; changelog?: string[];
+    duration?: number; resolveCommentIds?: string[]; resolveTaskIds?: string[]
+  }): Observable<WorkspaceVersion> {
     return this.http.post<WorkspaceVersion>(`${this.base}/${workspaceId}/versions`, data);
   }
 
@@ -62,8 +68,17 @@ export class WorkspaceService {
     return this.http.get<WorkspaceComment[]>(`${this.base}/${workspaceId}/versions/${versionId}/comments`);
   }
 
-  addComment(workspaceId: string, versionId: string, data: { content: string; timestampSeconds: number; parentId?: string }): Observable<WorkspaceComment> {
+  addComment(workspaceId: string, versionId: string, data: {
+    content: string; timestampSeconds: number; endTimestampSeconds?: number; parentId?: string
+  }): Observable<WorkspaceComment> {
     return this.http.post<WorkspaceComment>(`${this.base}/${workspaceId}/versions/${versionId}/comments`, data);
+  }
+
+  resolveComment(workspaceId: string, versionId: string, commentId: string, resolved: boolean): Observable<WorkspaceComment> {
+    return this.http.patch<WorkspaceComment>(
+      `${this.base}/${workspaceId}/versions/${versionId}/comments/${commentId}/resolve`,
+      { resolved }
+    );
   }
 
   // ── Files ──
@@ -88,5 +103,49 @@ export class WorkspaceService {
 
   sendChatMessage(workspaceId: string, content: string): Observable<WorkspaceChatMessage> {
     return this.http.post<WorkspaceChatMessage>(`${this.base}/${workspaceId}/chat`, { content });
+  }
+
+  // ── Tasks ──
+
+  getTasks(workspaceId: string): Observable<WorkspaceTask[]> {
+    return this.http.get<WorkspaceTask[]>(`${this.base}/${workspaceId}/tasks`);
+  }
+
+  createTask(workspaceId: string, data: {
+    title: string; description?: string; assignedToId?: string; timestampSeconds?: number
+  }): Observable<WorkspaceTask> {
+    return this.http.post<WorkspaceTask>(`${this.base}/${workspaceId}/tasks`, data);
+  }
+
+  updateTask(workspaceId: string, taskId: string, data: {
+    title?: string; description?: string; status?: string; assignedToId?: string
+  }): Observable<WorkspaceTask> {
+    return this.http.patch<WorkspaceTask>(`${this.base}/${workspaceId}/tasks/${taskId}`, data);
+  }
+
+  deleteTask(workspaceId: string, taskId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${workspaceId}/tasks/${taskId}`);
+  }
+
+  // ── Activities ──
+
+  getActivities(workspaceId: string, page = 0, size = 50): Observable<WorkspaceActivity[]> {
+    return this.http.get<WorkspaceActivity[]>(`${this.base}/${workspaceId}/activities?page=${page}&size=${size}`);
+  }
+
+  // ── References ──
+
+  getReferences(workspaceId: string): Observable<WorkspaceReference[]> {
+    return this.http.get<WorkspaceReference[]>(`${this.base}/${workspaceId}/references`);
+  }
+
+  addReference(workspaceId: string, data: {
+    title: string; artist?: string; url?: string; notes?: string; platform?: string
+  }): Observable<WorkspaceReference> {
+    return this.http.post<WorkspaceReference>(`${this.base}/${workspaceId}/references`, data);
+  }
+
+  deleteReference(workspaceId: string, refId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${workspaceId}/references/${refId}`);
   }
 }

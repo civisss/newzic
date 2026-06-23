@@ -17,6 +17,9 @@ class WorkspaceService(
     private val commentRepository: WorkspaceCommentRepository,
     private val fileRepository: WorkspaceFileRepository,
     private val chatRepository: WorkspaceChatRepository,
+    private val taskRepository: WorkspaceTaskRepository,
+    private val activityRepository: WorkspaceActivityRepository,
+    private val referenceRepository: WorkspaceReferenceRepository,
     private val userRepository: UserRepository,
     private val collaborationRepository: CollaborationRepository,
     private val notificationService: NotificationService
@@ -93,7 +96,15 @@ class WorkspaceService(
 
         request.title?.let { workspace.title = it }
         request.description?.let { workspace.description = it }
-        request.status?.let { workspace.status = WorkspaceStatus.valueOf(it.uppercase()) }
+        request.status?.let {
+            val newStatus = WorkspaceStatus.valueOf(it.uppercase())
+            if (newStatus != workspace.status) {
+                workspace.status = newStatus
+                val user = userRepository.findById(userId).orElseThrow()
+                logActivity(workspace, user, ActivityType.STATUS_CHANGED,
+                    "changed status to ${newStatus.name.lowercase()}")
+            }
+        }
         workspace.updatedAt = LocalDateTime.now()
 
         return toWorkspaceResponse(workspaceRepository.save(workspace))
@@ -114,6 +125,11 @@ class WorkspaceService(
         }
 
         val member = addMember(workspace, inviteeId, inviterId)
+
+        val invitee = userRepository.findById(inviteeId).orElseThrow()
+        logActivity(workspace, invitee, ActivityType.MEMBER_JOINED,
+            "joined the workspace")
+
         return toMemberResponse(member)
     }
 
@@ -144,10 +160,36 @@ class WorkspaceService(
                 versionNumber = nextVersion,
                 audioUrl = request.audioUrl,
                 notes = request.notes,
+                changelog = request.changelog.toMutableList(),
                 uploadedBy = uploader,
                 duration = request.duration
             )
         )
+
+        // Resolve linked comments
+        request.resolveCommentIds.forEach { commentIdStr ->
+            try {
+                val comment = commentRepository.findById(UUID.fromString(commentIdStr)).orElse(null)
+                if (comment != null && !comment.resolved) {
+                    comment.resolved = true
+                    comment.resolvedByVersion = version
+                    commentRepository.save(comment)
+                }
+            } catch (_: Exception) {}
+        }
+
+        // Resolve linked tasks
+        request.resolveTaskIds.forEach { taskIdStr ->
+            try {
+                val task = taskRepository.findById(UUID.fromString(taskIdStr)).orElse(null)
+                if (task != null && task.status != TaskStatus.DONE) {
+                    task.status = TaskStatus.DONE
+                    task.resolvedByVersion = version
+                    task.updatedAt = LocalDateTime.now()
+                    taskRepository.save(task)
+                }
+            } catch (_: Exception) {}
+        }
 
         // Update workspace status and timestamp
         if (workspace.status == WorkspaceStatus.DRAFT) {
@@ -155,6 +197,11 @@ class WorkspaceService(
         }
         workspace.updatedAt = LocalDateTime.now()
         workspaceRepository.save(workspace)
+
+        // Log activity
+        val changelogText = if (request.changelog.isNotEmpty()) ": ${request.changelog.joinToString(", ")}" else ""
+        logActivity(workspace, uploader, ActivityType.VERSION_UPLOADED,
+            "uploaded v$nextVersion$changelogText")
 
         // Notify other members
         notifyOtherMembers(workspaceId, userId, NotificationType.WORKSPACE_VERSION,
@@ -199,6 +246,7 @@ class WorkspaceService(
                 author = author,
                 content = request.content,
                 timestampSeconds = request.timestampSeconds,
+                endTimestampSeconds = request.endTimestampSeconds,
                 parent = parent
             )
         )
@@ -212,10 +260,38 @@ class WorkspaceService(
         val mins = (request.timestampSeconds / 60).toInt()
         val secs = (request.timestampSeconds % 60).toInt()
         val timeStr = "${mins}:${secs.toString().padStart(2, '0')}"
+        val rangeStr = if (request.endTimestampSeconds != null) {
+            val endMins = (request.endTimestampSeconds / 60).toInt()
+            val endSecs = (request.endTimestampSeconds % 60).toInt()
+            "$timeStr-${endMins}:${endSecs.toString().padStart(2, '0')}"
+        } else timeStr
+
+        // Log activity
+        logActivity(workspace, author, ActivityType.COMMENT_ADDED,
+            "commented at $rangeStr")
 
         notifyOtherMembers(workspaceId, userId, NotificationType.WORKSPACE_COMMENT,
-            "${author.displayName} commented at $timeStr on \"${workspace.title}\"",
+            "${author.displayName} commented at $rangeStr on \"${workspace.title}\"",
             "/workspace/$workspaceId")
+
+        return toCommentResponse(comment)
+    }
+
+    @Transactional
+    fun resolveComment(workspaceId: UUID, versionId: UUID, commentId: UUID, userId: UUID, resolved: Boolean): WorkspaceCommentResponse {
+        requireMember(workspaceId, userId)
+        val comment = commentRepository.findById(commentId)
+            .orElseThrow { NoSuchElementException("Comment not found") }
+        comment.resolved = resolved
+        if (!resolved) comment.resolvedByVersion = null
+        commentRepository.save(comment)
+
+        if (resolved) {
+            val workspace = comment.version.workspace
+            val user = userRepository.findById(userId).orElseThrow()
+            logActivity(workspace, user, ActivityType.COMMENT_RESOLVED,
+                "resolved a comment at ${formatTimeStr(comment.timestampSeconds)}")
+        }
 
         return toCommentResponse(comment)
     }
@@ -316,6 +392,186 @@ class WorkspaceService(
     }
 
     // ═══════════════════════════════════════════
+    // Tasks
+    // ═══════════════════════════════════════════
+
+    @Transactional
+    fun createTask(workspaceId: UUID, userId: UUID, request: CreateTaskRequest): WorkspaceTaskResponse {
+        val workspace = workspaceRepository.findById(workspaceId)
+            .orElseThrow { NoSuchElementException("Workspace not found") }
+        requireMember(workspaceId, userId)
+
+        val creator = userRepository.findById(userId)
+            .orElseThrow { NoSuchElementException("User not found") }
+
+        val assignee = request.assignedToId?.let {
+            userRepository.findById(UUID.fromString(it)).orElse(null)
+        }
+
+        val task = taskRepository.save(
+            WorkspaceTaskEntity(
+                workspace = workspace,
+                title = request.title,
+                description = request.description,
+                assignedTo = assignee,
+                createdBy = creator,
+                timestampSeconds = request.timestampSeconds
+            )
+        )
+
+        workspace.updatedAt = LocalDateTime.now()
+        workspaceRepository.save(workspace)
+
+        logActivity(workspace, creator, ActivityType.TASK_CREATED,
+            "created task \"${request.title}\"")
+
+        // Notify assigned user
+        if (assignee != null && assignee.id != userId) {
+            notificationService.create(
+                recipientId = assignee.id,
+                fromUserId = userId,
+                type = NotificationType.WORKSPACE_TASK,
+                message = "${creator.displayName} assigned you \"${request.title}\" in \"${workspace.title}\"",
+                link = "/workspace/$workspaceId"
+            )
+        }
+
+        return toTaskResponse(task)
+    }
+
+    @Transactional(readOnly = true)
+    fun getTasks(workspaceId: UUID, userId: UUID): List<WorkspaceTaskResponse> {
+        requireMember(workspaceId, userId)
+        return taskRepository.findByWorkspaceIdOrderByCreatedAtAsc(workspaceId)
+            .map { toTaskResponse(it) }
+    }
+
+    @Transactional
+    fun updateTask(workspaceId: UUID, taskId: UUID, userId: UUID, request: UpdateTaskRequest): WorkspaceTaskResponse {
+        requireMember(workspaceId, userId)
+        val task = taskRepository.findById(taskId)
+            .orElseThrow { NoSuchElementException("Task not found") }
+        if (task.workspace.id != workspaceId) {
+            throw IllegalArgumentException("Task does not belong to this workspace")
+        }
+
+        val user = userRepository.findById(userId).orElseThrow()
+        val workspace = task.workspace
+
+        request.title?.let { task.title = it }
+        request.description?.let { task.description = it }
+        request.status?.let {
+            val newStatus = TaskStatus.valueOf(it.uppercase())
+            if (newStatus == TaskStatus.DONE && task.status != TaskStatus.DONE) {
+                logActivity(workspace, user, ActivityType.TASK_COMPLETED,
+                    "completed task \"${task.title}\"")
+            }
+            task.status = newStatus
+        }
+        request.assignedToId?.let { assignedIdStr ->
+            val assignee = userRepository.findById(UUID.fromString(assignedIdStr)).orElse(null)
+            task.assignedTo = assignee
+            if (assignee != null && assignee.id != userId) {
+                logActivity(workspace, user, ActivityType.TASK_ASSIGNED,
+                    "assigned \"${task.title}\" to ${assignee.displayName}")
+                notificationService.create(
+                    recipientId = assignee.id,
+                    fromUserId = userId,
+                    type = NotificationType.WORKSPACE_TASK,
+                    message = "${user.displayName} assigned you \"${task.title}\" in \"${workspace.title}\"",
+                    link = "/workspace/$workspaceId"
+                )
+            }
+        }
+        task.updatedAt = LocalDateTime.now()
+        taskRepository.save(task)
+
+        return toTaskResponse(task)
+    }
+
+    @Transactional
+    fun deleteTask(workspaceId: UUID, taskId: UUID, userId: UUID) {
+        requireMember(workspaceId, userId)
+        val task = taskRepository.findById(taskId)
+            .orElseThrow { NoSuchElementException("Task not found") }
+        if (task.workspace.id != workspaceId) {
+            throw IllegalArgumentException("Task does not belong to this workspace")
+        }
+        taskRepository.delete(task)
+    }
+
+    // ═══════════════════════════════════════════
+    // Activity Feed
+    // ═══════════════════════════════════════════
+
+    @Transactional(readOnly = true)
+    fun getActivities(workspaceId: UUID, userId: UUID, page: Int, size: Int): List<WorkspaceActivityResponse> {
+        requireMember(workspaceId, userId)
+        return activityRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId, PageRequest.of(page, size))
+            .content
+            .map { toActivityResponse(it) }
+    }
+
+    // ═══════════════════════════════════════════
+    // Reference Tracks
+    // ═══════════════════════════════════════════
+
+    @Transactional
+    fun addReference(workspaceId: UUID, userId: UUID, request: AddReferenceRequest): WorkspaceReferenceResponse {
+        val workspace = workspaceRepository.findById(workspaceId)
+            .orElseThrow { NoSuchElementException("Workspace not found") }
+        requireMember(workspaceId, userId)
+
+        val user = userRepository.findById(userId)
+            .orElseThrow { NoSuchElementException("User not found") }
+
+        val platform = try {
+            ReferencePlatform.valueOf(request.platform.uppercase())
+        } catch (e: Exception) {
+            ReferencePlatform.OTHER
+        }
+
+        val ref = referenceRepository.save(
+            WorkspaceReferenceEntity(
+                workspace = workspace,
+                title = request.title,
+                artist = request.artist,
+                url = request.url,
+                notes = request.notes,
+                platform = platform,
+                addedBy = user
+            )
+        )
+
+        workspace.updatedAt = LocalDateTime.now()
+        workspaceRepository.save(workspace)
+
+        val artistStr = request.artist?.let { " - $it" } ?: ""
+        logActivity(workspace, user, ActivityType.REFERENCE_ADDED,
+            "added reference \"${request.title}$artistStr\"")
+
+        return toReferenceResponse(ref)
+    }
+
+    @Transactional(readOnly = true)
+    fun getReferences(workspaceId: UUID, userId: UUID): List<WorkspaceReferenceResponse> {
+        requireMember(workspaceId, userId)
+        return referenceRepository.findByWorkspaceIdOrderByCreatedAtDesc(workspaceId)
+            .map { toReferenceResponse(it) }
+    }
+
+    @Transactional
+    fun deleteReference(workspaceId: UUID, refId: UUID, userId: UUID) {
+        requireMember(workspaceId, userId)
+        val ref = referenceRepository.findById(refId)
+            .orElseThrow { NoSuchElementException("Reference not found") }
+        if (ref.workspace.id != workspaceId) {
+            throw IllegalArgumentException("Reference does not belong to this workspace")
+        }
+        referenceRepository.delete(ref)
+    }
+
+    // ═══════════════════════════════════════════
     // Helpers
     // ═══════════════════════════════════════════
 
@@ -359,6 +615,23 @@ class WorkspaceService(
                 link = link
             )
         }
+    }
+
+    private fun logActivity(workspace: WorkspaceEntity, user: UserEntity, type: ActivityType, message: String) {
+        activityRepository.save(
+            WorkspaceActivityEntity(
+                workspace = workspace,
+                user = user,
+                type = type,
+                message = message
+            )
+        )
+    }
+
+    private fun formatTimeStr(seconds: Double): String {
+        val mins = (seconds / 60).toInt()
+        val secs = (seconds % 60).toInt()
+        return "${mins}:${secs.toString().padStart(2, '0')}"
     }
 
     // ═══════════════════════════════════════════
@@ -407,6 +680,7 @@ class WorkspaceService(
             versionNumber = v.versionNumber,
             audioUrl = v.audioUrl,
             notes = v.notes,
+            changelog = v.changelog.toList(),
             uploadedById = v.uploadedBy.id.toString(),
             uploadedByName = v.uploadedBy.displayName,
             uploadedByAvatar = v.uploadedBy.avatar,
@@ -423,6 +697,9 @@ class WorkspaceService(
         authorAvatar = c.author.avatar,
         content = c.content,
         timestampSeconds = c.timestampSeconds,
+        endTimestampSeconds = c.endTimestampSeconds,
+        resolved = c.resolved,
+        resolvedByVersionNumber = c.resolvedByVersion?.versionNumber,
         parentId = c.parent?.id?.toString(),
         replies = emptyList(),
         createdAt = c.createdAt.toString() + "Z"
@@ -437,11 +714,52 @@ class WorkspaceService(
             authorAvatar = c.author.avatar,
             content = c.content,
             timestampSeconds = c.timestampSeconds,
+            endTimestampSeconds = c.endTimestampSeconds,
+            resolved = c.resolved,
+            resolvedByVersionNumber = c.resolvedByVersion?.versionNumber,
             parentId = null,
             replies = replies.map { toCommentResponse(it) },
             createdAt = c.createdAt.toString() + "Z"
         )
     }
+
+    private fun toTaskResponse(t: WorkspaceTaskEntity) = WorkspaceTaskResponse(
+        id = t.id.toString(),
+        title = t.title,
+        description = t.description,
+        status = t.status.name.lowercase(),
+        assignedToId = t.assignedTo?.id?.toString(),
+        assignedToName = t.assignedTo?.displayName,
+        assignedToAvatar = t.assignedTo?.avatar,
+        createdById = t.createdBy.id.toString(),
+        createdByName = t.createdBy.displayName,
+        timestampSeconds = t.timestampSeconds,
+        resolvedByVersionNumber = t.resolvedByVersion?.versionNumber,
+        createdAt = t.createdAt.toString() + "Z",
+        updatedAt = t.updatedAt.toString() + "Z"
+    )
+
+    private fun toActivityResponse(a: WorkspaceActivityEntity) = WorkspaceActivityResponse(
+        id = a.id.toString(),
+        userId = a.user.id.toString(),
+        userName = a.user.displayName,
+        userAvatar = a.user.avatar,
+        type = a.type.name.lowercase(),
+        message = a.message,
+        createdAt = a.createdAt.toString() + "Z"
+    )
+
+    private fun toReferenceResponse(r: WorkspaceReferenceEntity) = WorkspaceReferenceResponse(
+        id = r.id.toString(),
+        title = r.title,
+        artist = r.artist,
+        url = r.url,
+        notes = r.notes,
+        platform = r.platform.name.lowercase(),
+        addedById = r.addedBy.id.toString(),
+        addedByName = r.addedBy.displayName,
+        createdAt = r.createdAt.toString() + "Z"
+    )
 
     private fun toFileResponse(f: WorkspaceFileEntity) = WorkspaceFileResponse(
         id = f.id.toString(),

@@ -267,5 +267,104 @@
   "workspace.status.review": "Revisión",
   "workspace.status.done": "Completado",
 
-  "workspace.loading_track": "Cargando pista..."
+  "workspace.loading_track": "Cargando pista...",
+
+  "workspace.tab.comments": "Comentarios",
+  "workspace.tab.tasks": "Tareas",
+  "workspace.tab.versions": "Versiones",
+  "workspace.tab.references": "Referencias",
+  "workspace.tab.files": "Archivos",
+  "workspace.tab.activity": "Actividad",
+  "workspace.tab.chat": "Chat",
+
+  "workspace.comments.empty": "Sin comentarios. Haz clic en la forma de onda para dejar un comentario con marca de tiempo.",
+  "workspace.comments.reply": "Responder",
+  "workspace.comments.resolve": "Resolver",
+  "workspace.comments.reopen": "Reabrir",
+  "workspace.comments.resolved": "Resuelto",
+  "workspace.comments.resolved_in": "en v{{version}}",
+  "workspace.comments.type_comment": "Escribe tu comentario...",
+
+  "workspace.tasks.add": "Agregar Tarea",
+  "workspace.tasks.complete_pct": "{{pct}}% completado",
+  "workspace.tasks.todo": "Por Hacer",
+  "workspace.tasks.in_progress": "En Progreso",
+  "workspace.tasks.done": "Completado",
+  "workspace.tasks.start": "Iniciar",
+  "workspace.tasks.complete": "Completar",
+  "workspace.tasks.back": "Atrás",
+  "workspace.tasks.reopen": "Reabrir",
+  "workspace.tasks.empty": "Sin tareas. Agrega tareas para hacer seguimiento del trabajo.",
+
+  "workspace.versions.upload": "Subir Versión",
+  "workspace.versions.comments_count": "{{count}} comentarios",
+
+  "workspace.references.add": "Agregar Referencia",
+  "workspace.references.added_by": "Agregado por {{name}}",
+  "workspace.references.empty": "Sin pistas de referencia. Agrega pistas para definir el ambiente.",
+  "workspace.references.open_link": "Abrir enlace",
+  "workspace.references.remove": "Eliminar",
+
+  "workspace.files.upload": "Subir Archivo",
+  "workspace.files.delete": "Eliminar archivo",
+  "workspace.files.empty": "Sin archivos compartidos. Sube stems, muestras o referencias.",
+
+  "workspace.activity.empty": "Sin actividad. Las acciones en este workspace se registrarán aquí.",
+
+  "workspace.chat.empty": "Inicia la conversación sobre este proyecto.",
+  "workspace.chat.placeholder": "Escribe un mensaje...",
+
+  "workspace.no_audio.title": "Sin audio",
+  "workspace.no_audio.subtitle": "Sube la primera versión para empezar a colaborar",
+  "workspace.no_audio.upload_btn": "Subir Audio",
+
+  "workspace.waveform.hint": "Clic para comentar • Arrastra para seleccionar un rango",
+  "workspace.file_ready": "Listo para subir",
+
+  "workspace.modal.upload_version": "Subir Nueva Versión",
+  "workspace.modal.audio_file": "Archivo de Audio",
+  "workspace.modal.notes": "Notas (opcional)",
+  "workspace.modal.notes_placeholder": "¿Qué cambió en esta versión?",
+  "workspace.modal.changelog": "Registro de cambios",
+  "workspace.modal.changelog_placeholder": "ej. Corregido el bajo en la mezcla",
+  "workspace.modal.changelog_add": "+ Agregar al registro",
+  "workspace.modal.cancel": "Cancelar",
+  "workspace.modal.upload": "Subir",
+  "workspace.modal.uploading": "Subiendo…",
+  "workspace.modal.drag_drop": "Arrastra tu archivo de audio",
+  "workspace.modal.drag_sub": "o haz clic para buscar — MP3, WAV, FLAC hasta 50MB",
+  "workspace.modal.choose_file": "Elegir Archivo",
+
+  "workspace.modal.share_file": "Compartir Archivo",
+  "workspace.modal.file_name": "Nombre del Archivo",
+  "workspace.modal.file_url": "URL del Archivo",
+  "workspace.modal.file_type": "Tipo",
+  "workspace.modal.share": "Compartir",
+
+  "workspace.modal.invite": "Invitar Colaborador",
+  "workspace.modal.search_user": "Buscar por nombre o usuario",
+  "workspace.modal.search_placeholder": "Escribe un nombre o @usuario...",
+  "workspace.modal.no_users": "No se encontraron usuarios",
+  "workspace.modal.invite_btn": "Invitar",
+
+  "workspace.modal.add_task": "Agregar Tarea",
+  "workspace.modal.task_title": "Título",
+  "workspace.modal.task_title_placeholder": "ej. Grabar verso 2",
+  "workspace.modal.task_desc": "Descripción (opcional)",
+  "workspace.modal.task_desc_placeholder": "Detalles sobre esta tarea...",
+  "workspace.modal.task_assign": "Asignar a (opcional)",
+  "workspace.modal.task_unassigned": "Sin asignar",
+  "workspace.modal.task_add_btn": "Agregar Tarea",
+
+  "workspace.modal.add_reference": "Agregar Pista de Referencia",
+  "workspace.modal.ref_title": "Título",
+  "workspace.modal.ref_artist": "Artista (opcional)",
+  "workspace.modal.ref_link": "Enlace (opcional)",
+  "workspace.modal.ref_why": "¿Por qué esta referencia?",
+  "workspace.modal.ref_why_placeholder": "ej. Quiero este tipo de ambiente...",
+  "workspace.modal.ref_platform": "Plataforma",
+  "workspace.modal.ref_add_btn": "Agregar Referencia",
+  "workspace.modal.ref_other": "Otro",
+
+  "workspace.loading": "Cargando workspace..."
 }

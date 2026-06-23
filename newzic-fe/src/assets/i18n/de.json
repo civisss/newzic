@@ -267,5 +267,104 @@
   "workspace.status.review": "Überprüfung",
   "workspace.status.done": "Fertig",
 
-  "workspace.loading_track": "Track wird geladen..."
+  "workspace.loading_track": "Track wird geladen...",
+
+  "workspace.tab.comments": "Kommentare",
+  "workspace.tab.tasks": "Aufgaben",
+  "workspace.tab.versions": "Versionen",
+  "workspace.tab.references": "Referenzen",
+  "workspace.tab.files": "Dateien",
+  "workspace.tab.activity": "Aktivität",
+  "workspace.tab.chat": "Chat",
+
+  "workspace.comments.empty": "Noch keine Kommentare. Klicke auf die Wellenform, um einen zeitgestempelten Kommentar zu hinterlassen.",
+  "workspace.comments.reply": "Antworten",
+  "workspace.comments.resolve": "Lösen",
+  "workspace.comments.reopen": "Wiedereröffnen",
+  "workspace.comments.resolved": "Gelöst",
+  "workspace.comments.resolved_in": "in v{{version}}",
+  "workspace.comments.type_comment": "Kommentar eingeben...",
+
+  "workspace.tasks.add": "Aufgabe hinzufügen",
+  "workspace.tasks.complete_pct": "{{pct}}% abgeschlossen",
+  "workspace.tasks.todo": "Zu erledigen",
+  "workspace.tasks.in_progress": "In Bearbeitung",
+  "workspace.tasks.done": "Fertig",
+  "workspace.tasks.start": "Starten",
+  "workspace.tasks.complete": "Abschließen",
+  "workspace.tasks.back": "Zurück",
+  "workspace.tasks.reopen": "Wiedereröffnen",
+  "workspace.tasks.empty": "Noch keine Aufgaben. Füge Aufgaben hinzu, um den Fortschritt zu verfolgen.",
+
+  "workspace.versions.upload": "Version hochladen",
+  "workspace.versions.comments_count": "{{count}} Kommentare",
+
+  "workspace.references.add": "Referenz hinzufügen",
+  "workspace.references.added_by": "Hinzugefügt von {{name}}",
+  "workspace.references.empty": "Noch keine Referenztracks. Füge Tracks hinzu, um Stimmung und Richtung zu definieren.",
+  "workspace.references.open_link": "Link öffnen",
+  "workspace.references.remove": "Entfernen",
+
+  "workspace.files.upload": "Datei hochladen",
+  "workspace.files.delete": "Datei löschen",
+  "workspace.files.empty": "Noch keine geteilten Dateien. Lade Stems, Samples oder Referenzen hoch.",
+
+  "workspace.activity.empty": "Noch keine Aktivität. Aktionen in diesem Workspace werden hier protokolliert.",
+
+  "workspace.chat.empty": "Starte die Unterhaltung über dieses Projekt.",
+  "workspace.chat.placeholder": "Nachricht eingeben...",
+
+  "workspace.no_audio.title": "Noch kein Audio",
+  "workspace.no_audio.subtitle": "Lade die erste Version hoch, um mit der Zusammenarbeit zu beginnen",
+  "workspace.no_audio.upload_btn": "Audio hochladen",
+
+  "workspace.waveform.hint": "Klicken zum Kommentieren • Ziehen zum Auswählen",
+  "workspace.file_ready": "Bereit zum Hochladen",
+
+  "workspace.modal.upload_version": "Neue Version hochladen",
+  "workspace.modal.audio_file": "Audiodatei",
+  "workspace.modal.notes": "Notizen (optional)",
+  "workspace.modal.notes_placeholder": "Was hat sich in dieser Version geändert?",
+  "workspace.modal.changelog": "Änderungsprotokoll",
+  "workspace.modal.changelog_placeholder": "z.B. Bass-Mix korrigiert",
+  "workspace.modal.changelog_add": "+ Zum Protokoll hinzufügen",
+  "workspace.modal.cancel": "Abbrechen",
+  "workspace.modal.upload": "Hochladen",
+  "workspace.modal.uploading": "Wird hochgeladen…",
+  "workspace.modal.drag_drop": "Audiodatei hierher ziehen",
+  "workspace.modal.drag_sub": "oder klicken zum Durchsuchen — MP3, WAV, FLAC bis 50MB",
+  "workspace.modal.choose_file": "Datei wählen",
+
+  "workspace.modal.share_file": "Datei teilen",
+  "workspace.modal.file_name": "Dateiname",
+  "workspace.modal.file_url": "Datei-URL",
+  "workspace.modal.file_type": "Typ",
+  "workspace.modal.share": "Teilen",
+
+  "workspace.modal.invite": "Mitarbeiter einladen",
+  "workspace.modal.search_user": "Nach Name oder Benutzername suchen",
+  "workspace.modal.search_placeholder": "Name oder @Benutzername eingeben...",
+  "workspace.modal.no_users": "Keine Benutzer gefunden",
+  "workspace.modal.invite_btn": "Einladen",
+
+  "workspace.modal.add_task": "Aufgabe hinzufügen",
+  "workspace.modal.task_title": "Titel",
+  "workspace.modal.task_title_placeholder": "z.B. Strophe 2 aufnehmen",
+  "workspace.modal.task_desc": "Beschreibung (optional)",
+  "workspace.modal.task_desc_placeholder": "Details zu dieser Aufgabe...",
+  "workspace.modal.task_assign": "Zuweisen an (optional)",
+  "workspace.modal.task_unassigned": "Nicht zugewiesen",
+  "workspace.modal.task_add_btn": "Aufgabe hinzufügen",
+
+  "workspace.modal.add_reference": "Referenztrack hinzufügen",
+  "workspace.modal.ref_title": "Titel",
+  "workspace.modal.ref_artist": "Künstler (optional)",
+  "workspace.modal.ref_link": "Link (optional)",
+  "workspace.modal.ref_why": "Warum diese Referenz?",
+  "workspace.modal.ref_why_placeholder": "z.B. Ich möchte diese Stimmung...",
+  "workspace.modal.ref_platform": "Plattform",
+  "workspace.modal.ref_add_btn": "Referenz hinzufügen",
+  "workspace.modal.ref_other": "Andere",
+
+  "workspace.loading": "Workspace wird geladen..."
 }

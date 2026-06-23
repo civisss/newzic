@@ -36,6 +36,7 @@ data class WorkspaceVersionResponse(
     val versionNumber: Int,
     val audioUrl: String,
     val notes: String?,
+    val changelog: List<String>,
     val uploadedById: String,
     val uploadedByName: String,
     val uploadedByAvatar: String?,
@@ -51,6 +52,9 @@ data class WorkspaceCommentResponse(
     val authorAvatar: String?,
     val content: String,
     val timestampSeconds: Double,
+    val endTimestampSeconds: Double?,
+    val resolved: Boolean,
+    val resolvedByVersionNumber: Int?,
     val parentId: String?,
     val replies: List<WorkspaceCommentResponse>,
     val createdAt: String
@@ -94,12 +98,16 @@ data class UpdateWorkspaceRequest(
 data class UploadVersionRequest(
     @field:NotBlank val audioUrl: String,
     val notes: String? = null,
-    val duration: Int = 0
+    val changelog: List<String> = emptyList(),
+    val duration: Int = 0,
+    val resolveCommentIds: List<String> = emptyList(),
+    val resolveTaskIds: List<String> = emptyList()
 )
 
 data class AddCommentRequest(
     @field:NotBlank val content: String,
     val timestampSeconds: Double,
+    val endTimestampSeconds: Double? = null,
     val parentId: String? = null
 )
 
@@ -116,4 +124,76 @@ data class SendChatMessageRequest(
 
 data class InviteMemberRequest(
     @field:NotBlank val userId: String
+)
+
+// ── Tasks ──
+
+data class WorkspaceTaskResponse(
+    val id: String,
+    val title: String,
+    val description: String?,
+    val status: String,
+    val assignedToId: String?,
+    val assignedToName: String?,
+    val assignedToAvatar: String?,
+    val createdById: String,
+    val createdByName: String,
+    val timestampSeconds: Double?,
+    val resolvedByVersionNumber: Int?,
+    val createdAt: String,
+    val updatedAt: String
+)
+
+data class CreateTaskRequest(
+    @field:NotBlank val title: String,
+    val description: String? = null,
+    val assignedToId: String? = null,
+    val timestampSeconds: Double? = null
+)
+
+data class UpdateTaskRequest(
+    val title: String? = null,
+    val description: String? = null,
+    val status: String? = null,
+    val assignedToId: String? = null
+)
+
+// ── Activity Feed ──
+
+data class WorkspaceActivityResponse(
+    val id: String,
+    val userId: String,
+    val userName: String,
+    val userAvatar: String?,
+    val type: String,
+    val message: String,
+    val createdAt: String
+)
+
+// ── Reference Tracks ──
+
+data class WorkspaceReferenceResponse(
+    val id: String,
+    val title: String,
+    val artist: String?,
+    val url: String?,
+    val notes: String?,
+    val platform: String,
+    val addedById: String,
+    val addedByName: String,
+    val createdAt: String
+)
+
+data class AddReferenceRequest(
+    @field:NotBlank val title: String,
+    val artist: String? = null,
+    val url: String? = null,
+    val notes: String? = null,
+    val platform: String = "OTHER"
+)
+
+// ── Comment actions ──
+
+data class ResolveCommentRequest(
+    val resolved: Boolean = true
 )

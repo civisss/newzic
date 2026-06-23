@@ -95,11 +95,13 @@
           <!-- Waveform Canvas -->
           <canvas #waveformCanvas
                   class="waveform-canvas"
-                  (click)="onWaveformClick($event)">
+                  (mousedown)="onWaveformMouseDown($event)"
+                  (mousemove)="onWaveformMouseMove($event)"
+                  (mouseup)="onWaveformMouseUp($event)">
           </canvas>
 
           <!-- Click hint -->
-          <div class="waveform-hint">Click on the waveform to add a comment at that moment</div>
+          <div class="waveform-hint">{{ 'workspace.waveform.hint' | translate }}</div>
         </div>
       }
 
@@ -118,9 +120,15 @@
       <!-- Inline comment input (appears when clicking waveform) -->
       @if (showCommentInput()) {
         <div class="comment-input-bar">
-          <span class="comment-at">@{{ formatTimestamp(commentTimestamp()) }}</span>
+          <span class="comment-at">
+            @if (rangeEnd(); as end) {
+              {{ formatTimestamp(commentTimestamp()) }} → {{ formatTimestamp(end) }}
+            } @else {
+              @{{ formatTimestamp(commentTimestamp()) }}
+            }
+          </span>
           <input type="text" [(ngModel)]="newComment"
-                 placeholder="Type your comment..."
+                 [placeholder]="'workspace.comments.type_comment' | translate"
                  (keydown.enter)="submitComment()"
                  (keydown.escape)="cancelComment()" />
           <button class="send-comment-btn" (click)="submitComment()" [disabled]="!newComment.trim()">
@@ -149,9 +157,9 @@
   } @else {
     <div class="no-version">
       <div class="no-version-icon">🎵</div>
-      <h3>No audio yet</h3>
-      <p>Upload the first version to start collaborating</p>
-      <button class="upload-btn" (click)="showVersionModal.set(true)">Upload Audio</button>
+      <h3>{{ 'workspace.no_audio.title' | translate }}</h3>
+      <p>{{ 'workspace.no_audio.subtitle' | translate }}</p>
+      <button class="upload-btn" (click)="showVersionModal.set(true)">{{ 'workspace.no_audio.upload_btn' | translate }}</button>
     </div>
   }
 
@@ -160,19 +168,37 @@
     <div class="tab-bar">
       <button class="tab" [class.active]="activeTab() === 'comments'" (click)="activeTab.set('comments')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Comments
+        {{ 'workspace.tab.comments' | translate }}
+        @if (unresolvedCommentCount() > 0) {
+          <span class="tab-badge">{{ unresolvedCommentCount() }}</span>
+        }
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'tasks'" (click)="activeTab.set('tasks')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        {{ 'workspace.tab.tasks' | translate }}
+        @if (tasks().length > 0) {
+          <span class="tab-badge-subtle">{{ taskProgress() }}%</span>
+        }
       </button>
       <button class="tab" [class.active]="activeTab() === 'versions'" (click)="activeTab.set('versions')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        Versions
+        {{ 'workspace.tab.versions' | translate }}
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'references'" (click)="activeTab.set('references')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        {{ 'workspace.tab.references' | translate }}
       </button>
       <button class="tab" [class.active]="activeTab() === 'files'" (click)="activeTab.set('files')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-        Files
+        {{ 'workspace.tab.files' | translate }}
+      </button>
+      <button class="tab" [class.active]="activeTab() === 'activity'" (click)="activeTab.set('activity')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        {{ 'workspace.tab.activity' | translate }}
       </button>
       <button class="tab" [class.active]="activeTab() === 'chat'" (click)="activeTab.set('chat')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        Chat
+        {{ 'workspace.tab.chat' | translate }}
       </button>
     </div>
 
@@ -182,41 +208,166 @@
         @if (comments().length > 0) {
           <div class="comments-list">
             @for (c of comments(); track c.id) {
-              <div class="comment-item">
-                <img [src]="getAvatar(c.authorAvatar)" class="comment-avatar" />
-                <div class="comment-body">
-                  <div class="comment-header">
-                    <strong>{{ c.authorName }}</strong>
-                    <button class="timestamp-link" (click)="jumpToTimestamp(c.timestampSeconds)">
-                      @{{ formatTimestamp(c.timestampSeconds) }}
-                    </button>
-                    <span class="comment-date">{{ c.createdAt | date:'short' }}</span>
-                  </div>
-                  <p class="comment-text">{{ c.content }}</p>
-                  <button class="reply-btn" (click)="replyTo(c)">Reply</button>
-
-                  <!-- Replies -->
-                  @if (c.replies.length > 0) {
-                    <div class="replies">
-                      @for (r of c.replies; track r.id) {
-                        <div class="reply-item">
-                          <img [src]="getAvatar(r.authorAvatar)" class="reply-avatar" />
-                          <div class="reply-body">
-                            <strong>{{ r.authorName }}</strong>
-                            <span class="comment-date">{{ r.createdAt | date:'short' }}</span>
-                            <p>{{ r.content }}</p>
-                          </div>
-                        </div>
+                <div class="comment-item" [class.resolved]="c.resolved">
+                  <img [src]="getAvatar(c.authorAvatar)" class="comment-avatar" />
+                  <div class="comment-body">
+                    <div class="comment-header">
+                      <strong>{{ c.authorName }}</strong>
+                      <button class="timestamp-link" (click)="jumpToTimestamp(c.timestampSeconds)">
+                        @if (c.endTimestampSeconds) {
+                          {{ formatTimestamp(c.timestampSeconds) }} → {{ formatTimestamp(c.endTimestampSeconds) }}
+                        } @else {
+                          @{{ formatTimestamp(c.timestampSeconds) }}
+                        }
+                      </button>
+                      <span class="comment-date">{{ c.createdAt | date:'short' }}</span>
+                      @if (c.resolved) {
+                        <span class="resolved-badge">
+                          ✓ {{ 'workspace.comments.resolved' | translate }}
+                          @if (c.resolvedByVersionNumber) {
+                            {{ 'workspace.comments.resolved_in' | translate:{ version: c.resolvedByVersionNumber } }}
+                          }
+                        </span>
                       }
                     </div>
-                  }
+                    <p class="comment-text">{{ c.content }}</p>
+                    <div class="comment-actions">
+                      <button class="reply-btn" (click)="replyTo(c)">{{ 'workspace.comments.reply' | translate }}</button>
+                      <button class="resolve-btn" (click)="resolveComment(c)"
+                              [class.is-resolved]="c.resolved">
+                        {{ c.resolved ? ('workspace.comments.reopen' | translate) : ('workspace.comments.resolve' | translate) }}
+                      </button>
+                    </div>
+
+                    <!-- Replies -->
+                    @if (c.replies.length > 0) {
+                      <div class="replies">
+                        @for (r of c.replies; track r.id) {
+                          <div class="reply-item">
+                            <img [src]="getAvatar(r.authorAvatar)" class="reply-avatar" />
+                            <div class="reply-body">
+                              <strong>{{ r.authorName }}</strong>
+                              <span class="comment-date">{{ r.createdAt | date:'short' }}</span>
+                              <p>{{ r.content }}</p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
                 </div>
-              </div>
             }
           </div>
         } @else {
           <div class="tab-empty">
-            <p>No comments yet. Click on the waveform to leave a timestamped comment.</p>
+            <p>{{ 'workspace.comments.empty' | translate }}</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tasks Tab -->
+    @if (activeTab() === 'tasks') {
+      <div class="tab-content">
+        <div class="tab-actions">
+          <button class="action-btn-sm" (click)="showTaskModal.set(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            {{ 'workspace.tasks.add' | translate }}
+          </button>
+          @if (tasks().length > 0) {
+            <div class="task-progress">
+              <div class="task-progress-bar">
+                <div class="task-progress-fill" [style.width.%]="taskProgress()"></div>
+              </div>
+              <span class="task-progress-label">{{ 'workspace.tasks.complete_pct' | translate:{ pct: taskProgress() } }}</span>
+            </div>
+          }
+        </div>
+
+        @if (tasks().length > 0) {
+          <div class="task-board">
+            <!-- TODO column -->
+            <div class="task-column">
+              <div class="task-column-header todo">
+                <span class="task-col-dot"></span> {{ 'workspace.tasks.todo' | translate }}
+                <span class="task-col-count">{{ tasksByStatus().todo.length }}</span>
+              </div>
+              @for (task of tasksByStatus().todo; track task.id) {
+                <div class="task-card">
+                  <div class="task-title">{{ task.title }}</div>
+                  @if (task.description) {
+                    <p class="task-desc">{{ task.description }}</p>
+                  }
+                  @if (task.assignedToName) {
+                    <div class="task-assignee">
+                      <img [src]="getAvatar(task.assignedToAvatar)" class="task-assignee-avatar" />
+                      {{ task.assignedToName }}
+                    </div>
+                  }
+                  <div class="task-card-actions">
+                    <button class="task-action-btn" (click)="updateTaskStatus(task, 'in_progress')">{{ 'workspace.tasks.start' | translate }}</button>
+                    <button class="task-delete-btn" (click)="deleteTask(task.id)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- IN PROGRESS column -->
+            <div class="task-column">
+              <div class="task-column-header in-progress">
+                <span class="task-col-dot"></span> {{ 'workspace.tasks.in_progress' | translate }}
+                <span class="task-col-count">{{ tasksByStatus().in_progress.length }}</span>
+              </div>
+              @for (task of tasksByStatus().in_progress; track task.id) {
+                <div class="task-card">
+                  <div class="task-title">{{ task.title }}</div>
+                  @if (task.description) {
+                    <p class="task-desc">{{ task.description }}</p>
+                  }
+                  @if (task.assignedToName) {
+                    <div class="task-assignee">
+                      <img [src]="getAvatar(task.assignedToAvatar)" class="task-assignee-avatar" />
+                      {{ task.assignedToName }}
+                    </div>
+                  }
+                  <div class="task-card-actions">
+                    <button class="task-action-btn done" (click)="updateTaskStatus(task, 'done')">{{ 'workspace.tasks.complete' | translate }}</button>
+                    <button class="task-action-btn" (click)="updateTaskStatus(task, 'todo')">{{ 'workspace.tasks.back' | translate }}</button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- DONE column -->
+            <div class="task-column">
+              <div class="task-column-header done">
+                <span class="task-col-dot"></span> {{ 'workspace.tasks.done' | translate }}
+                <span class="task-col-count">{{ tasksByStatus().done.length }}</span>
+              </div>
+              @for (task of tasksByStatus().done; track task.id) {
+                <div class="task-card completed">
+                  <div class="task-title">{{ task.title }}</div>
+                  @if (task.resolvedByVersionNumber) {
+                    <span class="task-resolved-badge">v{{ task.resolvedByVersionNumber }}</span>
+                  }
+                  @if (task.assignedToName) {
+                    <div class="task-assignee">
+                      <img [src]="getAvatar(task.assignedToAvatar)" class="task-assignee-avatar" />
+                      {{ task.assignedToName }}
+                    </div>
+                  }
+                  <div class="task-card-actions">
+                    <button class="task-action-btn" (click)="updateTaskStatus(task, 'in_progress')">{{ 'workspace.tasks.reopen' | translate }}</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="tab-empty">
+            <p>{{ 'workspace.tasks.empty' | translate }}</p>
           </div>
         }
       </div>
@@ -228,7 +379,7 @@
         <div class="tab-actions">
           <button class="action-btn-sm" (click)="showVersionModal.set(true)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Upload Version
+            {{ 'workspace.versions.upload' | translate }}
           </button>
         </div>
         @if (versions().length > 0) {
@@ -243,12 +394,66 @@
                   @if (v.notes) {
                     <p class="version-note">{{ v.notes }}</p>
                   }
+                  @if (v.changelog && v.changelog.length > 0) {
+                    <ul class="version-changelog">
+                      @for (entry of v.changelog; track entry) {
+                        <li>✓ {{ entry }}</li>
+                      }
+                    </ul>
+                  }
                 </div>
                 <div class="version-stats">
-                  <span>{{ v.commentCount }} comments</span>
+                  <span>{{ 'workspace.versions.comments_count' | translate:{ count: v.commentCount } }}</span>
                 </div>
               </button>
             }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- References Tab -->
+    @if (activeTab() === 'references') {
+      <div class="tab-content">
+        <div class="tab-actions">
+          <button class="action-btn-sm" (click)="showReferenceModal.set(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            {{ 'workspace.references.add' | translate }}
+          </button>
+        </div>
+        @if (references().length > 0) {
+          <div class="references-list">
+            @for (ref of references(); track ref.id) {
+              <div class="reference-item">
+                <span class="ref-platform-icon">{{ getPlatformIcon(ref.platform) }}</span>
+                <div class="ref-info">
+                  <div class="ref-title-row">
+                    <strong>{{ ref.title }}</strong>
+                    @if (ref.artist) {
+                      <span class="ref-artist">— {{ ref.artist }}</span>
+                    }
+                  </div>
+                  @if (ref.notes) {
+                    <p class="ref-notes">"{{ ref.notes }}"</p>
+                  }
+                  <span class="ref-meta">{{ 'workspace.references.added_by' | translate:{ name: ref.addedByName } }} · {{ ref.createdAt | date:'mediumDate' }}</span>
+                </div>
+                <div class="ref-actions">
+                  @if (ref.url) {
+                    <a [href]="ref.url" target="_blank" class="ref-link-btn" [title]="'workspace.references.open_link' | translate">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </a>
+                  }
+                  <button class="delete-file-btn" (click)="deleteReference(ref.id)" [title]="'workspace.references.remove' | translate">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="tab-empty">
+            <p>{{ 'workspace.references.empty' | translate }}</p>
           </div>
         }
       </div>
@@ -260,7 +465,7 @@
         <div class="tab-actions">
           <button class="action-btn-sm" (click)="showFileModal.set(true)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Upload File
+            {{ 'workspace.files.upload' | translate }}
           </button>
         </div>
         @if (files().length > 0) {
@@ -273,7 +478,7 @@
                   <span class="file-meta">{{ f.uploadedByName }} · {{ formatFileSize(f.sizeBytes) }} · {{ f.createdAt | date:'mediumDate' }}</span>
                 </div>
                 <span class="file-type-badge">{{ f.fileType }}</span>
-                <button class="delete-file-btn" (click)="deleteFile(f.id)" title="Delete file">
+                <button class="delete-file-btn" (click)="deleteFile(f.id)" [title]="'workspace.files.delete' | translate">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
               </div>
@@ -281,7 +486,33 @@
           </div>
         } @else {
           <div class="tab-empty">
-            <p>No files shared yet. Upload stems, samples, or references.</p>
+            <p>{{ 'workspace.files.empty' | translate }}</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Activity Tab -->
+    @if (activeTab() === 'activity') {
+      <div class="tab-content">
+        @if (activities().length > 0) {
+          <div class="activity-feed">
+            @for (a of activities(); track a.id) {
+              <div class="activity-item" [attr.data-type]="a.type">
+                <div class="activity-node">
+                  <span class="activity-icon">{{ getActivityIcon(a.type) }}</span>
+                </div>
+                <img [src]="getAvatar(a.userAvatar)" class="activity-avatar" />
+                <div class="activity-info">
+                  <p class="activity-message"><strong>{{ a.userName }}</strong> {{ a.message }}</p>
+                  <span class="activity-time">{{ a.createdAt | date:'medium' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="tab-empty">
+            <p>{{ 'workspace.activity.empty' | translate }}</p>
           </div>
         }
       </div>
@@ -303,13 +534,13 @@
           }
           @if (chatMessages().length === 0) {
             <div class="tab-empty">
-              <p>Start the conversation about this project.</p>
+              <p>{{ 'workspace.chat.empty' | translate }}</p>
             </div>
           }
         </div>
         <div class="chat-input-row">
           <input type="text" [(ngModel)]="newChatMessage"
-                 placeholder="Type a message..."
+                 [placeholder]="'workspace.chat.placeholder' | translate"
                  (keydown.enter)="sendChat()" />
           <button class="send-btn" (click)="sendChat()" [disabled]="!newChatMessage.trim()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -325,9 +556,9 @@
 @if (showVersionModal()) {
   <div class="modal-overlay" (click)="showVersionModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Upload New Version</h2>
+      <h2>{{ 'workspace.modal.upload_version' | translate }}</h2>
       <div class="form-group">
-        <label>Audio File</label>
+        <label>{{ 'workspace.modal.audio_file' | translate }}</label>
         <div class="file-drop-area"
              [class.has-file]="!!newVersionFileName"
              [class.drag-over]="versionDragOver()"
@@ -343,7 +574,7 @@
               </div>
               <div class="file-details">
                 <p class="file-name">{{ newVersionFileName }}</p>
-                <span class="file-status">Ready to upload</span>
+                <span class="file-status">{{ 'workspace.file_ready' | translate }}</span>
               </div>
               <button class="change-btn" (click)="newVersionAudioData = ''; newVersionFileName = ''; $event.stopPropagation()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -358,10 +589,10 @@
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
               </div>
-              <p class="drop-title">Drag & drop your audio file</p>
-              <p class="drop-sub">or click to browse — MP3, WAV, FLAC up to 50MB</p>
+              <p class="drop-title">{{ 'workspace.modal.drag_drop' | translate }}</p>
+              <p class="drop-sub">{{ 'workspace.modal.drag_sub' | translate }}</p>
               <label class="browse-btn">
-                Choose File
+                {{ 'workspace.modal.choose_file' | translate }}
                 <input type="file" accept=".mp3,.wav,.flac" (change)="onVersionFileSelect($event)" hidden />
               </label>
             </div>
@@ -369,17 +600,36 @@
         </div>
       </div>
       <div class="form-group">
-        <label>Notes (optional)</label>
-        <textarea [(ngModel)]="newVersionNotes" rows="2" placeholder="What changed in this version?"></textarea>
+        <label>{{ 'workspace.modal.notes' | translate }}</label>
+        <textarea [(ngModel)]="newVersionNotes" rows="2" [placeholder]="'workspace.modal.notes_placeholder' | translate"></textarea>
+      </div>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.changelog' | translate }}</label>
+        <input type="text" [(ngModel)]="newChangelogEntry"
+               [placeholder]="'workspace.modal.changelog_placeholder' | translate"
+               (keydown.enter)="addChangelogEntry()" />
+        <button class="changelog-add-btn" (click)="addChangelogEntry()" [disabled]="!newChangelogEntry.trim()">
+          {{ 'workspace.modal.changelog_add' | translate }}
+        </button>
+        @if (newVersionChangelog.length > 0) {
+          <ul class="changelog-preview">
+            @for (entry of newVersionChangelog; track $index) {
+              <li>
+                <span>✓ {{ entry }}</span>
+                <button class="changelog-remove" (click)="removeChangelogEntry($index)">×</button>
+              </li>
+            }
+          </ul>
+        }
       </div>
       <div class="modal-actions">
-        <button class="btn-ghost" (click)="showVersionModal.set(false)" [disabled]="versionUploading()">Cancel</button>
+        <button class="btn-ghost" (click)="showVersionModal.set(false)" [disabled]="versionUploading()">{{ 'workspace.modal.cancel' | translate }}</button>
         <button class="btn-primary" (click)="uploadVersion()" [disabled]="!newVersionAudioData || versionUploading()">
           @if (versionUploading()) {
             <span class="spinner"></span>
-            Uploading…
+            {{ 'workspace.modal.uploading' | translate }}
           } @else {
-            Upload
+            {{ 'workspace.modal.upload' | translate }}
           }
         </button>
       </div>
@@ -391,17 +641,17 @@
 @if (showFileModal()) {
   <div class="modal-overlay" (click)="showFileModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Share File</h2>
+      <h2>{{ 'workspace.modal.share_file' | translate }}</h2>
       <div class="form-group">
-        <label>File Name</label>
+        <label>{{ 'workspace.modal.file_name' | translate }}</label>
         <input type="text" [(ngModel)]="newFileName" placeholder="vocals_v2.wav" />
       </div>
       <div class="form-group">
-        <label>File URL</label>
+        <label>{{ 'workspace.modal.file_url' | translate }}</label>
         <input type="text" [(ngModel)]="newFileUrl" placeholder="https://..." />
       </div>
       <div class="form-group">
-        <label>Type</label>
+        <label>{{ 'workspace.modal.file_type' | translate }}</label>
         <select [(ngModel)]="newFileType">
           @for (ft of fileTypes; track ft.value) {
             <option [value]="ft.value">{{ ft.label }}</option>
@@ -409,8 +659,8 @@
         </select>
       </div>
       <div class="modal-actions">
-        <button class="btn-ghost" (click)="showFileModal.set(false)">Cancel</button>
-        <button class="btn-primary" (click)="uploadFile()" [disabled]="!newFileName.trim() || !newFileUrl.trim()">Share</button>
+        <button class="btn-ghost" (click)="showFileModal.set(false)">{{ 'workspace.modal.cancel' | translate }}</button>
+        <button class="btn-primary" (click)="uploadFile()" [disabled]="!newFileName.trim() || !newFileUrl.trim()">{{ 'workspace.modal.share' | translate }}</button>
       </div>
     </div>
   </div>
@@ -420,9 +670,9 @@
 @if (showInviteModal()) {
   <div class="modal-overlay" (click)="showInviteModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h2>Invite Collaborator</h2>
+      <h2>{{ 'workspace.modal.invite' | translate }}</h2>
       <div class="form-group invite-search-group">
-        <label>Search by name or username</label>
+        <label>{{ 'workspace.modal.search_user' | translate }}</label>
         @if (selectedInvitee(); as invitee) {
           <div class="invite-selected">
             <img [src]="getAvatar(invitee.avatar)" class="invite-avatar" />
@@ -439,7 +689,7 @@
             <svg class="invite-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" [(ngModel)]="inviteSearch"
                    (input)="onInviteSearchInput()"
-                   placeholder="Type a name or @username..."
+                   [placeholder]="'workspace.modal.search_placeholder' | translate"
                    autocomplete="off" />
           </div>
           @if (inviteResults().length > 0) {
@@ -455,17 +705,88 @@
               }
             </div>
           } @else if (inviteSearch.trim().length >= 2 && inviteResults().length === 0) {
-            <div class="invite-no-results">No users found</div>
+            <div class="invite-no-results">{{ 'workspace.modal.no_users' | translate }}</div>
           }
         }
       </div>
       <div class="modal-actions">
-        <button class="btn-ghost" (click)="showInviteModal.set(false)">Cancel</button>
-        <button class="btn-primary" (click)="inviteMember()" [disabled]="!selectedInvitee()">Invite</button>
+        <button class="btn-ghost" (click)="showInviteModal.set(false)">{{ 'workspace.modal.cancel' | translate }}</button>
+        <button class="btn-primary" (click)="inviteMember()" [disabled]="!selectedInvitee()">{{ 'workspace.modal.invite_btn' | translate }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Add Task Modal -->
+@if (showTaskModal()) {
+  <div class="modal-overlay" (click)="showTaskModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ 'workspace.modal.add_task' | translate }}</h2>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.task_title' | translate }}</label>
+        <input type="text" [(ngModel)]="newTaskTitle" [placeholder]="'workspace.modal.task_title_placeholder' | translate" />
+      </div>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.task_desc' | translate }}</label>
+        <textarea [(ngModel)]="newTaskDescription" rows="2" [placeholder]="'workspace.modal.task_desc_placeholder' | translate"></textarea>
+      </div>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.task_assign' | translate }}</label>
+        <select [(ngModel)]="newTaskAssigneeId">
+          <option value="">{{ 'workspace.modal.task_unassigned' | translate }}</option>
+          @if (workspace(); as ws) {
+            @for (m of ws.members; track m.id) {
+              <option [value]="m.userId">{{ m.displayName }}</option>
+            }
+          }
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" (click)="showTaskModal.set(false)">{{ 'workspace.modal.cancel' | translate }}</button>
+        <button class="btn-primary" (click)="createTask()" [disabled]="!newTaskTitle.trim()">{{ 'workspace.modal.task_add_btn' | translate }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Add Reference Modal -->
+@if (showReferenceModal()) {
+  <div class="modal-overlay" (click)="showReferenceModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ 'workspace.modal.add_reference' | translate }}</h2>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.ref_title' | translate }}</label>
+        <input type="text" [(ngModel)]="newRefTitle" placeholder="e.g. Blinding Lights" />
+      </div>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.ref_artist' | translate }}</label>
+        <input type="text" [(ngModel)]="newRefArtist" placeholder="e.g. The Weeknd" />
+      </div>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.ref_link' | translate }}</label>
+        <input type="text" [(ngModel)]="newRefUrl" placeholder="https://open.spotify.com/..." />
+      </div>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.ref_why' | translate }}</label>
+        <textarea [(ngModel)]="newRefNotes" rows="2" [placeholder]="'workspace.modal.ref_why_placeholder' | translate"></textarea>
+      </div>
+      <div class="form-group">
+        <label>{{ 'workspace.modal.ref_platform' | translate }}</label>
+        <select [(ngModel)]="newRefPlatform">
+          <option value="SPOTIFY">Spotify</option>
+          <option value="YOUTUBE">YouTube</option>
+          <option value="SOUNDCLOUD">SoundCloud</option>
+          <option value="APPLE_MUSIC">Apple Music</option>
+          <option value="OTHER">{{ 'workspace.modal.ref_other' | translate }}</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" (click)="showReferenceModal.set(false)">{{ 'workspace.modal.cancel' | translate }}</button>
+        <button class="btn-primary" (click)="addReference()" [disabled]="!newRefTitle.trim()">{{ 'workspace.modal.ref_add_btn' | translate }}</button>
       </div>
     </div>
   </div>
 }
 } @else {
-  <div class="loading">Loading workspace...</div>
+  <div class="loading">{{ 'workspace.loading' | translate }}</div>
 }

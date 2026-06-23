@@ -24,6 +24,11 @@ class WorkspaceVersionEntity(
     @Column(columnDefinition = "TEXT")
     var notes: String? = null,
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "workspace_version_changelog", joinColumns = [JoinColumn(name = "version_id")])
+    @Column(name = "entry")
+    var changelog: MutableList<String> = mutableListOf(),
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploaded_by", nullable = false)
     val uploadedBy: UserEntity,

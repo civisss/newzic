@@ -25,6 +25,9 @@ class WorkspaceServiceTest {
     @Mock private lateinit var commentRepository: WorkspaceCommentRepository
     @Mock private lateinit var fileRepository: WorkspaceFileRepository
     @Mock private lateinit var chatRepository: WorkspaceChatRepository
+    @Mock private lateinit var taskRepository: WorkspaceTaskRepository
+    @Mock private lateinit var activityRepository: WorkspaceActivityRepository
+    @Mock private lateinit var referenceRepository: WorkspaceReferenceRepository
     @Mock private lateinit var userRepository: UserRepository
     @Mock private lateinit var collaborationRepository: CollaborationRepository
     @Mock private lateinit var notificationService: NotificationService
@@ -171,6 +174,8 @@ class WorkspaceServiceTest {
             whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
             whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
             stubWorkspaceCounts(ws.id)
 
             val result = workspaceService.update(ws.id, owner.id,
@@ -178,6 +183,7 @@ class WorkspaceServiceTest {
 
             assertEquals("New Title", result.title)
             assertEquals("in_progress", result.status)
+            verify(activityRepository).save(argThat { type == ActivityType.STATUS_CHANGED })
         }
     }
 
@@ -196,6 +202,7 @@ class WorkspaceServiceTest {
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, collaborator.id)).thenReturn(false)
             whenever(userRepository.findById(collaborator.id)).thenReturn(Optional.of(collaborator))
             whenever(memberRepository.save(any<WorkspaceMemberEntity>())).thenAnswer { it.arguments[0] }
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             val result = workspaceService.inviteMember(ws.id, owner.id, collaborator.id)
 
@@ -223,6 +230,7 @@ class WorkspaceServiceTest {
             whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, collaborator.id)).thenReturn(false)
             whenever(userRepository.findById(collaborator.id)).thenReturn(Optional.of(collaborator))
             whenever(memberRepository.save(any<WorkspaceMemberEntity>())).thenAnswer { it.arguments[0] }
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             workspaceService.inviteMember(ws.id, owner.id, collaborator.id)
 
@@ -263,6 +271,7 @@ class WorkspaceServiceTest {
             whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
             whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(emptyList())
             whenever(commentRepository.countByVersionId(any())).thenReturn(0)
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             val result = workspaceService.uploadVersion(ws.id, owner.id,
                 UploadVersionRequest(audioUrl = "https://audio.com/v3.mp3", notes = "Refined mix", duration = 200))
@@ -285,6 +294,7 @@ class WorkspaceServiceTest {
             whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
             whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(emptyList())
             whenever(commentRepository.countByVersionId(any())).thenReturn(0)
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             workspaceService.uploadVersion(ws.id, owner.id,
                 UploadVersionRequest(audioUrl = "https://audio.com/v1.mp3"))
@@ -306,6 +316,7 @@ class WorkspaceServiceTest {
             whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
             whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(listOf(ownerMember, collabMember))
             whenever(commentRepository.countByVersionId(any())).thenReturn(0)
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             workspaceService.uploadVersion(ws.id, owner.id,
                 UploadVersionRequest(audioUrl = "https://audio.com/v1.mp3"))
@@ -336,6 +347,7 @@ class WorkspaceServiceTest {
             whenever(commentRepository.save(any<WorkspaceCommentEntity>())).thenAnswer { it.arguments[0] }
             whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
             whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(emptyList())
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             val result = workspaceService.addComment(ws.id, version.id, collaborator.id,
                 AddCommentRequest(content = "The beat is too loud here", timestampSeconds = 34.5))
@@ -375,6 +387,7 @@ class WorkspaceServiceTest {
             whenever(commentRepository.save(any<WorkspaceCommentEntity>())).thenAnswer { it.arguments[0] }
             whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
             whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(emptyList())
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             val result = workspaceService.addComment(ws.id, version.id, collaborator.id,
                 AddCommentRequest(
@@ -398,6 +411,7 @@ class WorkspaceServiceTest {
             whenever(commentRepository.save(any<WorkspaceCommentEntity>())).thenAnswer { it.arguments[0] }
             whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
             whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(listOf(ownerMember))
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
 
             workspaceService.addComment(ws.id, version.id, collaborator.id,
                 AddCommentRequest(content = "Fix this", timestampSeconds = 125.0)) // 2:05
@@ -544,6 +558,310 @@ class WorkspaceServiceTest {
             assertThrows(SecurityException::class.java) {
                 workspaceService.sendChatMessage(ws.id, outsider.id,
                     SendChatMessageRequest(content = "Sneaky"))
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // Enhanced Comments (Range, Resolve)
+    // ═══════════════════════════════════════════
+
+    @Nested
+    inner class EnhancedComments {
+
+        @Test
+        fun `add range comment with end timestamp`() {
+            val ws = createWorkspace(owner)
+            val version = createVersion(ws, owner, 1)
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(versionRepository.findById(version.id)).thenReturn(Optional.of(version))
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(commentRepository.save(any<WorkspaceCommentEntity>())).thenAnswer { it.arguments[0] }
+            whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
+            whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(emptyList())
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
+
+            val result = workspaceService.addComment(ws.id, version.id, owner.id,
+                AddCommentRequest(content = "This section needs work", timestampSeconds = 30.0, endTimestampSeconds = 45.0))
+
+            assertEquals(30.0, result.timestampSeconds)
+            assertEquals(45.0, result.endTimestampSeconds)
+        }
+
+        @Test
+        fun `resolve and unresolve comment`() {
+            val ws = createWorkspace(owner)
+            val version = createVersion(ws, owner, 1)
+            val comment = WorkspaceCommentEntity(
+                version = version, author = collaborator, content = "Fix this", timestampSeconds = 10.0
+            )
+            assertFalse(comment.resolved)
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(commentRepository.findById(comment.id)).thenReturn(Optional.of(comment))
+            whenever(commentRepository.save(any<WorkspaceCommentEntity>())).thenAnswer { it.arguments[0] }
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
+
+            val resolved = workspaceService.resolveComment(ws.id, version.id, comment.id, owner.id, true)
+            assertTrue(resolved.resolved)
+
+            val reopened = workspaceService.resolveComment(ws.id, version.id, comment.id, owner.id, false)
+            assertFalse(reopened.resolved)
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // Version Changelog
+    // ═══════════════════════════════════════════
+
+    @Nested
+    inner class VersionChangelog {
+
+        @Test
+        fun `upload version with changelog`() {
+            val ws = createWorkspace(owner)
+            whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(versionRepository.findMaxVersionNumber(ws.id)).thenReturn(1)
+            whenever(versionRepository.save(any<WorkspaceVersionEntity>())).thenAnswer { it.arguments[0] }
+            whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
+            whenever(memberRepository.findByWorkspaceId(ws.id)).thenReturn(emptyList())
+            whenever(commentRepository.countByVersionId(any())).thenReturn(0)
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
+
+            val result = workspaceService.uploadVersion(ws.id, owner.id,
+                UploadVersionRequest(
+                    audioUrl = "https://audio.com/v2.mp3",
+                    notes = "Mix update",
+                    changelog = listOf("Fixed bass", "Added reverb"),
+                    duration = 180
+                ))
+
+            assertEquals(2, result.versionNumber)
+            assertEquals(listOf("Fixed bass", "Added reverb"), result.changelog)
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // Tasks
+    // ═══════════════════════════════════════════
+
+    @Nested
+    inner class Tasks {
+
+        @Test
+        fun `create task`() {
+            val ws = createWorkspace(owner)
+            whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(taskRepository.save(any<WorkspaceTaskEntity>())).thenAnswer { it.arguments[0] }
+            whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
+
+            val result = workspaceService.createTask(ws.id, owner.id,
+                CreateTaskRequest(title = "Record vocals", description = "Verse 1 and chorus"))
+
+            assertEquals("Record vocals", result.title)
+            assertEquals("Verse 1 and chorus", result.description)
+            assertEquals("todo", result.status)
+        }
+
+        @Test
+        fun `create task with assignee notifies`() {
+            val ws = createWorkspace(owner)
+            whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(userRepository.findById(collaborator.id)).thenReturn(Optional.of(collaborator))
+            whenever(taskRepository.save(any<WorkspaceTaskEntity>())).thenAnswer { it.arguments[0] }
+            whenever(workspaceRepository.save(any<WorkspaceEntity>())).thenAnswer { it.arguments[0] }
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
+
+            workspaceService.createTask(ws.id, owner.id,
+                CreateTaskRequest(title = "Fix mix", assignedToId = collaborator.id.toString()))
+
+            verify(notificationService).create(
+                eq(collaborator.id), eq(owner.id), eq(NotificationType.WORKSPACE_TASK),
+                argThat { contains("Fix mix") }, any(), anyOrNull()
+            )
+        }
+
+        @Test
+        fun `update task status`() {
+            val ws = createWorkspace(owner)
+            val task = WorkspaceTaskEntity(workspace = ws, title = "Test", createdBy = owner)
+            assertEquals(TaskStatus.TODO, task.status)
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(taskRepository.findById(task.id)).thenReturn(Optional.of(task))
+            whenever(taskRepository.save(any<WorkspaceTaskEntity>())).thenAnswer { it.arguments[0] }
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
+
+            val result = workspaceService.updateTask(ws.id, task.id, owner.id,
+                UpdateTaskRequest(status = "done"))
+
+            assertEquals("done", result.status)
+        }
+
+        @Test
+        fun `update task on wrong workspace throws`() {
+            val ws1 = createWorkspace(owner)
+            val ws2 = createWorkspace(owner)
+            val task = WorkspaceTaskEntity(workspace = ws2, title = "Test", createdBy = owner)
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws1.id, owner.id)).thenReturn(true)
+            whenever(taskRepository.findById(task.id)).thenReturn(Optional.of(task))
+
+            assertThrows(IllegalArgumentException::class.java) {
+                workspaceService.updateTask(ws1.id, task.id, owner.id,
+                    UpdateTaskRequest(status = "done"))
+            }
+        }
+
+        @Test
+        fun `delete task`() {
+            val ws = createWorkspace(owner)
+            val task = WorkspaceTaskEntity(workspace = ws, title = "Test", createdBy = owner)
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(taskRepository.findById(task.id)).thenReturn(Optional.of(task))
+
+            workspaceService.deleteTask(ws.id, task.id, owner.id)
+
+            verify(taskRepository).delete(task)
+        }
+
+        @Test
+        fun `get tasks returns all tasks for workspace`() {
+            val ws = createWorkspace(owner)
+            val t1 = WorkspaceTaskEntity(workspace = ws, title = "Task 1", createdBy = owner)
+            val t2 = WorkspaceTaskEntity(workspace = ws, title = "Task 2", createdBy = owner, status = TaskStatus.DONE)
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(taskRepository.findByWorkspaceIdOrderByCreatedAtAsc(ws.id)).thenReturn(listOf(t1, t2))
+
+            val result = workspaceService.getTasks(ws.id, owner.id)
+
+            assertEquals(2, result.size)
+            assertEquals("Task 1", result[0].title)
+            assertEquals("done", result[1].status)
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // Activities
+    // ═══════════════════════════════════════════
+
+    @Nested
+    inner class Activities {
+
+        @Test
+        fun `get activities returns feed`() {
+            val ws = createWorkspace(owner)
+            val activity = WorkspaceActivityEntity(
+                workspace = ws, user = owner,
+                type = ActivityType.VERSION_UPLOADED, message = "uploaded v1"
+            )
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(activityRepository.findByWorkspaceIdOrderByCreatedAtDesc(eq(ws.id), any()))
+                .thenReturn(PageImpl(listOf(activity)))
+
+            val result = workspaceService.getActivities(ws.id, owner.id, 0, 50)
+
+            assertEquals(1, result.size)
+            assertEquals("uploaded v1", result[0].message)
+            assertEquals("version_uploaded", result[0].type)
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // References
+    // ═══════════════════════════════════════════
+
+    @Nested
+    inner class References {
+
+        @Test
+        fun `add reference track`() {
+            val ws = createWorkspace(owner)
+            whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(userRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+            whenever(referenceRepository.save(any<WorkspaceReferenceEntity>())).thenAnswer { it.arguments[0] }
+            whenever(activityRepository.save(any<WorkspaceActivityEntity>())).thenAnswer { it.arguments[0] }
+
+            val result = workspaceService.addReference(ws.id, owner.id,
+                AddReferenceRequest(title = "Blinding Lights", artist = "The Weeknd",
+                    url = "https://spotify.com/track/123", notes = "This vibe", platform = "SPOTIFY"))
+
+            assertEquals("Blinding Lights", result.title)
+            assertEquals("The Weeknd", result.artist)
+            assertEquals("spotify", result.platform)
+        }
+
+        @Test
+        fun `get references returns list`() {
+            val ws = createWorkspace(owner)
+            val ref = WorkspaceReferenceEntity(
+                workspace = ws, title = "Track", addedBy = owner, platform = ReferencePlatform.SPOTIFY
+            )
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(referenceRepository.findByWorkspaceIdOrderByCreatedAtDesc(ws.id)).thenReturn(listOf(ref))
+
+            val result = workspaceService.getReferences(ws.id, owner.id)
+
+            assertEquals(1, result.size)
+            assertEquals("Track", result[0].title)
+        }
+
+        @Test
+        fun `delete reference on wrong workspace throws`() {
+            val ws1 = createWorkspace(owner)
+            val ws2 = createWorkspace(owner)
+            val ref = WorkspaceReferenceEntity(
+                workspace = ws2, title = "Track", addedBy = owner, platform = ReferencePlatform.OTHER
+            )
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws1.id, owner.id)).thenReturn(true)
+            whenever(referenceRepository.findById(ref.id)).thenReturn(Optional.of(ref))
+
+            assertThrows(IllegalArgumentException::class.java) {
+                workspaceService.deleteReference(ws1.id, ref.id, owner.id)
+            }
+        }
+
+        @Test
+        fun `delete reference`() {
+            val ws = createWorkspace(owner)
+            val ref = WorkspaceReferenceEntity(
+                workspace = ws, title = "Track", addedBy = owner, platform = ReferencePlatform.OTHER
+            )
+
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, owner.id)).thenReturn(true)
+            whenever(referenceRepository.findById(ref.id)).thenReturn(Optional.of(ref))
+
+            workspaceService.deleteReference(ws.id, ref.id, owner.id)
+
+            verify(referenceRepository).delete(ref)
+        }
+
+        @Test
+        fun `non-member cannot add reference`() {
+            val ws = createWorkspace(owner)
+            val outsider = createUser("Outsider")
+            whenever(workspaceRepository.findById(ws.id)).thenReturn(Optional.of(ws))
+            whenever(memberRepository.existsByWorkspaceIdAndUserId(ws.id, outsider.id)).thenReturn(false)
+
+            assertThrows(SecurityException::class.java) {
+                workspaceService.addReference(ws.id, outsider.id,
+                    AddReferenceRequest(title = "Test"))
             }
         }
     }

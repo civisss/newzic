@@ -143,6 +143,102 @@ class WorkspaceController(private val workspaceService: WorkspaceService) {
         return ResponseEntity.noContent().build()
     }
 
+    // ── Comment Actions ──
+
+    @PatchMapping("/{id}/versions/{versionId}/comments/{commentId}/resolve")
+    fun resolveComment(
+        auth: Authentication,
+        @PathVariable id: UUID,
+        @PathVariable versionId: UUID,
+        @PathVariable commentId: UUID,
+        @RequestBody request: ResolveCommentRequest
+    ): ResponseEntity<WorkspaceCommentResponse> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.ok(workspaceService.resolveComment(id, versionId, commentId, userId, request.resolved))
+    }
+
+    // ── Tasks ──
+
+    @PostMapping("/{id}/tasks")
+    fun createTask(
+        auth: Authentication,
+        @PathVariable id: UUID,
+        @Valid @RequestBody request: CreateTaskRequest
+    ): ResponseEntity<WorkspaceTaskResponse> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.status(HttpStatus.CREATED).body(workspaceService.createTask(id, userId, request))
+    }
+
+    @GetMapping("/{id}/tasks")
+    fun getTasks(auth: Authentication, @PathVariable id: UUID): ResponseEntity<List<WorkspaceTaskResponse>> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.ok(workspaceService.getTasks(id, userId))
+    }
+
+    @PatchMapping("/{id}/tasks/{taskId}")
+    fun updateTask(
+        auth: Authentication,
+        @PathVariable id: UUID,
+        @PathVariable taskId: UUID,
+        @Valid @RequestBody request: UpdateTaskRequest
+    ): ResponseEntity<WorkspaceTaskResponse> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.ok(workspaceService.updateTask(id, taskId, userId, request))
+    }
+
+    @DeleteMapping("/{id}/tasks/{taskId}")
+    fun deleteTask(
+        auth: Authentication,
+        @PathVariable id: UUID,
+        @PathVariable taskId: UUID
+    ): ResponseEntity<Void> {
+        val userId = auth.principal as UUID
+        workspaceService.deleteTask(id, taskId, userId)
+        return ResponseEntity.noContent().build()
+    }
+
+    // ── Activity Feed ──
+
+    @GetMapping("/{id}/activities")
+    fun getActivities(
+        auth: Authentication,
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "50") size: Int
+    ): ResponseEntity<List<WorkspaceActivityResponse>> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.ok(workspaceService.getActivities(id, userId, page, size))
+    }
+
+    // ── References ──
+
+    @PostMapping("/{id}/references")
+    fun addReference(
+        auth: Authentication,
+        @PathVariable id: UUID,
+        @Valid @RequestBody request: AddReferenceRequest
+    ): ResponseEntity<WorkspaceReferenceResponse> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.status(HttpStatus.CREATED).body(workspaceService.addReference(id, userId, request))
+    }
+
+    @GetMapping("/{id}/references")
+    fun getReferences(auth: Authentication, @PathVariable id: UUID): ResponseEntity<List<WorkspaceReferenceResponse>> {
+        val userId = auth.principal as UUID
+        return ResponseEntity.ok(workspaceService.getReferences(id, userId))
+    }
+
+    @DeleteMapping("/{id}/references/{refId}")
+    fun deleteReference(
+        auth: Authentication,
+        @PathVariable id: UUID,
+        @PathVariable refId: UUID
+    ): ResponseEntity<Void> {
+        val userId = auth.principal as UUID
+        workspaceService.deleteReference(id, refId, userId)
+        return ResponseEntity.noContent().build()
+    }
+
     // ── Chat ──
 
     @PostMapping("/{id}/chat")
