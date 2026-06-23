@@ -747,6 +747,7 @@
 
 // ── Responsive ──
 @include mobile {
+  .workspace-detail { padding: 24px 16px 80px; }
   .header-main { flex-direction: column; }
   .tab-bar { overflow-x: auto; }
   .tab { font-size: 0.76rem; padding: 12px 10px; white-space: nowrap; }
