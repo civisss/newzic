@@ -308,31 +308,36 @@
              (dragover)="onVersionDragOver($event)"
              (dragleave)="onVersionDragLeave()">
           @if (newVersionFileName) {
-            <div class="file-selected">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
-              </svg>
-              <div class="file-selected-info">
-                <span class="file-selected-name">{{ newVersionFileName }}</span>
-                <span class="file-selected-ready">Ready to upload</span>
+            <div class="file-ready">
+              <div class="file-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+                </svg>
               </div>
-              <button class="file-remove-btn" (click)="newVersionAudioData = ''; newVersionFileName = ''; $event.stopPropagation()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <div class="file-details">
+                <p class="file-name">{{ newVersionFileName }}</p>
+                <span class="file-status">Ready to upload</span>
+              </div>
+              <button class="change-btn" (click)="newVersionAudioData = ''; newVersionFileName = ''; $event.stopPropagation()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
           } @else {
-            <label class="file-drop-label">
-              <div class="file-drop-icon">
+            <div class="drop-visual">
+              <div class="drop-icon-ring">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
               </div>
-              <span class="file-drop-title">Drag & drop your audio file</span>
-              <span class="file-drop-hint">or click to browse — MP3, WAV, FLAC up to 50MB</span>
-              <input type="file" accept=".mp3,.wav,.flac" (change)="onVersionFileSelect($event)" hidden />
-            </label>
+              <p class="drop-title">Drag & drop your audio file</p>
+              <p class="drop-sub">or click to browse — MP3, WAV, FLAC up to 50MB</p>
+              <label class="browse-btn">
+                Choose File
+                <input type="file" accept=".mp3,.wav,.flac" (change)="onVersionFileSelect($event)" hidden />
+              </label>
+            </div>
           }
         </div>
       </div>
