@@ -29,6 +29,7 @@ class SongService(
     private val recommendationService: RecommendationService
 ) {
 
+    @Transactional(readOnly = true)
     fun getById(id: UUID): SongResponse {
         val song = songRepository.findById(id)
             .orElseThrow { NoSuchElementException("Song not found") }
