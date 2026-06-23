@@ -10,6 +10,13 @@
   z-index: $z-nav;
   @include glass(0.85);
   border-bottom: 1px solid $border-subtle;
+
+  // Hide when fullscreen player is open
+  :host-context(body.fs-player-open) & {
+    @include mobile {
+      display: none;
+    }
+  }
 }
 
 .nav-inner {

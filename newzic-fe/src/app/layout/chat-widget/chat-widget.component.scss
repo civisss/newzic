@@ -44,6 +44,11 @@
       right: 16px;
     }
   }
+
+  // Hide when fullscreen player is open
+  :host-context(body.fs-player-open) & {
+    display: none;
+  }
 }
 
 .fab-badge {

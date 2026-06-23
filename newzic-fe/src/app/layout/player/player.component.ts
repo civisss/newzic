@@ -67,8 +67,10 @@ export class PlayerComponent {
     this.expanded.update(v => !v);
     if (this.expanded()) {
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('fs-player-open');
     } else {
       document.body.style.overflow = '';
+      document.body.classList.remove('fs-player-open');
     }
   }
 
