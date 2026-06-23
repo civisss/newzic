@@ -132,6 +132,20 @@
         </div>
       }
     </div>
+  } @else if (!versionsLoaded()) {
+    <!-- Versions still loading — show equalizer loader -->
+    <div class="player-section">
+      <div class="ws-audio-loader">
+        <div class="ws-equalizer">
+          <div class="ws-eq-bar"></div>
+          <div class="ws-eq-bar"></div>
+          <div class="ws-eq-bar"></div>
+          <div class="ws-eq-bar"></div>
+          <div class="ws-eq-bar"></div>
+        </div>
+        <span class="ws-loader-text">{{ 'workspace.loading_track' | translate }}</span>
+      </div>
+    </div>
   } @else {
     <div class="no-version">
       <div class="no-version-icon">🎵</div>

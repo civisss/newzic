@@ -31,6 +31,7 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   workspace = signal<Workspace | null>(null);
   versions = signal<WorkspaceVersion[]>([]);
   activeVersion = signal<WorkspaceVersion | null>(null);
+  versionsLoaded = signal(false);
   comments = signal<WorkspaceComment[]>([]);
   files = signal<WorkspaceFile[]>([]);
   chatMessages = signal<WorkspaceChatMessage[]>([]);
@@ -150,8 +151,11 @@ export class WorkspaceDetailComponent implements OnInit, AfterViewInit, OnDestro
   loadVersions(wsId: string): void {
     this.workspaceService.getVersions(wsId).subscribe(versions => {
       this.versions.set(versions);
+      this.versionsLoaded.set(true);
       if (versions.length > 0 && !this.activeVersion()) {
         this.selectVersion(versions[0]); // Latest version
+      } else if (versions.length === 0) {
+        this.audioLoading.set(false);
       }
     });
   }
