@@ -35,20 +35,33 @@ class UserService(
         return userMapper.toResponse(user)
     }
 
-    fun getTrending(pageable: Pageable): Page<UserResponse> {
-        return userRepository.findTrending(pageable).map { userMapper.toResponse(it) }
+    fun getTrending(pageable: Pageable, excludeId: UUID? = null): Page<UserResponse> {
+        return userRepository.findTrending(pageable)
+            .let { page -> if (excludeId != null) filterPage(page, excludeId) else page }
+            .map { userMapper.toResponse(it) }
     }
 
-    fun getProducers(pageable: Pageable): Page<UserResponse> {
-        return userRepository.findByRole(ArtistRole.PRODUCER, pageable).map { userMapper.toResponse(it) }
+    fun getProducers(pageable: Pageable, excludeId: UUID? = null): Page<UserResponse> {
+        return userRepository.findByRole(ArtistRole.PRODUCER, pageable)
+            .let { page -> if (excludeId != null) filterPage(page, excludeId) else page }
+            .map { userMapper.toResponse(it) }
     }
 
-    fun getCommunityPicks(pageable: Pageable): Page<UserResponse> {
-        return userRepository.findCommunityPicks(pageable).map { userMapper.toResponse(it) }
+    fun getCommunityPicks(pageable: Pageable, excludeId: UUID? = null): Page<UserResponse> {
+        return userRepository.findCommunityPicks(pageable)
+            .let { page -> if (excludeId != null) filterPage(page, excludeId) else page }
+            .map { userMapper.toResponse(it) }
     }
 
-    fun search(query: String, pageable: Pageable): Page<UserResponse> {
-        return userRepository.search(query, pageable).map { userMapper.toResponse(it) }
+    fun search(query: String, pageable: Pageable, excludeId: UUID? = null): Page<UserResponse> {
+        return userRepository.search(query, pageable)
+            .let { page -> if (excludeId != null) filterPage(page, excludeId) else page }
+            .map { userMapper.toResponse(it) }
+    }
+
+    private fun <T : com.newzic.domain.entity.UserEntity> filterPage(page: Page<T>, excludeId: UUID): Page<T> {
+        val filtered = page.content.filter { it.id != excludeId }
+        return org.springframework.data.domain.PageImpl(filtered, page.pageable, page.totalElements - 1)
     }
 
     @Transactional(readOnly = true)

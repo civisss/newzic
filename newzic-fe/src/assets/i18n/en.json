@@ -82,6 +82,7 @@
   "profile.reactions": "Reactions",
   "profile.tracks": "Tracks",
   "profile.my_tracks": "My Tracks",
+  "profile.loading_tracks": "Loading tracks...",
   "profile.songs_you_love": "Songs you love",
   "profile.no_liked_songs": "No liked songs yet",
   "profile.songs_appear_here": "Songs you like will appear here",

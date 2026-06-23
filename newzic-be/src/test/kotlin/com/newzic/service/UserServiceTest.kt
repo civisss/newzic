@@ -294,4 +294,84 @@ class UserServiceTest {
 
         verify(notificationService, never()).create(any(), anyOrNull(), any(), any(), anyOrNull(), anyOrNull())
     }
+
+    // ── Self-exclusion tests ──
+
+    private fun makeUser(name: String): UserEntity = UserEntity(
+        id = UUID.randomUUID(), displayName = name, username = name.lowercase(),
+        email = "$name@test.com", passwordHash = "h", roles = mutableSetOf(ArtistRole.SINGER)
+    )
+
+    private fun pageOf(vararg users: UserEntity): org.springframework.data.domain.Page<UserEntity> {
+        val list = users.toList()
+        return org.springframework.data.domain.PageImpl(list, org.springframework.data.domain.PageRequest.of(0, 10), list.size.toLong())
+    }
+
+    private fun stubMapperForExclusionTests() {
+        whenever(userMapper.toResponse(any())).thenCallRealMethod()
+    }
+
+    @Test
+    fun `getTrending should exclude current user when excludeId provided`() {
+        val me = makeUser("Me")
+        val other = makeUser("Other")
+        whenever(userRepository.findTrending(any())).thenReturn(pageOf(me, other))
+        stubMapperForExclusionTests()
+
+        val result = userService.getTrending(org.springframework.data.domain.PageRequest.of(0, 10), me.id)
+
+        assertEquals(1, result.content.size)
+        assertEquals("Other", result.content[0].displayName)
+    }
+
+    @Test
+    fun `getTrending should return all when excludeId is null`() {
+        val a = makeUser("Alpha")
+        val b = makeUser("Beta")
+        whenever(userRepository.findTrending(any())).thenReturn(pageOf(a, b))
+        stubMapperForExclusionTests()
+
+        val result = userService.getTrending(org.springframework.data.domain.PageRequest.of(0, 10), null)
+
+        assertEquals(2, result.content.size)
+    }
+
+    @Test
+    fun `search should exclude current user when excludeId provided`() {
+        val me = makeUser("Me")
+        val other = makeUser("Other")
+        whenever(userRepository.search(eq("test"), any())).thenReturn(pageOf(me, other))
+        stubMapperForExclusionTests()
+
+        val result = userService.search("test", org.springframework.data.domain.PageRequest.of(0, 10), me.id)
+
+        assertEquals(1, result.content.size)
+        assertFalse(result.content.any { it.displayName == "Me" })
+    }
+
+    @Test
+    fun `getProducers should exclude current user when excludeId provided`() {
+        val me = makeUser("Me")
+        val other = makeUser("Producer")
+        whenever(userRepository.findByRole(eq(ArtistRole.PRODUCER), any())).thenReturn(pageOf(me, other))
+        stubMapperForExclusionTests()
+
+        val result = userService.getProducers(org.springframework.data.domain.PageRequest.of(0, 10), me.id)
+
+        assertEquals(1, result.content.size)
+        assertEquals("Producer", result.content[0].displayName)
+    }
+
+    @Test
+    fun `getCommunityPicks should exclude current user when excludeId provided`() {
+        val me = makeUser("Me")
+        val other = makeUser("Pick")
+        whenever(userRepository.findCommunityPicks(any())).thenReturn(pageOf(me, other))
+        stubMapperForExclusionTests()
+
+        val result = userService.getCommunityPicks(org.springframework.data.domain.PageRequest.of(0, 10), me.id)
+
+        assertEquals(1, result.content.size)
+        assertEquals("Pick", result.content[0].displayName)
+    }
 }

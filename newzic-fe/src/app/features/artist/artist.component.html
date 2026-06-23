@@ -150,6 +150,14 @@
         <!-- Tracks -->
         <div class="music-section">
           <h3>{{ 'artist.tracks' | translate }}</h3>
+          @if (songsLoading()) {
+            <div class="tracks-loader">
+              <div class="loader-bars">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <p class="loader-text">{{ 'profile.loading_tracks' | translate }}</p>
+            </div>
+          } @else {
           <div class="tracks-list">
             @for (song of songs(); track song.id; let i = $index) {
               <div class="track-row" (click)="playSong(song)">
@@ -192,6 +200,7 @@
               </div>
             }
           </div>
+          }
         </div>
       }
 

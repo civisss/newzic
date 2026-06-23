@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
@@ -39,7 +40,7 @@ class UserController(private val userService: UserService) {
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<Page<UserResponse>> {
-        return ResponseEntity.ok(userService.getTrending(PageRequest.of(page, size)))
+        return ResponseEntity.ok(userService.getTrending(PageRequest.of(page, size), currentUserId()))
     }
 
     @GetMapping("/artists/producers")
@@ -47,7 +48,7 @@ class UserController(private val userService: UserService) {
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<Page<UserResponse>> {
-        return ResponseEntity.ok(userService.getProducers(PageRequest.of(page, size)))
+        return ResponseEntity.ok(userService.getProducers(PageRequest.of(page, size), currentUserId()))
     }
 
     @GetMapping("/artists/community-picks")
@@ -55,7 +56,7 @@ class UserController(private val userService: UserService) {
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<Page<UserResponse>> {
-        return ResponseEntity.ok(userService.getCommunityPicks(PageRequest.of(page, size)))
+        return ResponseEntity.ok(userService.getCommunityPicks(PageRequest.of(page, size), currentUserId()))
     }
 
     @GetMapping("/artists/search")
@@ -64,7 +65,12 @@ class UserController(private val userService: UserService) {
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<Page<UserResponse>> {
-        return ResponseEntity.ok(userService.search(q, PageRequest.of(page, size)))
+        return ResponseEntity.ok(userService.search(q, PageRequest.of(page, size), currentUserId()))
+    }
+
+    private fun currentUserId(): UUID? {
+        val auth = SecurityContextHolder.getContext().authentication ?: return null
+        return try { auth.principal as? UUID } catch (_: Exception) { null }
     }
 
     @PostMapping("/artists/{id}/follow")

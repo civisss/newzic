@@ -82,6 +82,7 @@
   "profile.reactions": "Reacciones",
   "profile.tracks": "Canciones",
   "profile.my_tracks": "Mis Canciones",
+  "profile.loading_tracks": "Cargando canciones...",
   "profile.songs_you_love": "Canciones que amas",
   "profile.no_liked_songs": "Aún no hay canciones favoritas",
   "profile.songs_appear_here": "Las canciones que te gusten aparecerán aquí",

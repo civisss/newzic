@@ -310,3 +310,280 @@
   border-radius: 2px;
   transition: width 0.1s ease;
 }
+
+// ── Expand button (mobile only) ──
+.expand-btn {
+  display: none;
+  @include mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: $text-secondary;
+    padding: 4px;
+    margin-left: auto;
+    cursor: pointer;
+    flex-shrink: 0;
+    &:active { transform: scale(0.9); }
+  }
+}
+
+// Hide mini player when fullscreen is open
+.player-hidden {
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── FULLSCREEN PLAYER ──
+.fs-player {
+  position: fixed;
+  inset: 0;
+  z-index: $z-player + 10;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px calc(env(safe-area-inset-bottom, 16px) + 16px);
+  animation: fsSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @include mobile {
+    display: flex;
+  }
+}
+
+@keyframes fsSlideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+// Background: blurred cover image
+.fs-bg {
+  position: absolute;
+  inset: -40px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(60px) brightness(0.3) saturate(1.6);
+  z-index: -2;
+}
+
+.fs-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(8, 8, 20, 0.85) 50%,
+    rgba(8, 8, 20, 0.95) 100%
+  );
+  z-index: -1;
+}
+
+// Header
+.fs-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.fs-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: $text-primary;
+  cursor: pointer;
+  transition: background $transition-fast;
+  &:active { background: rgba(255, 255, 255, 0.15); transform: scale(0.95); }
+}
+
+.fs-now-playing {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.fs-header-spacer {
+  width: 44px;
+}
+
+// Cover art
+.fs-cover-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 50vh;
+  padding: 16px 0;
+}
+
+.fs-cover {
+  width: min(75vw, 320px);
+  height: min(75vw, 320px);
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba($accent-violet, 0.15);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
+
+  &.playing {
+    animation: fsCoverPulse 3s ease-in-out infinite;
+  }
+}
+
+@keyframes fsCoverPulse {
+  0%, 100% { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba($accent-violet, 0.15); }
+  50%      { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 60px rgba($accent-violet, 0.3); }
+}
+
+// Track info
+.fs-track-info {
+  text-align: center;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.fs-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-artist {
+  font-size: 0.95rem;
+  color: $text-secondary;
+  text-decoration: none;
+  &:active { color: $text-primary; }
+}
+
+// Progress
+.fs-progress {
+  width: 100%;
+  padding: 16px 0 8px;
+}
+
+.fs-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+}
+
+.fs-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $accent-violet, $accent-cyan);
+  border-radius: 3px;
+  position: relative;
+  transition: width 0.3s linear;
+}
+
+.fs-progress-knob {
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.fs-times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: $text-tertiary;
+  font-variant-numeric: tabular-nums;
+}
+
+// Controls
+.fs-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.fs-ctrl {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: color $transition-fast, transform $transition-fast;
+
+  &:active { transform: scale(0.9); }
+  &.active { color: $accent-violet; }
+
+  &.fs-ctrl-main {
+    color: $text-primary;
+    width: 52px;
+    height: 52px;
+  }
+}
+
+.fs-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: none;
+  background: $gradient-violet-blue;
+  color: white;
+  cursor: pointer;
+  transition: transform $transition-spring, box-shadow $transition-base;
+  box-shadow: $shadow-glow-violet;
+
+  &:active { transform: scale(0.93); }
+}
+
+// Like
+.fs-actions {
+  padding: 8px 0;
+}
+
+.fs-like-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:active { transform: scale(0.9); }
+  &.liked {
+    color: $accent-pink;
+    border-color: rgba($accent-pink, 0.3);
+    background: rgba($accent-pink, 0.1);
+  }
+}

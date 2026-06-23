@@ -23,6 +23,7 @@ import { FollowersModalComponent } from '../../shared/components/followers-modal
 export class ArtistComponent implements OnInit {
   artist = signal<Artist | null>(null);
   songs = signal<Song[]>([]);
+  songsLoading = signal(true);
   albums = signal<Album[]>([]);
   activeTab = signal<'music' | 'about' | 'photos'>('music');
   following = signal(false);
@@ -43,9 +44,11 @@ export class ArtistComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const id = params['id'];
+      this.songsLoading.set(true);
       this.artistService.getById(id).subscribe(a => this.artist.set(a ?? null));
       this.songService.getByArtist(id).subscribe(s => {
         this.songs.set(s);
+        this.songsLoading.set(false);
         if (this.auth.isLoggedIn()) {
           this.songService.getLikedSongs().subscribe(liked => {
             this.likedSongIds.set(new Set(liked.map(l => l.id)));
