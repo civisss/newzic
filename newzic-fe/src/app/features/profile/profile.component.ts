@@ -1,6 +1,7 @@
-import { Component, OnInit, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Location } from '@angular/common';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { AuthService } from '../../core/services/auth.service';
@@ -56,6 +57,17 @@ export class ProfileComponent implements OnInit {
   mentionStartPos = 0;
   private mentionSearch$ = new Subject<string>();
   @ViewChild('postTextarea') postTextarea!: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('highlightOverlay') highlightOverlay!: ElementRef<HTMLDivElement>;
+
+  highlightedContent = computed(() => {
+    const text = this.newPostContent();
+    if (!text) return '';
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return escaped.replace(/@(\w+)/g, '<span class="hl-mention">@$1</span>') + '\n';
+  });
   editCountry = '';
   editPreferredGenres: string[] = [];
   editSocialLinks: { spotify: string; youtubeMusic: string; appleMusic: string; soundcloud: string; tiktok: string; instagram: string } = {
@@ -98,7 +110,8 @@ export class ProfileComponent implements OnInit {
     private playerService: PlayerService,
     private http: HttpClient,
     private journalService: JournalService,
-    private artistService: ArtistService
+    private artistService: ArtistService,
+    private location: Location
   ) {
     this.mentionSearch$.pipe(
       debounceTime(250),
@@ -115,6 +128,7 @@ export class ProfileComponent implements OnInit {
     this.statsService.getMyStats().subscribe(s => this.stats.set(s));
     const user = this.auth.user();
     if (user) {
+      this.location.replaceState('/artist/' + user.username);
       this.songService.getByArtist(user.id).subscribe(songs => {
         this.mySongs.set(songs);
         this.songsLoading.set(false);
@@ -193,6 +207,12 @@ export class ProfileComponent implements OnInit {
   closeMentionDropdown(): void {
     this.showMentionDropdown.set(false);
     this.mentionSuggestions.set([]);
+  }
+
+  syncScroll(): void {
+    if (this.highlightOverlay && this.postTextarea) {
+      this.highlightOverlay.nativeElement.scrollTop = this.postTextarea.nativeElement.scrollTop;
+    }
   }
 
   onTextareaKeydown(event: KeyboardEvent): void {

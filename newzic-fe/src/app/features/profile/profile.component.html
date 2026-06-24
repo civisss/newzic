@@ -25,7 +25,7 @@
         <button class="btn-edit-profile" (click)="activeTab.set('settings')">{{ 'profile.edit_profile' | translate }}</button>
         @if (!auth.user()?.premium) {
           <button class="btn-become-premium" (click)="showUpgradeModal.set(true)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <svg class="crown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M5 16L3 5l5.5 5L12 2l3.5 8L21 5l-2 11H5z" fill="url(#crownProf)"/>
               <path d="M5 19h14v2H5z" fill="url(#crownProf)" opacity="0.7"/>
               <defs><linearGradient id="crownProf" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#FBBF24"/><stop offset="0.5" stop-color="#F59E0B"/><stop offset="1" stop-color="#EC4899"/></linearGradient></defs>
@@ -156,6 +156,7 @@
             </button>
           </div>
           <div class="textarea-wrap">
+            <div class="highlight-overlay" #highlightOverlay [innerHTML]="highlightedContent()"></div>
             <textarea
               #postTextarea
               [placeholder]="'journal.write_placeholder' | translate"
@@ -163,6 +164,7 @@
               (ngModelChange)="newPostContent.set($event)"
               (input)="onPostInput($event)"
               (keydown)="onTextareaKeydown($event)"
+              (scroll)="syncScroll()"
               rows="4"
               class="post-textarea"
             ></textarea>

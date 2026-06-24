@@ -122,12 +122,23 @@
     pointer-events: none;
   }
 
+  .crown-icon {
+    filter: drop-shadow(0 0 4px rgba(251,191,36,0.5));
+    animation: crownBounce 2s ease-in-out infinite;
+  }
+
   &:hover {
     background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.2), rgba(251,191,36,0.18));
     border-color: rgba(251,191,36,0.55);
     box-shadow: 0 0 16px rgba(251,191,36,0.25), 0 0 32px rgba(245,158,11,0.15);
     transform: translateY(-2px);
   }
+}
+
+@keyframes crownBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-1px) rotate(-3deg); }
+  75% { transform: translateY(-1px) rotate(3deg); }
 }
 
 @keyframes premBtnGlow {
@@ -190,11 +201,11 @@
 .stats-detail-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
 
   @include mobile {
     justify-content: center;
-    gap: 12px;
+    gap: 16px;
   }
 }
 
@@ -203,10 +214,9 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
   strong { font-size: 1.3rem; font-weight: 700; }
-  span { font-size: 0.78rem; color: $text-tertiary; }
+  span { font-size: 0.78rem; color: $text-tertiary; white-space: nowrap; }
 
   @include mobile {
     strong { font-size: 1.1rem; }
@@ -793,6 +803,30 @@ select {
   position: relative;
 }
 
+.highlight-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  font-size: 0.9rem;
+  font-family: inherit;
+  line-height: normal;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  pointer-events: none;
+  color: transparent;
+
+  ::ng-deep .hl-mention {
+    color: $accent-violet;
+    font-weight: 600;
+  }
+}
+
 .post-textarea {
   width: 100%;
   background: rgba(255, 255, 255, 0.03);
@@ -801,11 +835,13 @@ select {
   padding: 14px;
   font-size: 0.9rem;
   color: $text-primary;
-  resize: vertical;
+  resize: none;
   min-height: 100px;
   font-family: inherit;
   outline: none;
   transition: border-color $transition-fast;
+  position: relative;
+  caret-color: $text-primary;
 
   &::placeholder { color: $text-muted; }
   &:focus { border-color: rgba($accent-violet, 0.3); }

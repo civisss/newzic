@@ -214,11 +214,11 @@
 .stats-detail-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
 
   @include mobile {
     justify-content: center;
-    gap: 12px;
+    gap: 16px;
   }
 }
 
@@ -236,10 +236,9 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
   strong { font-size: 1.3rem; font-weight: 700; }
-  span { font-size: 0.78rem; color: $text-tertiary; }
+  span { font-size: 0.78rem; color: $text-tertiary; white-space: nowrap; }
 
   @include mobile {
     strong { font-size: 1.1rem; }

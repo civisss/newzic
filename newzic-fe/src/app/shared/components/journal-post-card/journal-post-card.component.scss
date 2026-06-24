@@ -218,23 +218,24 @@
   word-break: break-word;
   flex: 1;
 
-  :host ::ng-deep {
-    .mention {
-      color: $accent-violet;
-      font-weight: 600;
-      text-decoration: none;
-      transition: color $transition-fast;
-      &:hover { color: color.adjust($accent-violet, $lightness: 10%); text-decoration: underline; }
-    }
+}
 
-    .hashtag {
-      color: $accent-cyan;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: color $transition-fast;
-      &:hover { color: color.adjust($accent-cyan, $lightness: 10%); }
-    }
+::ng-deep .card-content {
+  .mention {
+    color: $accent-violet;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color $transition-fast;
+    &:hover { color: color.adjust($accent-violet, $lightness: 10%); text-decoration: underline; }
+  }
+
+  .hashtag {
+    color: $accent-cyan;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color $transition-fast;
+    &:hover { color: color.adjust($accent-cyan, $lightness: 10%); }
   }
 }
 
