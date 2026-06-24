@@ -819,7 +819,7 @@ select {
   word-wrap: break-word;
   overflow: hidden;
   pointer-events: none;
-  color: transparent;
+  color: $text-primary;
 
   ::ng-deep .hl-mention {
     color: $accent-violet;
@@ -834,7 +834,7 @@ select {
   border-radius: $radius-md;
   padding: 14px;
   font-size: 0.9rem;
-  color: $text-primary;
+  color: transparent;
   resize: none;
   min-height: 100px;
   font-family: inherit;

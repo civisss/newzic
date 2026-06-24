@@ -67,8 +67,8 @@ export class JournalPostCardComponent implements OnDestroy {
     // Highlight @mentions
     html = html.replace(/@(\w+)/g, '<a class="mention" href="/artist/$1">@$1</a>');
 
-    // Highlight #hashtags
-    html = html.replace(/#(\w+)/g, '<a class="hashtag">#$1</a>');
+    // Highlight #hashtags – link to search
+    html = html.replace(/#(\w+)/g, '<a class="hashtag" href="/search?q=%23$1">#$1</a>');
 
     return html;
   }

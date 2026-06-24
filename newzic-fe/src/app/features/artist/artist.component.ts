@@ -1,5 +1,5 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UpperCasePipe, SlicePipe } from '@angular/common';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
@@ -39,6 +39,13 @@ export class ArtistComponent implements OnInit {
   followModalMode = signal<'followers' | 'following'>('followers');
   showDonateModal = signal(false);
 
+  totalReactions = computed(() => {
+    return this.songs().reduce((sum, s) => {
+      const r = s.reactions;
+      return sum + (r.fire || 0) + (r.gem || 0) + (r.onpoint || 0) + (r.star || 0);
+    }, 0);
+  });
+
   constructor(
     private route: ActivatedRoute,
     private artistService: ArtistService,
@@ -47,12 +54,18 @@ export class ArtistComponent implements OnInit {
     public playerService: PlayerService,
     public auth: AuthService,
     private messageService: MessageService,
-    private journalService: JournalService
+    private journalService: JournalService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const username = params['username'];
+      const currentUser = this.auth.user();
+      if (currentUser && currentUser.username === username) {
+        this.router.navigate(['/profile'], { replaceUrl: true });
+        return;
+      }
       this.songsLoading.set(true);
       this.artistService.getByUsername(username).subscribe(a => {
         this.artist.set(a ?? null);

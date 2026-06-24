@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
   return next(req).pipe(
     catchError(err => {
-      if (err.status === 401) {
+      if (err.status === 401 || err.status === 403) {
         localStorage.removeItem('newzic_token');
         localStorage.removeItem('newzic_user');
         router.navigate(['/login']);

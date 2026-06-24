@@ -46,6 +46,10 @@
                 <span>{{ 'artist.total_plays' | translate }}</span>
               </div>
               <div class="stat">
+                <strong>{{ totalReactions() | formatNumber }}</strong>
+                <span>{{ 'artist.reactions' | translate }}</span>
+              </div>
+              <div class="stat">
                 <strong>{{ songs().length }}</strong>
                 <span>{{ 'artist.tracks' | translate }}</span>
               </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
@@ -42,19 +42,35 @@ export class SearchComponent implements OnInit {
     private artistService: ArtistService,
     private songService: SongService,
     private playerService: PlayerService,
-    private journalService: JournalService
+    private journalService: JournalService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadDefaults();
+    this.route.queryParams.subscribe(params => {
+      const q = params['q'];
+      if (q) {
+        this.query = q;
+        if (q.startsWith('#')) {
+          this.activeFilter.set('journal');
+        }
+        this.onSearch();
+      } else {
+        this.loadDefaults();
+      }
+    });
   }
 
   onSearch(): void {
     this.activeGenre.set('');
     const q = this.query.trim();
     if (!q) {
+      this.activeFilter.set('all');
       this.loadDefaults();
       return;
+    }
+    if (q.startsWith('#')) {
+      this.activeFilter.set('journal');
     }
     this.artistService.search(q).subscribe(a => this.artists.set(a));
     this.songService.search(q).subscribe(s => this.songs.set(s));
