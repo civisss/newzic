@@ -22,7 +22,6 @@
       </div>
       <p class="profile-bio">{{ auth.user()?.bio }}</p>
       <div class="profile-actions">
-        <a routerLink="/upload" class="btn-upload-profile">{{ 'profile.upload_music' | translate }}</a>
         <button class="btn-edit-profile" (click)="activeTab.set('settings')">{{ 'profile.edit_profile' | translate }}</button>
         @if (!auth.user()?.premium) {
           <button class="btn-become-premium" (click)="showUpgradeModal.set(true)">

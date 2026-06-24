@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
@@ -18,7 +17,7 @@ import { PremiumBadgeComponent } from '../../shared/components/premium-badge/pre
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterLink, FormatNumberPipe, FormsModule, TranslatePipe, FollowersModalComponent, UpgradeModalComponent, PremiumBadgeComponent],
+  imports: [FormatNumberPipe, FormsModule, TranslatePipe, FollowersModalComponent, UpgradeModalComponent, PremiumBadgeComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })

@@ -72,8 +72,10 @@ import { RouterLink } from '@angular/router';
       background: linear-gradient(135deg, #A855F7, #3B82F6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-left: 4px;
+      background-clip: text;
+      margin-left: 6px;
       opacity: 0.85;
+      align-self: center;
     }
   `],
   imports: [RouterLink]
