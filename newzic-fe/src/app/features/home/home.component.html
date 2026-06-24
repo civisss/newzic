@@ -365,6 +365,28 @@
         <h2>{{ 'home.fresh_drops' | translate }} 💿</h2>
       </div>
     </div>
+    @if (newReleases().length < 3) {
+      <div class="container">
+        <div class="fresh-drops-grid">
+          @for (song of newReleases(); track song.id) {
+            <div class="release-marquee-item" (click)="toggleSong(song)">
+              <div class="release-cover-wrap" [class.playing]="isPlayingSong(song)">
+                <img [src]="song.cover" [alt]="song.title" class="release-cover" />
+                <div class="release-play-overlay" [class.visible]="isPlayingSong(song)">
+                  @if (isPlayingSong(song)) {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  } @else {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                  }
+                </div>
+              </div>
+              <h4>{{ song.title }}</h4>
+              <span class="release-artist-name">{{ song.artistName }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
     <div class="marquee-section">
       <div class="marquee-track">
         <div class="marquee-inner" #dropsMarquee
@@ -437,6 +459,7 @@
         </div>
       </div>
     </div>
+    }
   </section>
   }
 
