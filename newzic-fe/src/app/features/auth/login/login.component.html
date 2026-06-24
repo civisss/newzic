@@ -6,6 +6,7 @@
   </div>
 
   <!-- Cover marquee top — scrolls left -->
+  @if (coversTop.length > 0) {
   <div class="login-marquee login-marquee-top">
     <div class="login-marquee-inner scroll-left">
       @for (cover of coversTop; track $index + 'a') {
@@ -22,6 +23,7 @@
       }
     </div>
   </div>
+  }
 
   <div class="login-layout">
     <!-- LEFT: Brand -->
@@ -60,13 +62,6 @@
         </div>
       </div>
 
-      <div class="brand-stats">
-        <div class="bstat"><strong>10K+</strong><span>{{ 'auth.stat_artists' | translate }}</span></div>
-        <div class="bstat-divider"></div>
-        <div class="bstat"><strong>50K+</strong><span>{{ 'auth.stat_tracks' | translate }}</span></div>
-        <div class="bstat-divider"></div>
-        <div class="bstat"><strong>2M+</strong><span>{{ 'auth.stat_plays' | translate }}</span></div>
-      </div>
     </div>
 
     <!-- RIGHT: Form -->
@@ -123,6 +118,7 @@
   </div>
 
   <!-- Cover marquee bottom — scrolls right -->
+  @if (coversBottom.length > 0) {
   <div class="login-marquee login-marquee-bottom">
     <div class="login-marquee-inner scroll-right">
       @for (cover of coversBottom; track $index + 'a') {
@@ -139,4 +135,5 @@
       }
     </div>
   </div>
+  }
 </div>

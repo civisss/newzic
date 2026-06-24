@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SlicePipe } from '@angular/common';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { BackButtonComponent } from '../../shared/components/back-button/back-button.component';
 import { SongService } from '../../core/services/song.service';
 import { PlayerService } from '../../core/services/player.service';
@@ -11,7 +12,7 @@ import { Song } from '../../core/models';
 @Component({
   selector: 'app-song',
   standalone: true,
-  imports: [RouterLink, SlicePipe, FormatNumberPipe, DurationPipe, BackButtonComponent],
+  imports: [RouterLink, SlicePipe, FormatNumberPipe, DurationPipe, TranslatePipe, BackButtonComponent],
   templateUrl: './song.component.html',
   styleUrl: './song.component.scss'
 })

@@ -442,5 +442,11 @@
   "journal.cat_collaboration": "Collaborazione",
   "journal.cat_looking_for_collab": "Cerco Collab",
   "journal.cat_announcement": "Annuncio",
-  "journal.posts_used": "post utilizzati"
+  "journal.posts_used": "post utilizzati",
+
+  "feed.title": "Open Mic",
+  "feed.subtitle": "Cosa condividono gli artisti in questo momento — release, dietro le quinte, traguardi e altro.",
+  "feed.play_preview": "Ascolta anteprima",
+
+  "song.more_from": "Altro da"
 }

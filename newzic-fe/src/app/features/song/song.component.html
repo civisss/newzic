@@ -52,7 +52,7 @@
 
     @if (relatedSongs().length > 0) {
       <div class="related-section">
-        <h3>More from {{ song()!.artistName }}</h3>
+        <h3>{{ 'song.more_from' | translate }} {{ song()!.artistName }}</h3>
         <div class="related-list">
           @for (s of relatedSongs(); track s.id) {
             <div class="related-row" (click)="playRelated(s)">

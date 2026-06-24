@@ -442,5 +442,11 @@
   "journal.cat_collaboration": "Collaboration",
   "journal.cat_looking_for_collab": "Looking for Collab",
   "journal.cat_announcement": "Announcement",
-  "journal.posts_used": "posts used"
+  "journal.posts_used": "posts used",
+
+  "feed.title": "Open Mic",
+  "feed.subtitle": "What artists are sharing right now — releases, behind the scenes, milestones, and more.",
+  "feed.play_preview": "Play preview",
+
+  "song.more_from": "More from"
 }

@@ -7,7 +7,7 @@ import { SongService } from '../../core/services/song.service';
 import { SpotlightService } from '../../core/services/spotlight.service';
 import { FeedService } from '../../core/services/feed.service';
 import { PlayerService } from '../../core/services/player.service';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService, DEFAULT_AVATAR } from '../../core/services/auth.service';
 import { JournalService } from '../../core/services/journal.service';
 import { Artist, Song, Spotlight, FeedPost, JournalPost } from '../../core/models';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
@@ -21,6 +21,7 @@ import { JournalPostCardComponent } from '../../shared/components/journal-post-c
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  readonly defaultAvatar = DEFAULT_AVATAR;
   trendingArtists = signal<Artist[]>([]);
   trendingSongs = signal<Song[]>([]);
   newReleases = signal<Song[]>([]);

@@ -27,6 +27,16 @@ class SongController(
     private val songMapper: SongMapper
 ) {
 
+    @GetMapping("/covers")
+    fun getRecentCovers(
+        @RequestParam(defaultValue = "24") limit: Int
+    ): ResponseEntity<List<String>> {
+        val maxLimit = limit.coerceAtMost(24)
+        val songs = songRepository.findTrending(PageRequest.of(0, maxLimit))
+        val covers = songs.content.mapNotNull { it.cover }.distinct()
+        return ResponseEntity.ok(covers)
+    }
+
     @GetMapping("/{id}")
     fun getById(@PathVariable id: UUID): ResponseEntity<SongResponse> {
         return ResponseEntity.ok(songService.getById(id))

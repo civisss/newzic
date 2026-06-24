@@ -45,6 +45,10 @@ export class SongService {
     );
   }
 
+  getCovers(limit: number = 24): Observable<string[]> {
+    return this.http.get<string[]>(`${environment.apiUrl}/songs/covers?limit=${limit}`);
+  }
+
   create(data: { title: string; genre?: string; tags?: string[]; cover?: string; description?: string; audioData?: string }): Observable<Song> {
     return this.http.post<any>(`${environment.apiUrl}/songs`, data).pipe(
       map(s => this.mapSong(s))

@@ -64,6 +64,8 @@ Once running:
 - **Backend API**: [http://localhost:8080/api](http://localhost:8080/api)
 - **Database**: `localhost:5432` (user: `newzic`, password: `newzic`)
 
+> **Note**: The application starts completely empty — no mock data, no demo artists or songs. All content is user-generated. An admin account (`admin` / `admin`) is available for initial access. Register new users to start populating the platform.
+
 ### Run individually (development)
 
 ```bash
@@ -96,7 +98,7 @@ cd newzic-be && ./gradlew test && cd ../newzic-fe && npx ng test --watch=false
 - **Personalized recommendations** — matching algorithm based on country/region, genres, listening preferences, popularity, and verified status
 - **Reactions system** — fire 🔥, gem 💎, on point 🎯, star 🌟 (beyond simple likes)
 - **Song likes** — like/unlike songs from the player bar or song cards with animated heart icon
-- **Trending & Fresh Drops** — auto-generated charts and new release streams
+- **Trending & Fresh Drops** — auto-generated charts and new release streams (hidden when empty)
 - **Premium Discovery boost** — premium artists get moderate visibility boost in recommendations (quality still matters)
 
 ### Social
@@ -104,7 +106,7 @@ cd newzic-be && ./gradlew test && cd ../newzic-fe && npx ng test --watch=false
 - **Followers & Following modal** — click on follower/following counts to see the full list and navigate to profiles
 - **Real-time messaging** — chat widget with unread badge, conversation list, and message history
 - **Open Mic feed** — social feed for artist updates and previews
-- **Weekly Spotlight** — editorial curated picks
+- **Weekly Spotlight** — editorial curated picks (hidden when no data)
 
 ### Music Journal
 - **Journal entries** — artists publish updates, collaboration notes, announcements, and collab-seeking posts
@@ -190,6 +192,10 @@ The project is pre-configured with:
 - `railway.toml` per service
 - Environment-driven configuration (DB, JWT, CORS, backend URL)
 - Railway internal networking for frontend → backend proxy
+
+## Fresh Start
+
+The platform ships with **no mock data**. All sections (trending artists, charts, fresh drops, journal, spotlight, cover marquees on login/register) are conditionally hidden when empty. As users register, upload songs, and interact, the home page and auth pages dynamically populate with real content up to a performance-safe limit (max 24 covers on auth pages, 10 items per section on home).
 
 ## License
 

@@ -2,13 +2,14 @@ import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { FeedService } from '../../core/services/feed.service';
 import { FeedPost } from '../../core/models';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [RouterLink, DatePipe, FormatNumberPipe],
+  imports: [RouterLink, DatePipe, FormatNumberPipe, TranslatePipe],
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.scss'
 })

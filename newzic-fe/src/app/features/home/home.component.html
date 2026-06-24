@@ -19,22 +19,6 @@
           <a routerLink="/login" class="btn-hero-primary">{{ 'home.get_started' | translate }}</a>
           <a routerLink="/search" class="btn-hero-ghost">{{ 'home.explore_artists' | translate }}</a>
         </div>
-        <div class="hero-stats animate-slide-up stagger-3">
-          <div class="hero-stat">
-            <strong>10K+</strong>
-            <span>{{ 'home.hero_artists' | translate }}</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <strong>50K+</strong>
-            <span>{{ 'home.hero_tracks' | translate }}</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <strong>2M+</strong>
-            <span>{{ 'home.hero_plays' | translate }}</span>
-          </div>
-        </div>
       </div>
     </section>
   }
@@ -57,7 +41,7 @@
                   <div class="spotlight-cover">
                     <div class="spotlight-overlay"></div>
                     <div class="spotlight-inner">
-                      <img [src]="s.artistAvatar" [alt]="s.artistName" class="spotlight-avatar" />
+                      <img [src]="s.artistAvatar || defaultAvatar" [alt]="s.artistName" class="spotlight-avatar" />
                       <div class="spotlight-info">
                         <span class="spotlight-category">{{ s.categoryLabel }}</span>
                         <div class="spotlight-name-row">
@@ -238,6 +222,7 @@
   }
 
   <!-- TRENDING ARTISTS — infinite scrolling marquee -->
+  @if (trendingArtists().length > 0) {
   <section class="section">
     <div class="container">
       <div class="section-header">
@@ -334,8 +319,10 @@
       </div>
     </div>
   </section>
+  }
 
   <!-- CHART: TRENDING TRACKS -->
+  @if (trendingSongs().length > 0) {
   <section class="section chart-section">
     <div class="container">
       <div class="section-header">
@@ -368,8 +355,10 @@
       </div>
     </div>
   </section>
+  }
 
   <!-- FRESH DROPS — infinite scrolling marquee -->
+  @if (newReleases().length > 0) {
   <section class="section fresh-drops-section">
     <div class="container">
       <div class="section-header">
@@ -449,6 +438,7 @@
       </div>
     </div>
   </section>
+  }
 
   <!-- MUSIC JOURNAL -->
   @if (journalFeed().length > 0) {
