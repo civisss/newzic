@@ -40,7 +40,7 @@
         </button>
         @if (getActiveUser(); as user) {
           <img [src]="user.avatar || '/assets/default-avatar.png'" [alt]="user.displayName" class="chat-avatar" />
-          <a [routerLink]="'/artist/' + user.userId" class="chat-user-name">{{ user.displayName }}</a>
+          <a [routerLink]="'/artist/' + user.username" class="chat-user-name">{{ user.displayName }}</a>
         }
       </div>
 

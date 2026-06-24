@@ -14,6 +14,7 @@ export class SpotlightService {
       map(list => list.map(s => ({
         artistId: s.artistId,
         artistName: s.artistName,
+        artistUsername: s.artistUsername || '',
         artistAvatar: s.artistAvatar || '',
         artistCover: s.artistCover || '',
         artistFollowers: s.artistFollowers || 0,

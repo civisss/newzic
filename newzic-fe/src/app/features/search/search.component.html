@@ -38,15 +38,19 @@
       <button class="filter-btn" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">{{ 'search.filter_all' | translate }}</button>
       <button class="filter-btn" [class.active]="activeFilter() === 'artists'" (click)="setFilter('artists')">{{ 'search.artists' | translate }} ({{ artists().length }})</button>
       <button class="filter-btn" [class.active]="activeFilter() === 'songs'" (click)="setFilter('songs')">{{ 'search.tracks' | translate }} ({{ songs().length }})</button>
+      <button class="filter-btn" [class.active]="activeFilter() === 'journal'" (click)="setFilter('journal')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 3px; vertical-align: -1px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        {{ 'journal.title' | translate }} ({{ journalPosts().length }})
+      </button>
     </div>
 
     <!-- Results: Artists -->
-    @if (activeFilter() !== 'songs' && artists().length > 0) {
+    @if ((activeFilter() === 'all' || activeFilter() === 'artists') && artists().length > 0) {
       <div class="results-section">
         <h3>{{ 'search.artists' | translate }}</h3>
         <div class="artist-masonry">
           @for (artist of artists(); track artist.id) {
-            <a [routerLink]="'/artist/' + artist.id" class="search-artist-card">
+            <a [routerLink]="'/artist/' + artist.username" class="search-artist-card">
               <div class="sac-cover" [style.background-image]="'url(' + artist.cover + ')'">
                 <div class="sac-overlay"></div>
               </div>
@@ -80,7 +84,7 @@
     }
 
     <!-- Results: Songs -->
-    @if (activeFilter() !== 'artists' && songs().length > 0) {
+    @if ((activeFilter() === 'all' || activeFilter() === 'songs') && songs().length > 0) {
       <div class="results-section">
         <h3>{{ 'search.tracks' | translate }}</h3>
         <div class="song-results">
@@ -89,7 +93,7 @@
               <img [src]="song.cover" [alt]="song.title" class="sr-cover" />
               <div class="sr-info">
                 <span class="sr-title">{{ song.title }}</span>
-                <a [routerLink]="'/artist/' + song.artistId" class="sr-artist" (click)="$event.stopPropagation()">{{ song.artistName }}</a>
+                <a [routerLink]="'/artist/' + song.artistUsername" class="sr-artist" (click)="$event.stopPropagation()">{{ song.artistName }}</a>
               </div>
               <span class="sr-genre">{{ song.genre }}</span>
               <div class="sr-reactions">
@@ -107,7 +111,22 @@
       </div>
     }
 
-    @if (artists().length === 0 && songs().length === 0) {
+    <!-- Results: Journal -->
+    @if ((activeFilter() === 'all' || activeFilter() === 'journal') && journalPosts().length > 0) {
+      <div class="results-section">
+        <h3>{{ 'journal.title' | translate }}</h3>
+        <div class="journal-results">
+          @for (post of journalPosts(); track post.id) {
+            <app-journal-post-card
+              [post]="post"
+              (updated)="onJournalPostUpdated($event)"
+            />
+          }
+        </div>
+      </div>
+    }
+
+    @if (artists().length === 0 && songs().length === 0 && journalPosts().length === 0) {
       <div class="no-results">
         <h3>{{ 'search.no_results' | translate }}</h3>
         <p>{{ 'search.no_results_hint' | translate }}</p>

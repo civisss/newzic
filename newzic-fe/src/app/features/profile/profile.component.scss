@@ -105,24 +105,39 @@
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 24px; font-size: 0.85rem; font-weight: 700;
   letter-spacing: 0.04em;
-  background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(168,85,247,0.15), rgba(236,72,153,0.12));
+  background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(245,158,11,0.14), rgba(251,191,36,0.12));
   border: 1.5px solid rgba(251,191,36,0.35);
   border-radius: $radius-full; cursor: pointer;
   color: #FBBF24;
   transition: all $transition-base;
   animation: premBtnGlow 3s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: premBtnShimmer 2.5s ease-in-out infinite;
+    pointer-events: none;
+  }
 
   &:hover {
-    background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(168,85,247,0.22), rgba(236,72,153,0.18));
-    border-color: rgba(251,191,36,0.5);
-    box-shadow: 0 0 16px rgba(251,191,36,0.2), 0 0 32px rgba(168,85,247,0.15);
+    background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.2), rgba(251,191,36,0.18));
+    border-color: rgba(251,191,36,0.55);
+    box-shadow: 0 0 16px rgba(251,191,36,0.25), 0 0 32px rgba(245,158,11,0.15);
     transform: translateY(-2px);
   }
 }
 
 @keyframes premBtnGlow {
-  0%, 100% { box-shadow: 0 0 8px rgba(251,191,36,0.1); }
-  50% { box-shadow: 0 0 16px rgba(251,191,36,0.18), 0 0 24px rgba(168,85,247,0.1); }
+  0%, 100% { box-shadow: 0 0 8px rgba(251,191,36,0.12); }
+  50% { box-shadow: 0 0 16px rgba(251,191,36,0.22), 0 0 24px rgba(245,158,11,0.12); }
+}
+
+@keyframes premBtnShimmer {
+  0%, 100% { left: -100%; }
+  50% { left: 200%; }
 }
 
 // Tabs
@@ -130,6 +145,10 @@
   display: flex; gap: 4px;
   border-bottom: 1px solid $border-subtle;
   margin-bottom: 32px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
 .ptab {
@@ -140,6 +159,8 @@
   color: $text-tertiary; font-size: 0.9rem;
   font-weight: 500; cursor: pointer;
   margin-bottom: -1px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all $transition-fast;
   &:hover { color: $text-primary; }
   &.active {
@@ -182,6 +203,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  flex: 1;
+  min-width: 0;
   strong { font-size: 1.3rem; font-weight: 700; }
   span { font-size: 0.78rem; color: $text-tertiary; }
 
@@ -640,4 +663,292 @@ select {
   font-size: 0.85rem;
   color: $text-tertiary;
   letter-spacing: 0.5px;
+}
+
+// ── Journal ──
+.journal-section {
+  padding-top: 8px;
+}
+
+.journal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.journal-limit-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: $glass-card-bg;
+  border: 1px solid $glass-card-border;
+  border-radius: $radius-md;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+
+  .limit-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $text-secondary;
+    white-space: nowrap;
+  }
+
+  .limit-progress {
+    flex: 1;
+    min-width: 80px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: $radius-full;
+    overflow: hidden;
+  }
+
+  .limit-fill {
+    height: 100%;
+    background: $gradient-violet-blue;
+    border-radius: $radius-full;
+    transition: width 0.4s ease;
+
+    &.limit-full {
+      background: linear-gradient(90deg, #ef4444, #f97316);
+    }
+  }
+}
+
+.btn-upgrade-inline {
+  background: $gradient-violet-blue;
+  border: none;
+  border-radius: $radius-full;
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform $transition-fast;
+
+  &:hover { transform: scale(1.03); }
+}
+
+.btn-new-post {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: $gradient-violet-blue;
+  border: none;
+  border-radius: $radius-full;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.04);
+    box-shadow: 0 4px 15px rgba($accent-violet, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.new-post-form {
+  background: $glass-card-bg;
+  border: 1px solid $glass-card-border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  margin-bottom: 24px;
+
+  .form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+
+    h3 { font-size: 1rem; font-weight: 700; color: $text-primary; margin: 0; }
+  }
+
+  .btn-close-form {
+    background: none;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: $radius-sm;
+    transition: color $transition-fast;
+    &:hover { color: $text-primary; }
+  }
+}
+
+.textarea-wrap {
+  position: relative;
+}
+
+.post-textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  padding: 14px;
+  font-size: 0.9rem;
+  color: $text-primary;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color $transition-fast;
+
+  &::placeholder { color: $text-muted; }
+  &:focus { border-color: rgba($accent-violet, 0.3); }
+}
+
+.mention-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: $bg-surface;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  margin-bottom: 4px;
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: background $transition-fast;
+  text-align: left;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover {
+    background: rgba($accent-violet, 0.08);
+  }
+}
+
+.mention-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mention-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($accent-violet, 0.1);
+  color: $text-muted;
+}
+
+.mention-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mention-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.mention-username {
+  font-size: 0.78rem;
+  color: $accent-violet;
+}
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.category-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cat-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &.active {
+    background: rgba($accent-violet, 0.12);
+    border-color: rgba($accent-violet, 0.25);
+    color: $accent-violet;
+  }
+}
+
+.btn-publish {
+  background: $gradient-violet-blue;
+  border: none;
+  border-radius: $radius-full;
+  padding: 8px 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: opacity $transition-fast, transform $transition-fast;
+  white-space: nowrap;
+
+  &:hover { transform: scale(1.03); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.journal-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.journal-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: $text-muted;
+
+  p { margin-top: 12px; font-size: 0.9rem; }
+}
+
+.journal-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 0;
 }

@@ -7,6 +7,7 @@ data class FeedPostResponse(
     val type: String,
     val authorId: String,
     val authorName: String,
+    val authorUsername: String,
     val authorAvatar: String?,
     val authorRole: String,
     val content: String,

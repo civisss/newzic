@@ -1,0 +1,571 @@
+@use 'sass:color';
+@use 'app/shared/styles/variables' as *;
+@use 'app/shared/styles/mixins' as *;
+
+.journal-card {
+  background: $glass-card-bg;
+  border: 1px solid $glass-card-border;
+  border-radius: $radius-lg;
+  padding: 24px;
+  transition: border-color $transition-base, box-shadow $transition-base, transform $transition-base;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: $gradient-violet-blue;
+    opacity: 0;
+    transition: opacity $transition-base;
+  }
+
+  &:hover {
+    border-color: rgba($accent-violet, 0.15);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+
+    &::before { opacity: 1; }
+  }
+
+  // Category-specific accents
+  &.announcement {
+    border-color: rgba($accent-orange, 0.15);
+    &::before { background: $gradient-warm; }
+    &:hover { border-color: rgba($accent-orange, 0.25); }
+  }
+
+  &.looking-collab {
+    border-color: rgba($accent-cyan, 0.12);
+    &::before { background: $gradient-violet-cyan; }
+    &:hover { border-color: rgba($accent-cyan, 0.22); }
+  }
+
+  @include mobile { padding: 18px; }
+}
+
+// ── Category badge ──
+.card-category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: $radius-full;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: rgba($accent-violet, 0.1);
+  color: $accent-violet;
+  border: 1px solid rgba($accent-violet, 0.15);
+
+  [data-category="collaboration"] & {
+    background: rgba($accent-blue, 0.1);
+    color: $accent-blue;
+    border-color: rgba($accent-blue, 0.15);
+  }
+  [data-category="looking_for_collab"] & {
+    background: rgba($accent-cyan, 0.1);
+    color: $accent-cyan;
+    border-color: rgba($accent-cyan, 0.15);
+  }
+  [data-category="announcement"] & {
+    background: rgba($accent-orange, 0.1);
+    color: $accent-orange;
+    border-color: rgba($accent-orange, 0.15);
+  }
+}
+
+.category-icon {
+  font-size: 0.8rem;
+}
+
+.post-time {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+// ── Author ──
+.card-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.author-avatar-link {
+  flex-shrink: 0;
+}
+
+.author-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba($accent-violet, 0.2);
+  transition: border-color $transition-fast;
+
+  &:hover { border-color: $accent-violet; }
+}
+
+.author-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($accent-violet, 0.1);
+  color: $text-secondary;
+}
+
+.author-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.author-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.author-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: $text-primary;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover { color: $accent-violet; }
+}
+
+.author-handle {
+  display: block;
+  font-size: 0.78rem;
+  color: $text-muted;
+  margin-top: 1px;
+}
+
+.card-actions-menu {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.btn-menu {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: $radius-sm;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: $text-secondary;
+  }
+}
+
+.delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: $text-secondary;
+
+  .btn-confirm-yes {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: none;
+    padding: 4px 12px;
+    border-radius: $radius-sm;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background $transition-fast;
+    &:hover { background: rgba(239, 68, 68, 0.25); }
+  }
+
+  .btn-confirm-no {
+    background: rgba(255, 255, 255, 0.06);
+    color: $text-secondary;
+    border: none;
+    padding: 4px 12px;
+    border-radius: $radius-sm;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background $transition-fast;
+    &:hover { background: rgba(255, 255, 255, 0.1); }
+  }
+}
+
+// ── Content ──
+.card-content {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: $text-primary;
+  margin-bottom: 14px;
+  word-break: break-word;
+  flex: 1;
+
+  :host ::ng-deep {
+    .mention {
+      color: $accent-violet;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color $transition-fast;
+      &:hover { color: color.adjust($accent-violet, $lightness: 10%); text-decoration: underline; }
+    }
+
+    .hashtag {
+      color: $accent-cyan;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color $transition-fast;
+      &:hover { color: color.adjust($accent-cyan, $lightness: 10%); }
+    }
+  }
+}
+
+// ── Image ──
+.card-image {
+  margin-bottom: 14px;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    display: block;
+    transition: transform $transition-slow;
+  }
+
+  &:hover img {
+    transform: scale(1.02);
+  }
+}
+
+// ── Tagged users ──
+.card-tagged {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  background: rgba($accent-violet, 0.04);
+  border-radius: $radius-sm;
+  border: 1px solid rgba($accent-violet, 0.08);
+
+  svg { color: $text-muted; flex-shrink: 0; }
+}
+
+.tagged-user {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $accent-violet;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover { color: color.adjust($accent-violet, $lightness: 12%); }
+}
+
+// ── Reactions ──
+.card-reactions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid $border-subtle;
+  margin-top: auto;
+}
+
+.reactions-group {
+  display: flex;
+  gap: 4px;
+}
+
+.reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
+
+  &.active {
+    background: rgba($accent-violet, 0.12);
+    border-color: rgba($accent-violet, 0.25);
+
+    .reaction-count { color: $accent-violet; }
+  }
+
+  @include mobile { padding: 5px 8px; }
+}
+
+.reaction-emoji {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.reaction-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $text-secondary;
+}
+
+.comment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: $text-secondary;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: $radius-full;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba($accent-violet, 0.1);
+    border-color: rgba($accent-violet, 0.25);
+    color: $accent-violet;
+    transform: scale(1.05);
+  }
+}
+
+// ── Comments Modal ──
+.comments-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-modal;
+  padding: 20px;
+  animation: fadeIn 0.15s ease;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.comments-modal {
+  background: $bg-surface;
+  border: 1px solid $border-light;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: modalSlideUp 0.2s ease;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.comments-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid $border-subtle;
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.comments-modal-close {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: $radius-sm;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: $text-primary;
+  }
+}
+
+.comments-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 24px;
+  min-height: 120px;
+}
+
+.comments-modal-footer {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid $border-subtle;
+
+  input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid $border-subtle;
+    border-radius: $radius-full;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: $text-primary;
+    outline: none;
+    transition: border-color $transition-fast;
+
+    &::placeholder { color: $text-muted; }
+    &:focus { border-color: rgba($accent-violet, 0.3); }
+  }
+}
+
+.comments-loading {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.spinner-sm {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba($accent-violet, 0.2);
+  border-top-color: $accent-violet;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.comment-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+
+  & + & { border-top: 1px solid rgba(255, 255, 255, 0.03); }
+}
+
+.comment-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.comment-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($accent-violet, 0.08);
+  color: $text-muted;
+}
+
+.comment-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.comment-author {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-primary;
+  text-decoration: none;
+
+  &:hover { color: $accent-violet; }
+}
+
+.comment-time {
+  font-size: 0.7rem;
+  color: $text-muted;
+}
+
+.comment-delete {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity $transition-fast, color $transition-fast;
+
+  .comment-item:hover & { opacity: 1; }
+  &:hover { color: #ef4444; }
+}
+
+.comment-text {
+  font-size: 0.84rem;
+  color: $text-secondary;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.no-comments {
+  text-align: center;
+  font-size: 0.8rem;
+  color: $text-muted;
+  padding: 12px 0;
+  margin: 0;
+}
+
+.btn-send-comment {
+  background: $gradient-violet-blue;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity $transition-fast, transform $transition-fast;
+
+  &:hover { transform: scale(1.08); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}

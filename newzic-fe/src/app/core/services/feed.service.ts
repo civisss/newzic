@@ -27,6 +27,7 @@ export class FeedService {
       type: p.type,
       authorId: p.authorId,
       authorName: p.authorName,
+      authorUsername: p.authorUsername || '',
       authorAvatar: p.authorAvatar || '',
       authorRole: p.authorRole,
       content: p.content,

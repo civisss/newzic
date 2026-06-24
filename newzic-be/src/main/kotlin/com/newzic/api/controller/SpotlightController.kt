@@ -66,6 +66,7 @@ class SpotlightController(
         return mapOf(
             "artistId" to artist.id.toString(),
             "artistName" to artist.displayName,
+            "artistUsername" to artist.username,
             "artistAvatar" to artist.avatar,
             "artistCover" to artist.cover,
             "artistFollowers" to artist.followers,

@@ -19,7 +19,7 @@
       } @else {
         <div class="modal-list">
           @for (user of users(); track user.id) {
-            <button class="modal-user-row" (click)="goToArtist(user.id)">
+            <button class="modal-user-row" (click)="goToArtist(user.username)">
               <img [src]="user.avatar || '/assets/default-avatar.png'" [alt]="user.name" class="modal-user-avatar" />
               <div class="modal-user-info">
                 <span class="modal-user-name">

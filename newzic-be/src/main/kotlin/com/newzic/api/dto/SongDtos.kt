@@ -7,6 +7,7 @@ data class SongResponse(
     val title: String,
     val artistId: String,
     val artistName: String,
+    val artistUsername: String,
     val artistAvatar: String?,
     val albumId: String?,
     val albumName: String?,

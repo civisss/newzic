@@ -30,6 +30,10 @@ import { PremiumService } from '../../../core/services/premium.service';
           </div>
           <div class="feature-item">
             <span class="check">✓</span>
+            <span>{{ 'premium.feature.unlimited_journal' | translate }}</span>
+          </div>
+          <div class="feature-item">
+            <span class="check">✓</span>
             <span>{{ 'premium.feature.unlimited_workspaces' | translate }}</span>
           </div>
           <div class="feature-item">
@@ -47,10 +51,6 @@ import { PremiumService } from '../../../core/services/premium.service';
           <div class="feature-item">
             <span class="check">✓</span>
             <span>{{ 'premium.feature.verified_profile' | translate }}</span>
-          </div>
-          <div class="feature-item">
-            <span class="check">✓</span>
-            <span>{{ 'premium.feature.custom_url' | translate }}</span>
           </div>
           <div class="feature-item">
             <span class="check">✓</span>

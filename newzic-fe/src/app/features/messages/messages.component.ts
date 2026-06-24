@@ -101,6 +101,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
           }
           return [{
             userId: recipientId,
+            username: '',
             displayName: msg.recipientName,
             avatar: msg.recipientAvatar,
             lastMessage: content,

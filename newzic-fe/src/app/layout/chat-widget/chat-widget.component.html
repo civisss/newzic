@@ -57,7 +57,7 @@
         </button>
         @if (getActiveUser(); as user) {
           <img [src]="user.avatar || '/assets/default-avatar.png'" [alt]="user.displayName" class="cb-chat-avatar" />
-          <a [routerLink]="'/artist/' + user.userId" class="cb-chat-name" (click)="toggle()">{{ user.displayName }}</a>
+          <a [routerLink]="'/artist/' + user.username" class="cb-chat-name" (click)="toggle()">{{ user.displayName }}</a>
         }
       </div>
       <div class="cb-messages">

@@ -22,7 +22,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/search/search.component').then(m => m.SearchComponent)
   },
   {
-    path: 'artist/:id',
+    path: 'artist/:username',
     canActivate: [authGuard],
     loadComponent: () => import('./features/artist/artist.component').then(m => m.ArtistComponent)
   },

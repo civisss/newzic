@@ -5,6 +5,7 @@ export interface FeedPost {
   type: FeedPostType;
   authorId: string;
   authorName: string;
+  authorUsername: string;
   authorAvatar: string;
   authorRole: string;
   content: string;

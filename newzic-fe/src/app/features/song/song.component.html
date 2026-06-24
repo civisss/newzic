@@ -8,7 +8,7 @@
       <div class="song-details">
         <span class="song-type">{{ song()!.albumName ? 'Album Track' : 'Single' }}</span>
         <h1>{{ song()!.title }}</h1>
-        <a [routerLink]="'/artist/' + song()!.artistId" class="song-artist-link">
+        <a [routerLink]="'/artist/' + song()!.artistUsername" class="song-artist-link">
           @if (song()!.artistAvatar) {
             <img [src]="song()!.artistAvatar" class="artist-mini-avatar" />
           }

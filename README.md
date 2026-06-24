@@ -13,6 +13,7 @@ The platform is designed around the idea that every artist deserves a stage. Whe
 - **Artist profiles** — showcase your music, bio, photos, social links, and collaboration availability
 - **Trending & charts** — see what's hot in the community right now
 - **Feed (Open Mic)** — a social feed where artists share updates, thoughts, and previews
+- **Music Journal** — artists publish journal entries (updates, collabs, announcements) with @mentions, #hashtags, reactions, and comments
 - **Weekly Spotlight** — curated editorial picks highlighting standout artists
 - **Producer & Beatmaker section** — dedicated space for the behind-the-scenes creators
 - **Fresh Drops** — continuous stream of newly released tracks
@@ -105,6 +106,17 @@ cd newzic-be && ./gradlew test && cd ../newzic-fe && npx ng test --watch=false
 - **Open Mic feed** — social feed for artist updates and previews
 - **Weekly Spotlight** — editorial curated picks
 
+### Music Journal
+- **Journal entries** — artists publish updates, collaboration notes, announcements, and collab-seeking posts
+- **Categories** — Update ✏️, Collaboration 🤝, Looking for Collab 🔍, Announcement 📢
+- **Rich content** — @mention tagging with artist links, #hashtag extraction, image attachments
+- **Reactions** — 4-type reactions: ❤️ Like, 🔥 Fire, 🎵 Music, 🚀 Hype (toggle on/off)
+- **Comments** — threaded comments with add/delete, real-time count updates
+- **Notifications** — automatic notifications for @tags, reactions, and comments on your posts
+- **Integrated everywhere** — journal tab on artist profiles and personal profile, "From the Studio" section on home, journal filter in search
+- **Free plan limit** — 10 journal posts max for free users, with progress bar and upgrade prompt
+- **Search** — full-text content search and #hashtag filtering
+
 ### Workspace Collaboration
 - **Real-time workspaces** — create collaborative projects with other artists
 - **Version management** — upload and compare audio versions with timestamped comments
@@ -114,6 +126,7 @@ cd newzic-be && ./gradlew test && cd ../newzic-fe && npx ng test --watch=false
 
 ### Newzic Premium (€9.99/month)
 - **Unlimited songs** — free plan limited to 10 published tracks
+- **Unlimited journal posts** — free plan limited to 10 journal entries
 - **Unlimited workspaces** — free plan limited to 1 workspace
 - **Unlimited collaborators** — free plan limited to 4 per workspace
 - **Unlimited comments** — free plan limited to 5 per version

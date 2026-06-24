@@ -79,6 +79,7 @@ export class SongService {
       title: s.title,
       artistId: s.artistId,
       artistName: s.artistName,
+      artistUsername: s.artistUsername || '',
       artistAvatar: s.artistAvatar,
       albumId: s.albumId,
       albumName: s.albumName,

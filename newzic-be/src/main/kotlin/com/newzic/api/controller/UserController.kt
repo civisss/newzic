@@ -30,6 +30,11 @@ class UserController(private val userService: UserService) {
         return ResponseEntity.ok(userService.updateProfile(userId, request))
     }
 
+    @GetMapping("/artists/by-username/{username}")
+    fun getArtistByUsername(@PathVariable username: String): ResponseEntity<UserResponse> {
+        return ResponseEntity.ok(userService.getByUsername(username))
+    }
+
     @GetMapping("/artists/{id}")
     fun getArtist(@PathVariable id: UUID): ResponseEntity<UserResponse> {
         return ResponseEntity.ok(userService.getById(id))

@@ -27,7 +27,7 @@
     @for (collab of collabs(); track collab.id) {
       <div class="collab-card">
         <div class="collab-top">
-          <a [routerLink]="'/artist/' + collab.authorId" class="collab-author">
+          <a [routerLink]="'/artist/' + collab.authorUsername" class="collab-author">
             <img [src]="collab.authorAvatar" [alt]="collab.authorName" />
             <div>
               <strong>{{ collab.authorName }}</strong>

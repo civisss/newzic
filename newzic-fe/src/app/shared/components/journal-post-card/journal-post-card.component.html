@@ -1,0 +1,167 @@
+<article class="journal-card" [class.announcement]="post.category === 'announcement'" [class.looking-collab]="post.category === 'looking_for_collab'">
+  <!-- Category badge -->
+  <div class="card-category">
+    <span class="category-badge" [attr.data-category]="post.category">
+      <span class="category-icon">{{ categoryIcon }}</span>
+      {{ categoryLabel | translate }}
+    </span>
+    <span class="post-time">{{ getTimeAgo(post.createdAt) }}</span>
+  </div>
+
+  <!-- Author -->
+  <div class="card-author">
+    <a [routerLink]="'/artist/' + post.authorUsername" class="author-avatar-link">
+      @if (post.authorAvatar) {
+        <img [src]="post.authorAvatar" [alt]="post.authorName" class="author-avatar" />
+      } @else {
+        <div class="author-avatar author-avatar-placeholder">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      }
+    </a>
+    <div class="author-info">
+      <div class="author-name-row">
+        <a [routerLink]="'/artist/' + post.authorUsername" class="author-name">{{ post.authorName }}</a>
+        @if (post.authorVerified) {
+          <app-verified-badge />
+        }
+        @if (post.authorPremium) {
+          <app-premium-badge size="sm" />
+        }
+      </div>
+      <span class="author-handle">&#64;{{ post.authorUsername }} · {{ post.authorRole }}</span>
+    </div>
+    @if (isOwner) {
+      <div class="card-actions-menu">
+        @if (showDeleteConfirm()) {
+          <div class="delete-confirm">
+            <span>{{ 'journal.confirm_delete' | translate }}</span>
+            <button class="btn-confirm-yes" (click)="deletePost()">{{ 'journal.yes' | translate }}</button>
+            <button class="btn-confirm-no" (click)="showDeleteConfirm.set(false)">{{ 'journal.no' | translate }}</button>
+          </div>
+        } @else {
+          <button class="btn-menu" (click)="confirmDelete()" title="Delete">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Content -->
+  <div class="card-content" [innerHTML]="formattedContent"></div>
+
+  <!-- Image -->
+  @if (post.imageUrl) {
+    <div class="card-image">
+      <img [src]="post.imageUrl" alt="Post image" loading="lazy" />
+    </div>
+  }
+
+  <!-- Tagged users -->
+  @if (post.taggedUsers.length > 0) {
+    <div class="card-tagged">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      @for (user of post.taggedUsers; track user.id) {
+        <a [routerLink]="'/artist/' + user.username" class="tagged-user">&#64;{{ user.username }}</a>
+      }
+    </div>
+  }
+
+  <!-- Reactions bar -->
+  <div class="card-reactions">
+    <div class="reactions-group">
+      <button class="reaction-btn" [class.active]="hasReacted('like')" (click)="toggleReaction('like')">
+        <span class="reaction-emoji">❤️</span>
+        @if (post.reactions.like > 0) {
+          <span class="reaction-count">{{ post.reactions.like }}</span>
+        }
+      </button>
+      <button class="reaction-btn" [class.active]="hasReacted('fire')" (click)="toggleReaction('fire')">
+        <span class="reaction-emoji">🔥</span>
+        @if (post.reactions.fire > 0) {
+          <span class="reaction-count">{{ post.reactions.fire }}</span>
+        }
+      </button>
+      <button class="reaction-btn" [class.active]="hasReacted('music')" (click)="toggleReaction('music')">
+        <span class="reaction-emoji">🎵</span>
+        @if (post.reactions.music > 0) {
+          <span class="reaction-count">{{ post.reactions.music }}</span>
+        }
+      </button>
+      <button class="reaction-btn" [class.active]="hasReacted('hype')" (click)="toggleReaction('hype')">
+        <span class="reaction-emoji">🚀</span>
+        @if (post.reactions.hype > 0) {
+          <span class="reaction-count">{{ post.reactions.hype }}</span>
+        }
+      </button>
+    </div>
+
+    <button class="comment-btn" (click)="toggleComments()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>{{ post.commentCount }}</span>
+    </button>
+  </div>
+</article>
+
+<!-- Comments modal -->
+@if (showComments()) {
+  <div class="comments-modal-overlay" (click)="toggleComments()">
+    <div class="comments-modal" (click)="$event.stopPropagation()">
+      <div class="comments-modal-header">
+        <h4>{{ 'journal.comments_title' | translate }}</h4>
+        <button class="comments-modal-close" (click)="toggleComments()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="comments-modal-body">
+        @if (commentsLoading()) {
+          <div class="comments-loading">
+            <div class="spinner-sm"></div>
+          </div>
+        } @else {
+          @for (comment of comments(); track comment.id) {
+            <div class="comment-item">
+              @if (comment.authorAvatar) {
+                <img [src]="comment.authorAvatar" [alt]="comment.authorName" class="comment-avatar" />
+              } @else {
+                <div class="comment-avatar comment-avatar-placeholder">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+              }
+              <div class="comment-body">
+                <div class="comment-header">
+                  <a [routerLink]="'/artist/' + comment.authorUsername" class="comment-author">{{ comment.authorName }}</a>
+                  <span class="comment-time">{{ getTimeAgo(comment.createdAt) }}</span>
+                  @if (comment.authorId === auth.user()?.id) {
+                    <button class="comment-delete" (click)="deleteComment(comment.id)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  }
+                </div>
+                <p class="comment-text">{{ comment.content }}</p>
+              </div>
+            </div>
+          }
+
+          @if (comments().length === 0) {
+            <p class="no-comments">{{ 'journal.no_comments' | translate }}</p>
+          }
+        }
+      </div>
+      @if (auth.isLoggedIn()) {
+        <div class="comments-modal-footer">
+          <input type="text"
+            [placeholder]="'journal.write_comment' | translate"
+            [ngModel]="newComment()"
+            (ngModelChange)="newComment.set($event)"
+            (keydown.enter)="submitComment()"
+            [disabled]="submittingComment()" />
+          <button class="btn-send-comment" (click)="submitComment()" [disabled]="!newComment().trim() || submittingComment()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}

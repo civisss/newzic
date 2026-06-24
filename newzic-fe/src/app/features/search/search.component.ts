@@ -7,21 +7,24 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { ArtistService } from '../../core/services/artist.service';
 import { SongService } from '../../core/services/song.service';
 import { PlayerService } from '../../core/services/player.service';
-import { Artist, Song } from '../../core/models';
+import { JournalService } from '../../core/services/journal.service';
+import { Artist, Song, JournalPost } from '../../core/models';
+import { JournalPostCardComponent } from '../../shared/components/journal-post-card/journal-post-card.component';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [RouterLink, FormsModule, FormatNumberPipe, DurationPipe, TranslatePipe],
+  imports: [RouterLink, FormsModule, FormatNumberPipe, DurationPipe, TranslatePipe, JournalPostCardComponent],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })
 export class SearchComponent implements OnInit {
   query = '';
-  activeFilter = signal<'all' | 'artists' | 'songs'>('all');
+  activeFilter = signal<'all' | 'artists' | 'songs' | 'journal'>('all');
   activeGenre = signal<string>('');
   artists = signal<Artist[]>([]);
   songs = signal<Song[]>([]);
+  journalPosts = signal<JournalPost[]>([]);
 
   genres = [
     'Dream Pop', 'Trap', 'Indie Rock', 'K-Pop', 'House', 'Techno',
@@ -38,7 +41,8 @@ export class SearchComponent implements OnInit {
   constructor(
     private artistService: ArtistService,
     private songService: SongService,
-    private playerService: PlayerService
+    private playerService: PlayerService,
+    private journalService: JournalService
   ) {}
 
   ngOnInit(): void {
@@ -54,14 +58,20 @@ export class SearchComponent implements OnInit {
     }
     this.artistService.search(q).subscribe(a => this.artists.set(a));
     this.songService.search(q).subscribe(s => this.songs.set(s));
+    this.journalService.search(q).subscribe(res => this.journalPosts.set(res.content));
   }
 
   private loadDefaults(): void {
     this.artistService.getTrending().subscribe(a => this.artists.set(a));
     this.songService.getTrending().subscribe(s => this.songs.set(s));
+    this.journalService.getFeed(0, 6).subscribe(res => this.journalPosts.set(res.content));
   }
 
-  setFilter(f: 'all' | 'artists' | 'songs'): void {
+  onJournalPostUpdated(post: JournalPost): void {
+    this.journalPosts.update(posts => posts.map(p => p.id === post.id ? post : p));
+  }
+
+  setFilter(f: 'all' | 'artists' | 'songs' | 'journal'): void {
     this.activeFilter.set(f);
   }
 
@@ -75,6 +85,7 @@ export class SearchComponent implements OnInit {
     this.activeGenre.set(genre);
     this.artistService.search(genre).subscribe(a => this.artists.set(a));
     this.songService.search(genre).subscribe(s => this.songs.set(s));
+    this.journalService.search(genre).subscribe(res => this.journalPosts.set(res.content));
   }
 
   playSong(song: Song): void {

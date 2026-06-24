@@ -1,6 +1,7 @@
 export interface Spotlight {
   artistId: string;
   artistName: string;
+  artistUsername: string;
   artistAvatar: string;
   artistCover: string;
   artistFollowers: number;

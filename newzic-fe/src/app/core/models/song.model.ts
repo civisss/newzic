@@ -12,6 +12,7 @@ export interface Song {
   title: string;
   artistId: string;
   artistName: string;
+  artistUsername: string;
   artistAvatar?: string;
   albumId?: string;
   albumName?: string;

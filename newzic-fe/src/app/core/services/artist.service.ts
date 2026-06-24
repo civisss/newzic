@@ -15,6 +15,12 @@ export class ArtistService {
     );
   }
 
+  getByUsername(username: string): Observable<Artist | undefined> {
+    return this.http.get<any>(`${environment.apiUrl}/artists/by-username/${encodeURIComponent(username)}`).pipe(
+      map(u => this.mapArtist(u))
+    );
+  }
+
   getTrending(): Observable<Artist[]> {
     return this.http.get<any>(`${environment.apiUrl}/artists/trending?size=10`).pipe(
       map(page => (page.content || []).map((u: any) => this.mapArtist(u)))

@@ -234,6 +234,10 @@
 .stat {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 0;
   strong { font-size: 1.3rem; font-weight: 700; }
   span { font-size: 0.78rem; color: $text-tertiary; }
 
@@ -730,4 +734,34 @@
   font-size: 0.85rem;
   color: $text-tertiary;
   letter-spacing: 0.5px;
+}
+
+// ── Journal ──
+.journal-section {
+  padding-top: 8px;
+}
+
+.journal-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.journal-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: $text-muted;
+
+  p {
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+}
+
+.journal-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 0;
 }

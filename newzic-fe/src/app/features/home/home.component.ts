@@ -8,13 +8,15 @@ import { SpotlightService } from '../../core/services/spotlight.service';
 import { FeedService } from '../../core/services/feed.service';
 import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
-import { Artist, Song, Spotlight, FeedPost } from '../../core/models';
+import { JournalService } from '../../core/services/journal.service';
+import { Artist, Song, Spotlight, FeedPost, JournalPost } from '../../core/models';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
+import { JournalPostCardComponent } from '../../shared/components/journal-post-card/journal-post-card.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FormatNumberPipe, LogoComponent, TranslatePipe],
+  imports: [RouterLink, FormatNumberPipe, LogoComponent, TranslatePipe, JournalPostCardComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -31,6 +33,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   feed = signal<FeedPost[]>([]);
   likedSongIds = signal<Set<string>>(new Set());
   likeAnimatingId = signal<string | null>(null);
+  journalFeed = signal<JournalPost[]>([]);
   private carouselInterval: any;
 
   constructor(
@@ -39,7 +42,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private songService: SongService,
     private spotlightService: SpotlightService,
     private feedService: FeedService,
-    public playerService: PlayerService
+    public playerService: PlayerService,
+    private journalService: JournalService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +57,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (list.length > 1) this.startCarousel();
     });
     this.feedService.getFeed().subscribe(f => this.feed.set(f.slice(0, 4)));
+    this.journalService.getFeed(0, 6).subscribe(res => this.journalFeed.set(res.content));
 
     if (this.auth.user()) {
       this.artistService.getRecommended().subscribe(a => this.recommendedArtists.set(a));
@@ -113,6 +118,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       milestone: 'Milestone', collab_request: 'Collab Request', update: 'Update'
     };
     return map[type] || type;
+  }
+
+  onJournalPostUpdated(post: JournalPost): void {
+    this.journalFeed.update(posts => posts.map(p => p.id === post.id ? post : p));
   }
 
   getPostTypeClass(type: string): string {

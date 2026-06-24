@@ -27,6 +27,7 @@ data class MessageResponse(
 
 data class ConversationPreview(
     val userId: String,
+    val username: String,
     val displayName: String,
     val avatar: String?,
     val lastMessage: String,
@@ -51,6 +52,7 @@ class MessageController(
             val other = if (m.sender.id == userId) m.recipient else m.sender
             ConversationPreview(
                 userId = otherId.toString(),
+                username = other.username,
                 displayName = other.displayName,
                 avatar = other.avatar,
                 lastMessage = m.content.take(100),

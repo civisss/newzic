@@ -7,6 +7,7 @@ export interface Collaboration {
   description: string;
   authorId: string;
   authorName: string;
+  authorUsername: string;
   authorAvatar: string;
   authorRole: string;
   category: CollabCategory;

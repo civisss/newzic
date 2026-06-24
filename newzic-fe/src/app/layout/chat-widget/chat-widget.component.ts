@@ -145,6 +145,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked, OnDestroy 
           }
           return [{
             userId: recipientId,
+            username: '',
             displayName: msg.recipientName,
             avatar: msg.recipientAvatar,
             lastMessage: content,

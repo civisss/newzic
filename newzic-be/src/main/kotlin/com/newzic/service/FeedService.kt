@@ -101,6 +101,7 @@ class FeedService(
             type = post.type.name.lowercase(),
             authorId = post.author.id.toString(),
             authorName = post.author.displayName,
+            authorUsername = post.author.username,
             authorAvatar = post.author.avatar,
             authorRole = post.author.roles.firstOrNull()?.name?.lowercase() ?: "singer",
             content = post.content,

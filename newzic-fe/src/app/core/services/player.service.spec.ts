@@ -14,6 +14,7 @@ describe('PlayerService', () => {
     title: 'Test Song',
     artistId: 'artist-1',
     artistName: 'Test Artist',
+    artistUsername: 'testartist',
     cover: 'cover.jpg',
     duration: 200,
     genre: 'Pop',

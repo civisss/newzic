@@ -24,6 +24,70 @@ describe('ArtistService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('should get artist by ID', () => {
+    const mockArtist = {
+      id: 'u1', displayName: 'Test Artist', username: 'testartist', avatar: '', cover: '',
+      bio: '', roles: ['singer'], followers: 100, following: 10, totalPlays: 5000,
+      genres: ['Pop'], tags: [], verified: false, premium: false, joinedDate: '2024-01-01',
+      socialLinks: {}, photos: [], preferredGenres: [], lookingForCollab: false,
+      collabDescription: null, weeklyGrowth: null, country: null, location: null,
+      preferredLanguage: null, longBio: null
+    };
+
+    service.getById('u1').subscribe(artist => {
+      expect(artist).toBeTruthy();
+      expect(artist!.id).toBe('u1');
+      expect(artist!.username).toBe('testartist');
+      expect(artist!.name).toBe('Test Artist');
+    });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/artists/u1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockArtist);
+  });
+
+  it('should get artist by username', () => {
+    const mockArtist = {
+      id: 'u1', displayName: 'Test Artist', username: 'testartist', avatar: '', cover: '',
+      bio: '', roles: ['singer'], followers: 100, following: 10, totalPlays: 5000,
+      genres: ['Pop'], tags: [], verified: false, premium: false, joinedDate: '2024-01-01',
+      socialLinks: {}, photos: [], preferredGenres: [], lookingForCollab: false,
+      collabDescription: null, weeklyGrowth: null, country: null, location: null,
+      preferredLanguage: null, longBio: null
+    };
+
+    service.getByUsername('testartist').subscribe(artist => {
+      expect(artist).toBeTruthy();
+      expect(artist!.id).toBe('u1');
+      expect(artist!.username).toBe('testartist');
+      expect(artist!.name).toBe('Test Artist');
+    });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/artists/by-username/testartist`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockArtist);
+  });
+
+  it('should encode special characters in username for getByUsername', () => {
+    const mockArtist = {
+      id: 'u2', displayName: 'Special User', username: 'user@name', avatar: '', cover: '',
+      bio: '', roles: ['singer'], followers: 0, following: 0, totalPlays: 0,
+      genres: [], tags: [], verified: false, premium: false, joinedDate: '2024-01-01',
+      socialLinks: {}, photos: [], preferredGenres: [], lookingForCollab: false,
+      collabDescription: null, weeklyGrowth: null, country: null, location: null,
+      preferredLanguage: null, longBio: null
+    };
+
+    service.getByUsername('user@name').subscribe(artist => {
+      expect(artist).toBeTruthy();
+      expect(artist!.username).toBe('user@name');
+    });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/artists/by-username/user%40name`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockArtist);
+  });
+
   it('should follow an artist', () => {
     service.follow('artist-1').subscribe(res => {
       expect(res.following).toBeTrue();

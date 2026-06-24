@@ -55,6 +55,7 @@ class SongRecommendationTest {
                 title = song.title,
                 artistId = song.artist.id.toString(),
                 artistName = song.artist.displayName,
+                artistUsername = song.artist.username,
                 artistAvatar = song.artist.avatar,
                 albumId = null,
                 albumName = null,

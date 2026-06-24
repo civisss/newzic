@@ -44,6 +44,7 @@ export class CollaborationService {
       description: c.description,
       authorId: c.authorId,
       authorName: c.authorName,
+      authorUsername: c.authorUsername || '',
       authorAvatar: c.authorAvatar || '',
       authorRole: c.authorRole,
       category: c.category,

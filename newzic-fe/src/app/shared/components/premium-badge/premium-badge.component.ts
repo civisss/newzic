@@ -32,7 +32,7 @@ import { Component, Input } from '@angular/core';
       position: relative; overflow: hidden;
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em;
-      background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(168,85,247,0.15), rgba(236,72,153,0.12));
+      background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(245,158,11,0.14), rgba(251,191,36,0.12));
       border: 1.5px solid rgba(251,191,36,0.35);
       padding: 4px 12px 4px 8px; border-radius: 20px;
       animation: premiumGlow 3s ease-in-out infinite;
@@ -43,7 +43,7 @@ import { Component, Input } from '@angular/core';
     }
 
     .badge-text {
-      background: linear-gradient(90deg, #FBBF24, #F59E0B, #EC4899, #A855F7, #FBBF24);
+      background: linear-gradient(90deg, #FBBF24, #F59E0B, #D97706, #F59E0B, #FBBF24);
       background-size: 200% 100%;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -57,7 +57,7 @@ import { Component, Input } from '@angular/core';
 
     .badge-glow {
       position: absolute; inset: -1px; border-radius: inherit;
-      background: conic-gradient(from 0deg, rgba(251,191,36,0.3), rgba(168,85,247,0.3), rgba(236,72,153,0.3), rgba(251,191,36,0.3));
+      background: conic-gradient(from 0deg, rgba(251,191,36,0.35), rgba(245,158,11,0.25), rgba(251,191,36,0.3), rgba(245,158,11,0.35));
       animation: glowRotate 4s linear infinite;
       filter: blur(4px); opacity: 0.6; z-index: -1;
     }
@@ -81,7 +81,7 @@ import { Component, Input } from '@angular/core';
 
     @keyframes premiumGlow {
       0%, 100% { border-color: rgba(251,191,36,0.35); box-shadow: 0 0 8px rgba(251,191,36,0.15), 0 0 20px rgba(168,85,247,0.1); }
-      50% { border-color: rgba(236,72,153,0.4); box-shadow: 0 0 12px rgba(236,72,153,0.2), 0 0 30px rgba(168,85,247,0.15); }
+      50% { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 12px rgba(251,191,36,0.25), 0 0 30px rgba(245,158,11,0.15); }
     }
 
     @keyframes textShine {

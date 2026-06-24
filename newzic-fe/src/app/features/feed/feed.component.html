@@ -8,7 +8,7 @@
     @for (post of posts(); track post.id) {
       <div class="feed-card">
         <div class="fc-header">
-          <a [routerLink]="'/artist/' + post.authorId" class="fc-author">
+          <a [routerLink]="'/artist/' + post.authorUsername" class="fc-author">
             <img [src]="post.authorAvatar" [alt]="post.authorName" />
             <div>
               <strong>{{ post.authorName }}</strong>

@@ -28,6 +28,7 @@ describe('MessageService', () => {
     const mockConversations: ConversationPreview[] = [
       {
         userId: '123',
+        username: 'testuser',
         displayName: 'Test User',
         avatar: null,
         lastMessage: 'Hello!',

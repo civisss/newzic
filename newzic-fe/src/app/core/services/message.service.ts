@@ -18,6 +18,7 @@ export interface Message {
 
 export interface ConversationPreview {
   userId: string;
+  username: string;
   displayName: string;
   avatar: string | null;
   lastMessage: string;

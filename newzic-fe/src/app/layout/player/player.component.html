@@ -7,7 +7,7 @@
         <img [src]="player.currentSong()!.cover" [alt]="player.currentSong()!.title" class="track-cover" />
         <div class="track-info">
           <span class="track-title">{{ player.currentSong()!.title }}</span>
-          <a [routerLink]="'/artist/' + player.currentSong()!.artistId" class="track-artist" (click)="$event.stopPropagation()">{{ player.currentSong()!.artistName }}</a>
+          <a [routerLink]="'/artist/' + player.currentSong()!.artistUsername" class="track-artist" (click)="$event.stopPropagation()">{{ player.currentSong()!.artistName }}</a>
         </div>
         @if (!isOwnSong()) {
           <button class="like-btn" [class.liked]="liked()" [class.like-pop]="likeAnimating()" (click)="toggleLike(); $event.stopPropagation()" aria-label="Like">
@@ -107,7 +107,7 @@
       <!-- Track info -->
       <div class="fs-track-info">
         <h2 class="fs-title">{{ player.currentSong()!.title }}</h2>
-        <a [routerLink]="'/artist/' + player.currentSong()!.artistId" class="fs-artist" (click)="toggleExpand()">{{ player.currentSong()!.artistName }}</a>
+        <a [routerLink]="'/artist/' + player.currentSong()!.artistUsername" class="fs-artist" (click)="toggleExpand()">{{ player.currentSong()!.artistName }}</a>
       </div>
 
       <!-- Progress bar -->

@@ -5,21 +5,23 @@ import { FormatNumberPipe } from '../../shared/pipes/format-number.pipe';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { ArtistService } from '../../core/services/artist.service';
+import { JournalService } from '../../core/services/journal.service';
 import { SongService } from '../../core/services/song.service';
 import { AlbumService } from '../../core/services/album.service';
 import { PlayerService } from '../../core/services/player.service';
 import { AuthService } from '../../core/services/auth.service';
 import { MessageService } from '../../core/services/message.service';
-import { Artist, Song, Album } from '../../core/models';
+import { Artist, Song, Album, JournalPost } from '../../core/models';
 import { FollowersModalComponent } from '../../shared/components/followers-modal/followers-modal.component';
 import { PremiumBadgeComponent } from '../../shared/components/premium-badge/premium-badge.component';
 import { VerifiedBadgeComponent } from '../../shared/components/verified-badge/verified-badge.component';
 import { DonateModalComponent } from '../../shared/components/donate-modal/donate-modal.component';
+import { JournalPostCardComponent } from '../../shared/components/journal-post-card/journal-post-card.component';
 
 @Component({
   selector: 'app-artist',
   standalone: true,
-  imports: [UpperCasePipe, SlicePipe, FormatNumberPipe, DurationPipe, TranslatePipe, FollowersModalComponent, PremiumBadgeComponent, VerifiedBadgeComponent, DonateModalComponent],
+  imports: [UpperCasePipe, SlicePipe, FormatNumberPipe, DurationPipe, TranslatePipe, FollowersModalComponent, PremiumBadgeComponent, VerifiedBadgeComponent, DonateModalComponent, JournalPostCardComponent],
   templateUrl: './artist.component.html',
   styleUrl: './artist.component.scss'
 })
@@ -28,7 +30,9 @@ export class ArtistComponent implements OnInit {
   songs = signal<Song[]>([]);
   songsLoading = signal(true);
   albums = signal<Album[]>([]);
-  activeTab = signal<'music' | 'about' | 'photos'>('music');
+  activeTab = signal<'music' | 'journal' | 'about' | 'photos'>('music');
+  journalPosts = signal<JournalPost[]>([]);
+  journalLoading = signal(false);
   following = signal(false);
   likedSongIds = signal<Set<string>>(new Set());
   showFollowModal = signal(false);
@@ -42,27 +46,33 @@ export class ArtistComponent implements OnInit {
     private albumService: AlbumService,
     public playerService: PlayerService,
     public auth: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private journalService: JournalService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      const id = params['id'];
+      const username = params['username'];
       this.songsLoading.set(true);
-      this.artistService.getById(id).subscribe(a => this.artist.set(a ?? null));
-      this.songService.getByArtist(id).subscribe(s => {
-        this.songs.set(s);
-        this.songsLoading.set(false);
+      this.artistService.getByUsername(username).subscribe(a => {
+        this.artist.set(a ?? null);
+        if (!a) return;
+        const id = a.id;
+        this.songService.getByArtist(id).subscribe(s => {
+          this.songs.set(s);
+          this.songsLoading.set(false);
+          if (this.auth.isLoggedIn()) {
+            this.songService.getLikedSongs().subscribe(liked => {
+              this.likedSongIds.set(new Set(liked.map(l => l.id)));
+            });
+          }
+        });
+        this.albumService.getByArtist(id).subscribe(al => this.albums.set(al));
+        this.loadJournal(id);
         if (this.auth.isLoggedIn()) {
-          this.songService.getLikedSongs().subscribe(liked => {
-            this.likedSongIds.set(new Set(liked.map(l => l.id)));
-          });
+          this.artistService.isFollowing(id).subscribe(r => this.following.set(r.following));
         }
       });
-      this.albumService.getByArtist(id).subscribe(a => this.albums.set(a));
-      if (this.auth.isLoggedIn()) {
-        this.artistService.isFollowing(id).subscribe(r => this.following.set(r.following));
-      }
     });
   }
 
@@ -132,7 +142,23 @@ export class ArtistComponent implements OnInit {
     });
   }
 
-  setTab(tab: 'music' | 'about' | 'photos'): void {
+  loadJournal(artistId: string): void {
+    this.journalLoading.set(true);
+    this.journalService.getPostsByAuthor(artistId).subscribe(res => {
+      this.journalPosts.set(res.content);
+      this.journalLoading.set(false);
+    });
+  }
+
+  onJournalPostUpdated(post: JournalPost): void {
+    this.journalPosts.update(posts => posts.map(p => p.id === post.id ? post : p));
+  }
+
+  onJournalPostDeleted(postId: string): void {
+    this.journalPosts.update(posts => posts.filter(p => p.id !== postId));
+  }
+
+  setTab(tab: 'music' | 'journal' | 'about' | 'photos'): void {
     this.activeTab.set(tab);
   }
 

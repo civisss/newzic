@@ -44,9 +44,9 @@ export class FollowersModalComponent {
     });
   }
 
-  goToArtist(id: string): void {
+  goToArtist(username: string): void {
     this.closed.emit();
-    this.router.navigate(['/artist', id]);
+    this.router.navigate(['/artist', username]);
   }
 
   close(): void {
