@@ -13,6 +13,14 @@
   padding: 0 24px;
 }
 
+.reg-covers-static {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 20px 0;
+  pointer-events: none;
+}
+
 // ── COVER MARQUEES ──
 .reg-marquee {
   position: relative;

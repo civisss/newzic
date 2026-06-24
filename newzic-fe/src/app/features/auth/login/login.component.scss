@@ -62,6 +62,14 @@
   66%      { transform: translate(-100px, 60px) scale(0.88); }
 }
 
+.login-covers-static {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 20px 0;
+  pointer-events: none;
+}
+
 // ── COVER MARQUEES ──
 .login-marquee {
   position: relative;

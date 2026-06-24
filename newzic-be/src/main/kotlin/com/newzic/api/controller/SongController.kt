@@ -31,7 +31,7 @@ class SongController(
     fun getRecentCovers(
         @RequestParam(defaultValue = "24") limit: Int
     ): ResponseEntity<List<String>> {
-        val maxLimit = limit.coerceAtMost(24)
+        val maxLimit = limit.coerceAtMost(30)
         val songs = songRepository.findTrending(PageRequest.of(0, maxLimit))
         val covers = songs.content.mapNotNull { it.cover }.distinct()
         return ResponseEntity.ok(covers)

@@ -74,10 +74,9 @@ export class RegisterComponent implements OnInit {
   constructor(private auth: AuthService, private router: Router, public i18n: I18nService, private songService: SongService) {}
 
   ngOnInit(): void {
-    this.songService.getCovers(24).subscribe(covers => {
-      const half = Math.ceil(covers.length / 2);
-      this.coversTop = covers.slice(0, half);
-      this.coversBottom = covers.slice(half);
+    this.songService.getCovers(30).subscribe(covers => {
+      this.coversTop = covers;
+      this.coversBottom = covers;
     });
   }
 
