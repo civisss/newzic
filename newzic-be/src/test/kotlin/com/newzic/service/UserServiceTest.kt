@@ -262,7 +262,7 @@ class UserServiceTest {
             eq(followerId),
             eq(com.newzic.domain.entity.NotificationType.FOLLOW),
             argThat { contains("started following") },
-            argThat { contains(followerId.toString()) },
+            argThat { contains("follower") },
             anyOrNull()
         )
     }

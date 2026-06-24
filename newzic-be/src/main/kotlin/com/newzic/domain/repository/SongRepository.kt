@@ -41,6 +41,14 @@ interface SongRepository : JpaRepository<SongEntity, UUID> {
 
     fun countByArtistId(artistId: UUID): Long
 
+    @Query("""
+        SELECT s.artist.id, SUM(s.reactionsFire + s.reactionsGem + s.reactionsOnpoint + s.reactionsStar)
+        FROM SongEntity s
+        GROUP BY s.artist.id
+        ORDER BY SUM(s.reactionsFire + s.reactionsGem + s.reactionsOnpoint + s.reactionsStar) DESC
+    """)
+    fun findTopArtistByReactions(pageable: Pageable): Page<Array<Any>>
+
     @EntityGraph(attributePaths = ["artist", "album", "tags"])
     @Query("""
         SELECT s FROM SongEntity s 

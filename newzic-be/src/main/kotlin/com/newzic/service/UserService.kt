@@ -232,7 +232,7 @@ class UserService(
                 fromUserId = followerId,
                 type = NotificationType.FOLLOW,
                 message = "${follower.displayName} started following you",
-                link = "/artist/$followerId"
+                link = "/artist/${follower.username}"
             )
 
             return true // followed

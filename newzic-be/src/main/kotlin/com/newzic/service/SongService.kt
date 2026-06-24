@@ -200,7 +200,7 @@ class SongService(
                 fromUserId = userId,
                 type = NotificationType.REACTION,
                 message = "${user.displayName} reacted $reactionEmoji to \"${song.title}\"",
-                link = "/artist/${song.artist.id}",
+                link = "/artist/${user.username}",
                 songId = songId
             )
 

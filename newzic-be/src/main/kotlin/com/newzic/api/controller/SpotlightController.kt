@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/spotlight")
@@ -29,20 +30,18 @@ class SpotlightController(
             slides.add(artistSlide(topPlays, "top_plays", "🔥 Most Played Artist", "Top artist by total plays this week"))
         }
 
-        // 2. Top artist by reactions (sum reactions across songs)
-        val allSongs = songRepository.findAll()
-        val reactionsByArtist = allSongs.groupBy { it.artist.id }
-            .mapValues { (_, songs) -> songs.sumOf { it.reactionsFire + it.reactionsGem + it.reactionsOnpoint + it.reactionsStar } }
-        val topReactionArtistId = reactionsByArtist.maxByOrNull { it.value }?.key
-        val topReactions = if (topReactionArtistId != null) userRepository.findById(topReactionArtistId).orElse(null) else null
+        // 2. Top artist by reactions (optimized DB query)
+        val topReactionRow = songRepository.findTopArtistByReactions(top1).content.firstOrNull()
+        val topReactions = if (topReactionRow != null) {
+            val artistId = topReactionRow[0] as UUID
+            userRepository.findById(artistId).orElse(null)
+        } else null
         if (topReactions != null) {
-            val totalReactions = reactionsByArtist[topReactionArtistId] ?: 0
+            val totalReactions = (topReactionRow!![1] as Long)
             slides.add(artistSlide(topReactions, "top_reactions", "💎 Most Loved Artist", "Top artist by total reactions this week", totalReactions))
         }
 
-        // 3. Top artist by followers
-        val topFollowers = userRepository.findTrending(top1).content.firstOrNull()
-        // findTrending orders by followers DESC, but if same as topPlays, pick second
+        // 3. Top artist by followers (deduplicated from previous slides)
         val followerPage = userRepository.findTrending(PageRequest.of(0, 3))
         val topFollower = followerPage.content.firstOrNull { it.id != topPlays?.id && it.id != topReactions?.id }
             ?: followerPage.content.firstOrNull { it.id != topPlays?.id }
