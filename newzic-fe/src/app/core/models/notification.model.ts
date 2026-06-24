@@ -1,4 +1,4 @@
-export type NotificationType = 'follow' | 'reaction' | 'like' | 'comment' | 'release' | 'milestone';
+export type NotificationType = 'follow' | 'reaction' | 'like' | 'comment' | 'release' | 'milestone' | 'workspace_comment' | 'workspace_version' | 'workspace_invite' | 'workspace_task' | 'donation';
 
 export interface Notification {
   id: string;

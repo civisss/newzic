@@ -2,6 +2,7 @@ package com.newzic.service
 
 import com.newzic.api.dto.*
 import com.newzic.domain.entity.DonationEntity
+import com.newzic.domain.entity.NotificationType
 import com.newzic.domain.repository.*
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -14,7 +15,8 @@ class PremiumService(
     private val userRepository: UserRepository,
     private val songRepository: SongRepository,
     private val workspaceRepository: WorkspaceRepository,
-    private val donationRepository: DonationRepository
+    private val donationRepository: DonationRepository,
+    private val notificationService: NotificationService
 ) {
 
     companion object {
@@ -169,6 +171,16 @@ class PremiumService(
                 platformCents = platformCents,
                 message = request.message
             )
+        )
+
+        // Notify the artist about the donation
+        val amountFormatted = "€%.2f".format(donation.artistCents / 100.0)
+        notificationService.create(
+            recipientId = toArtist.id,
+            fromUserId = fromUserId,
+            type = NotificationType.DONATION,
+            message = "${fromUser.displayName} ti ha donato $amountFormatted",
+            link = "/profile"
         )
 
         return toDonationResponse(donation)

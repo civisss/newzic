@@ -27,11 +27,20 @@
   margin-bottom: 28px;
 
   h2 {
-    font-size: 1.4rem; font-weight: 800; letter-spacing: 0.12em;
-    background: $gradient-violet-blue;
+    font-size: 1.6rem; font-weight: 800; letter-spacing: 0.14em;
+    font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(135deg, #B06CFF 0%, #3B82F6 50%, #B06CFF 100%);
+    background-size: 200% 100%;
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: titleShimmer 4s ease infinite;
+    filter: drop-shadow(0 0 8px rgba(176, 108, 255, 0.35));
     margin: 12px 0 8px;
+  }
+
+  @keyframes titleShimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
 }
 
