@@ -1,7 +1,15 @@
-# ── Local Dockerfile (runtime-only) ──
-# JAR is pre-built by start.sh → ./gradlew bootJar
+# ── Stage 1: Build ──
+FROM eclipse-temurin:21-jdk AS build
+WORKDIR /app
+COPY gradle/ gradle/
+COPY gradlew build.gradle.kts settings.gradle.kts ./
+RUN chmod +x gradlew && ./gradlew dependencies --no-daemon || true
+COPY src/ src/
+RUN ./gradlew bootJar --no-daemon -x test
+
+# ── Stage 2: Runtime ──
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
